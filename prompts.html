@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason｜Claude Prompt 實戰指令包｜內容創作者直接抄的 13 套指令</title>
+<meta name="description" content="AI 應用 — 3 個場景完整指令 + 1 個萬用框架 + 10 個常用 Claude 指令，全部可一鍵複製，填好括號就能跑">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D97757; --gold-bright:#E89B82; --gold-dim:rgba(217,119,87,0.32);
+  --bg:#F7F3EF; --bg2:#FCFAF7; --card:#FFFFFF; --card2:#FBF5F0;
+  --code:#241c16; --code-tx:#f0e7df;
+  --text:#332a22; --dim:#7a6e62; --faint:#b3a89c;
+  --line:rgba(80,55,35,0.13);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(217,119,87,0.16) 0%, rgba(217,119,87,0.05) 34%, rgba(247,243,239,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;
+  background:radial-gradient(circle, rgba(217,119,87,0.16), rgba(217,119,87,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
+  background:radial-gradient(circle, rgba(232,155,130,0.14), rgba(232,155,130,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+
+.hero{position:relative;z-index:1;padding:70px 30px 44px;}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.logo-row svg{width:26px;height:26px;flex-shrink:0;}
+.logo-row .kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.24em;color:var(--gold);font-weight:500;margin:0;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2018;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:28px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:28px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:32px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:22px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:30px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:3px;}
+
+.sec{position:relative;z-index:1;padding:40px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(217,119,87,0.13);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:18px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:25px;line-height:1.42;margin-bottom:16px;color:#2a2018;}
+.sec h2 .g{color:var(--gold);}
+.sec p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--gold);margin:24px 0 12px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:22px 24px;margin:22px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:10px;}
+.insight .it{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.7;color:#2a2018;}
+
+.howto{background:var(--card2);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px;margin:20px 0;}
+.howto .hi{display:flex;gap:12px;font-size:14px;line-height:1.7;margin-bottom:12px;color:var(--text);}
+.howto .hi:last-child{margin-bottom:0;}
+.howto .hi .num{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.howto .hi b{color:var(--gold);}
+
+.cmd-head{display:flex;align-items:baseline;gap:12px;margin:30px 0 4px;}
+.cmd-head .cn{font-family:"Inter";font-weight:800;font-size:20px;color:var(--gold-dim);flex-shrink:0;}
+.cmd-head .ct{font-family:var(--serif);font-weight:700;font-size:18px;color:#2a2018;line-height:1.4;}
+.cmd-use{font-size:13px;color:var(--dim);margin:0 0 10px 32px;line-height:1.7;}
+
+.prompt{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:18px 18px;margin:12px 0 16px;position:relative;}
+.prompt .pl{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--gold-bright);margin-bottom:12px;display:flex;align-items:center;gap:8px;max-width:calc(100% - 76px);}
+.prompt .pl::before{content:"\25B6";font-size:9px;}
+.prompt pre{font-family:var(--mono);font-size:12.5px;line-height:1.9;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.prompt .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(217,119,87,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:11px;font-weight:700;padding:5px 13px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.04em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#fff;}
+.copy-btn.done{background:var(--gold);color:#fff;}
+
+.tip{font-size:13px;color:var(--dim);line-height:1.8;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0;}
+.tip b{color:var(--gold);}
+
+.cta{position:relative;z-index:1;padding:48px 30px 56px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2018;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(217,119,87,0.08);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(217,119,87,0.30);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(217,119,87,0.42);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+</style>
+</head>
+<body>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="logo-row">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="#D97757"><path d="M50 6 L53 46 L50 50 L47 46 Z"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(30 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(60 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(90 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(120 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(150 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(180 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(210 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(240 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(270 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(300 50 50)"/><path d="M50 6 L53 46 L50 50 L47 46 Z" transform="rotate(330 50 50)"/></g></svg>
+      <div class="kicker">CLAUDE PROMPT · 實戰指令包</div>
+    </div>
+    <h1>內容創作者<br>直接抄的<br><span class="g">13 套 Claude 指令</span></h1>
+    <div class="hero-sub">不用學 Prompt 工程，不用從零想<br>3 個場景完整指令 ＋ 1 個萬用框架 ＋ 10 個常用指令<br>全部一鍵複製，填好括號就能跑</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">13</div><div class="l">套指令 · 可直接複製</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">大區塊 · 涵蓋全流程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">全部免費</div></div>
+    </div>
+    <div class="author-card"><div class="a">Jason 哥</div><div class="b">從底層翻身的短影音老闆——用 AI，一個人做完一個團隊的事</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">用之前先看</span>
+    <h2>這份不是教學<br><span class="g">是讓你直接抄的工具</span></h2>
+    <p>大部分人卡在 AI，不是不會用，是<span class="hl">不知道第一句怎麼下</span>。這份指令包把內容創作從選題、寫稿、改稿到接案的每個環節，都先幫你寫好了。</p>
+    <p>所有指令都能原封不動貼進 Claude。看到方括號 <span class="hl">[ ]</span> 的地方，就是你要換成自己資訊的位置。</p>
+    <div class="howto">
+      <div class="hi"><span class="num">1</span><div><b>挑一個你現在最需要的場景</b>，往下滑找到對應指令</div></div>
+      <div class="hi"><span class="num">2</span><div>按<b>「複製」</b>，貼進 Claude（或任何能用的 AI）</div></div>
+      <div class="hi"><span class="num">3</span><div>把 <b>[ ]</b> 裡的字換成你自己的，填越具體，輸出越準</div></div>
+    </div>
+    <div class="insight"><div class="il">為什麼好用</div><div class="it">會用 AI 的人贏的不是聰明，是「有現成的東西可以抄」。先抄起來跑，比你自己研究三小時更快。</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 場景指令</span>
+    <h2>3 個最常用的<br><span class="g">完整場景指令</span></h2>
+    <p>這三個是內容創作者最高頻的需求：<span class="hl">規劃輪播、排內容日曆、生 Threads 短文</span>。直接複製，填好括號就能用。</p>
+
+    <div class="cmd-head"><span class="cn">A</span><span class="ct">IG 輪播貼文規劃</span></div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">場景 A — 7 張輪播企劃</div><pre>你是一位專注於 AI 工具教學的 IG 內容創作者。
+
+任務：幫我規劃一篇 7 張輪播貼文。
+主題：<span class="ph">[填入主題，例如：Claude 怎麼幫創作者省時間]</span>
+目標受眾：<span class="ph">[填入受眾，例如：對 AI 工具有興趣、想提升工作效率的內容創作者]</span>
+
+每張輸出格式：
+- 張次與角色（封面／內容／CTA）
+- 標題（10 字以內）
+- 正文（80–120 字）
+- 視覺建議（一句話描述畫面）
+
+規則：
+- 封面必須有強烈對比或數字
+- 禁止使用「你是否曾經…」開場
+- 最後一張必須有明確 CTA
+- 語氣：直接、實用，不說教
+
+輸出：依張次逐一列出，不加多餘說明</pre></div>
+
+    <div class="cmd-head"><span class="cn">B</span><span class="ct">每週內容日曆規劃</span></div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">場景 B — 一週 5 篇日曆</div><pre>你是我的內容策略助理。
+
+任務：幫我規劃一週 IG 內容日曆（週一至週五，共 5 篇）
+
+帳號定位：<span class="ph">[填入帳號名稱與定位，例如：@jasonxtsai，專注於 AI 工具教學與效率工作流]</span>
+目標受眾：<span class="ph">[填入受眾，例如：25–40 歲，有在經營自媒體或做內容的工作者]</span>
+本週主題方向：<span class="ph">[填入，例如：Claude 的 5 種實用場景]</span>
+
+每篇輸出格式：
+- 發文日期與時間建議
+- 內容類型（輪播／單圖／Reels）
+- Hook（開場第一句，30 字以內）
+- 核心訊息（一句話）
+- 適合搭配的視覺方向
+
+規則：
+- 5 篇要有內容節奏，不能全是同一類型
+- 至少 1 篇互動型（問題／投票）
+- 至少 1 篇可收藏型（清單／教學）
+- Hook 不能重複句型
+
+輸出：用表格呈現，每欄對應上方格式</pre></div>
+
+    <div class="cmd-head"><span class="cn">C</span><span class="ct">Threads 短文生成</span></div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">場景 C — 5 則 Threads</div><pre>你是我的 Threads 文案助理。
+
+任務：幫我寫 5 則 Threads 貼文
+主題系列：<span class="ph">[填入主題，例如：用 Claude 做內容的 5 個心得]</span>
+帳號語氣：<span class="ph">[填入語氣，例如：口語、直接、像在跟朋友說話，偶爾帶點乾話感]</span>
+
+每則輸出格式：
+- 則次（1/5、2/5…）
+- Hook（第一句，製造好奇或共鳴，25 字以內）
+- 本文（60–100 字）
+- 結尾（一句收尾或互動引導）
+
+規則：
+- 5 則要有各自的切入角度，不重複
+- 禁止使用「你是否曾經」「很多人都」開場
+- 禁止勵志收尾
+- 每則至少有一個具體數字或具體場景
+- 第 3 則或第 4 則：把最有衝擊力的結論標註為【劇透】，提示讀者點開查看
+
+輸出：依則次逐一列出</pre></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · 萬用框架</span>
+    <h2>學會這一個<br><span class="g">什麼任務都能套</span></h2>
+    <p>記不住那麼多指令沒關係。所有內容任務都能用這個框架——<span class="hl">角色、任務、格式、規則</span>四塊填好，輸出就穩了。</p>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">萬用 PROMPT 框架模板</div><pre>你是 <span class="ph">[角色設定，例如：我的 IG 內容策略助理／YouTube 腳本編輯／品牌文案顧問]</span>。
+
+任務：<span class="ph">[具體要完成什麼，一句話說清楚]</span>
+背景：<span class="ph">[帳號定位 / 目標受眾 / 本次主題]</span>
+
+輸出格式：
+- <span class="ph">[格式欄位 1，例如：標題]</span>
+- <span class="ph">[格式欄位 2，例如：正文字數範圍]</span>
+- <span class="ph">[格式欄位 3，例如：輸出結構]</span>
+
+規則：
+- <span class="ph">[不要什麼，例如：禁止使用問句開場]</span>
+- <span class="ph">[至少要有什麼，例如：至少包含一個具體數字]</span>
+- <span class="ph">[語氣或風格要求，例如：口語，不說教]</span>
+
+輸出：<span class="ph">[指定呈現方式，例如：用表格 / 依序列出 / 不加多餘說明]</span></pre></div>
+    <div class="tip"><b>三個訣竅：</b>角色設定越具體，語氣越準；格式欄位寫越細，來回改越少；規則裡「禁止什麼」跟「至少要有什麼」一樣重要。</div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">Part 3 · 10 個常用指令</span>
+    <h2>創作流程的<br><span class="g">每個環節都有一個</span></h2>
+    <p>從一篇貼文到整月日曆、從 Hook 到接案信——下面 10 個指令涵蓋你日常會遇到的場景。需要哪個就抄哪個。</p>
+
+    <div class="cmd-head"><span class="cn">01</span><span class="ct">單篇貼文從主題到完稿</span></div>
+    <div class="cmd-use">有一個主題，但不知道怎麼展開</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 01 — 主題到完稿</div><pre>你是我的 IG 內容編輯。
+
+我的帳號定位：<span class="ph">[填入，例如：AI 工具教學，目標受眾是想用 AI 提升效率的創作者]</span>
+這篇貼文的主題：<span class="ph">[填入，例如：Claude 的 Projects 功能怎麼用]</span>
+
+請幫我完成以下三件事：
+
+1. 提出 3 個不同切入角度的標題選項（每個標題附一句說明這個角度的邏輯）
+2. 針對我選擇的標題，規劃這篇貼文的完整結構（開場、中段核心內容、結尾 CTA）
+3. 依照結構寫出完整貼文正文
+
+格式要求：
+- 開場第一句不用問句
+- 正文 150–250 字
+- 結尾必須有一個具體 CTA（留言／收藏／追蹤）
+- 語氣：<span class="ph">[填入，例如：直接、實用、不說教]</span>
+
+請先輸出步驟 1，等我確認標題後再繼續步驟 2 和 3。</pre></div>
+
+    <div class="cmd-head"><span class="cn">02</span><span class="ct">長影片 / Podcast 轉多平台內容</span></div>
+    <div class="cmd-use">有一段逐字稿，想一次產出多種格式</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 02 — 一稿多用</div><pre>你是我的內容再製助理。
+
+以下是我這支影片／Podcast 的逐字稿或重點整理：
+<span class="ph">[貼入逐字稿或內容摘要]</span>
+
+請幫我把這段內容轉製成以下 4 種格式：
+
+1. IG 輪播貼文大綱（6–8 張，每張一行標題 + 兩行重點）
+2. Threads 貼文 3 則（每則 80 字以內，各自獨立可發）
+3. YouTube 社群貼文 1 則（150 字以內，附 CTA）
+4. IG 限時動態腳本 3 張（每張一句話，串起來有敘事感）
+
+規則：
+- 所有格式都要保留原始內容的核心觀點，不要自行加入我沒說過的資訊
+- 語氣統一：<span class="ph">[填入，例如：口語、直接]</span>
+- 每種格式獨立輸出，清楚標示格式名稱
+
+輸出：依序輸出 4 種格式，格式之間用分隔線區隔</pre></div>
+
+    <div class="cmd-head"><span class="cn">03</span><span class="ct">競品帳號內容分析</span></div>
+    <div class="cmd-use">想了解同類帳號在做什麼、找到差異化</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 03 — 競品拆解</div><pre>你是我的內容策略顧問。
+
+我的帳號定位：<span class="ph">[填入]</span>
+我想分析的競品帳號類型：<span class="ph">[填入帳號名稱或描述，例如：專注 AI 工具教學的英文 IG 帳號]</span>
+
+請幫我分析以下四個面向：
+
+1. 這類帳號最常用的內容類型是什麼（輪播／Reels／單圖）？各自比例大約如何？
+2. 表現最好的貼文通常有什麼共同結構或主題？
+3. 這類帳號的 CTA 策略是什麼？最常見的引導行為是什麼？
+4. 根據以上分析，我的帳號可以從哪個角度切入，做出差異化？
+
+輸出格式：
+- 每個面向用小標題區分
+- 第 4 點給出至少 3 個具體的差異化方向，每個方向附一個可執行的內容點子
+
+請根據你對這類帳號的知識進行分析，若有不確定的部分請明確標示。</pre></div>
+
+    <div class="cmd-head"><span class="cn">04</span><span class="ct">Hook 批量生成</span></div>
+    <div class="cmd-use">需要多個開場選項來測哪個效果最好</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 04 — 10 個 Hook</div><pre>你是我的文案助理，專門負責寫 IG 和 Threads 的開場第一句。
+
+這篇貼文的主題：<span class="ph">[填入，例如：為什麼我停止用 ChatGPT 寫貼文]</span>
+目標受眾：<span class="ph">[填入]</span>
+貼文目的：<span class="ph">[填入，例如：讓人想繼續滑看完整篇 / 引發留言討論]</span>
+
+請幫我寫 10 個不同類型的 Hook，涵蓋以下角度：
+- 數字型（包含具體數字）× 2
+- 反常識型（說出跟一般人預期相反的事）× 2
+- 場景描述型（描述一個具體畫面或情境）× 2
+- 結果先行型（先說結果，讓人想知道過程）× 2
+- 對比型（用兩個對比製造張力）× 2
+
+規則：
+- 每個 Hook 不超過 30 字
+- 不用問句開場
+- 不用「你是否曾經」「很多人都」這類開場
+- 每個 Hook 後面附一句話說明這個 Hook 的邏輯
+
+輸出：依類型分組，每組 2 個，共 10 個</pre></div>
+
+    <div class="cmd-head"><span class="cn">05</span><span class="ct">品牌合作提案撰寫</span></div>
+    <div class="cmd-use">要主動聯繫品牌，需要一封專業但不僵的提案信</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 05 — 合作提案信</div><pre>你是我的商務文案助理。
+
+關於我的帳號：
+- 帳號名稱：<span class="ph">[填入]</span>
+- 定位：<span class="ph">[填入，例如：AI 工具教學，目標受眾是想用科技提升效率的工作者]</span>
+- 追蹤人數：<span class="ph">[填入]</span>
+- 平均觸及率／互動率：<span class="ph">[填入，若有]</span>
+- 過去合作品牌（若有）：<span class="ph">[填入]</span>
+
+關於這次要聯繫的品牌：
+- 品牌名稱：<span class="ph">[填入]</span>
+- 品牌產品或服務：<span class="ph">[填入]</span>
+- 我為什麼覺得這個品牌適合我的受眾：<span class="ph">[填入]</span>
+
+請幫我寫一封品牌合作提案信，包含：
+1. 開場（說明為什麼主動聯繫這個品牌）
+2. 自我介紹（帳號定位、受眾、數據）
+3. 合作方向提案（至少提出 2 種合作形式）
+4. 下一步（引導對方回覆或安排通話）
+
+規則：
+- 語氣：專業但不過度正式，像是創作者對品牌說話，不是求職信
+- 全文不超過 350 字
+- 不要用制式開場白，例如「您好，我是…」
+- 結尾不要用「期待您的回覆」這類被動收尾
+
+輸出：完整信件正文，可直接複製使用</pre></div>
+
+    <div class="cmd-head"><span class="cn">06</span><span class="ct">舊貼文重新包裝</span></div>
+    <div class="cmd-use">有一篇表現普通的舊貼文，想重整再發一次</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 06 — 舊文翻新</div><pre>你是我的內容編輯。
+
+以下是我之前發過的一篇貼文：
+<span class="ph">[貼入舊貼文全文]</span>
+
+這篇貼文當時的問題（若知道）：<span class="ph">[填入，例如：開場太平、沒有明確 CTA、資訊太密]</span>
+
+請幫我做以下三件事：
+
+1. 診斷這篇貼文的問題（從開場、結構、語氣、CTA 四個面向分析）
+2. 提出改寫建議（每個問題對應一個具體的修改方向）
+3. 依照建議重新寫一個改良版本
+
+改良版規則：
+- 保留原始貼文的核心觀點，不要加入我沒說過的內容
+- 開場第一句要有畫面感或具體數字
+- 結尾必須有明確 CTA
+- 字數控制在 180–250 字
+- 語氣：<span class="ph">[填入]</span>
+
+輸出：先輸出診斷與建議，再輸出改良版全文</pre></div>
+
+    <div class="cmd-head"><span class="cn">07</span><span class="ct">YouTube 影片腳本生成</span></div>
+    <div class="cmd-use">有一個影片主題，需要從架構到完稿的腳本</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 07 — YouTube 腳本</div><pre>你是我的 YouTube 腳本編輯。
+
+頻道定位：<span class="ph">[填入，例如：AI 工具實測與工作流分享]</span>
+目標受眾：<span class="ph">[填入]</span>
+這支影片的主題：<span class="ph">[填入，例如：我用 Claude 幫自己規劃一週內容的完整流程]</span>
+目標片長：<span class="ph">[填入，例如：8–10 分鐘]</span>
+
+請幫我完成完整腳本，包含：
+
+1. 開場鉤子（前 30 秒，讓觀眾決定繼續看）
+2. 影片架構（各段落標題 + 預計時長 + 段落核心內容一句話）
+3. 完整逐字腳本（依段落展開，包含過場銜接句）
+4. 結尾 CTA（訂閱引導 + 下一支影片預告方向）
+
+規則：
+- 開場不要用「嗨大家好我是…」這類制式開場
+- 說話語氣要像在跟一個朋友解釋，不要像在上課
+- 每個段落結束要有一句銜接到下一段的過渡句
+- 腳本中標註哪裡適合加 B-roll 或截圖畫面
+
+輸出：先輸出架構讓我確認，確認後再輸出完整逐字腳本</pre></div>
+
+    <div class="cmd-head"><span class="cn">08</span><span class="ct">個人品牌定位梳理</span></div>
+    <div class="cmd-use">想重整帳號定位，或剛開始不確定方向</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 08 — 定位梳理</div><pre>你是我的個人品牌策略顧問。
+
+關於我：
+- 我的背景與專業：<span class="ph">[填入，例如：做了 3 年行銷，最近開始深入研究 AI 工具]</span>
+- 我目前在做或想做的內容方向：<span class="ph">[填入]</span>
+- 我的目標受眾（若有想法）：<span class="ph">[填入，若還不確定也可以說不確定]</span>
+- 我希望帳號帶來的結果：<span class="ph">[填入，例如：品牌合作／賣課程／建立個人影響力]</span>
+
+請幫我梳理以下四件事：
+
+1. 根據我的背景，提出 3 個可能的帳號定位方向，每個方向說明：
+   - 目標受眾是誰
+   - 主要內容類型
+   - 這個定位的競爭優勢在哪
+
+2. 針對每個定位，指出潛在的挑戰或風險
+
+3. 根據我說的目標，建議最適合的定位方向，並說明理由
+
+4. 給出這個定位的前 30 天內容執行建議（每週發什麼類型的內容）
+
+輸出：依序輸出四個部分，用小標題區分</pre></div>
+
+    <div class="cmd-head"><span class="cn">09</span><span class="ct">受眾提問轉內容選題</span></div>
+    <div class="cmd-use">收到粉絲留言私訊，想轉化成內容選題</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 09 — 留言變選題</div><pre>你是我的內容選題助理。
+
+以下是我最近收到的粉絲留言、私訊或常見問題：
+<span class="ph">[貼入留言或問題，可以是一段文字，也可以是條列的問題清單]</span>
+
+我的帳號定位：<span class="ph">[填入]</span>
+
+請幫我做以下三件事：
+
+1. 從這些問題中，找出 3–5 個最有內容潛力的核心主題（說明為什麼這個主題值得做）
+
+2. 針對每個主題，提出 2 個具體的貼文角度（不是主題本身，是切入的角度）
+
+3. 幫我把最有潛力的那個主題，直接規劃成一篇輪播貼文的大綱（6–8 張，每張一行標題）
+
+規則：
+- 選題要具體，不要太寬泛（例如「AI 工具」太寬，「Claude 在 X 場景比 ChatGPT 更好用」才夠具體）
+- 貼文角度要跟受眾的實際痛點或好奇心直接相關
+- 大綱的每張標題要讓人想繼續滑
+
+輸出：依序輸出三個部分</pre></div>
+
+    <div class="cmd-head"><span class="cn">10</span><span class="ct">完整內容月曆規劃</span></div>
+    <div class="cmd-use">想一次規劃整個月，不用每週重想</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">指令 10 — 整月日曆</div><pre>你是我的內容策略助理。
+
+帳號定位：<span class="ph">[填入]</span>
+目標受眾：<span class="ph">[填入]</span>
+這個月的主軸主題：<span class="ph">[填入，例如：Claude 的實戰應用]</span>
+每週發文頻率：<span class="ph">[填入，例如：每週 4 篇，週一到週四]</span>
+內容平台：<span class="ph">[填入，例如：IG 為主，Threads 同步]</span>
+
+請幫我規劃一整個月（4 週）的內容日曆，格式如下：
+
+每週包含：
+- 本週內容小主題（從月主軸延伸出來的子題）
+- 每篇內容的格式（輪播／單圖／Reels／互動貼文）
+- 每篇的 Hook（開場第一句）
+- 每篇的核心訊息（一句話）
+
+整月規則：
+- 每週至少 1 篇可收藏型內容（清單／教學／比較）
+- 每週至少 1 篇互動型內容（問題／投票／填空）
+- 四週的主題要有遞進感，不要每週都在講同一件事
+- Hook 不能重複句型
+
+額外輸出：
+- 整月內容的主題邏輯說明（為什麼這樣排）
+- 3 個備用選題（當某篇來不及做時可以替換）
+
+輸出：用表格呈現月曆，額外輸出放在表格下方</pre></div>
+
+    <div class="tip"><b>用順手之後：</b>把常用的那幾個 Prompt 存進 Claude 的 Projects，下次直接叫出來用，不用每次重貼。第一次輸出不滿意，別重問——直接在同一個對話說「第三點改成 X」「語氣再口語一點」更快。</div>
+  </div>
+
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>這 13 套只是<span class="g">開始用的起點</span></h2>
+      <div class="cta-lead">指令包能讓你「跑起來」，但真正讓你拉開差距的，是一整套「叫 AI 當你團隊」的工作流——選題、生產、決策、接案，一個人做完。這些，我都放在社群裡。</div>
+      <div class="fit">
+        <div class="f">收藏了一堆 AI 文章，卻從來沒真的用起來的你</div>
+        <div class="f">一個人在做內容、想把產能拉到像一個團隊的創作者</div>
+        <div class="f">工作穩定、但想多開一條用 AI 賺錢的路的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">不只這 13 套——持續更新的完整 Prompt 庫</div>
+        <div class="gi">從「執行者」變「決策者」的 AI 工作流拆解</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">@jasonxtsai</div>
+    <div class="fc">一起打造快樂生活</div>
+  </div>
+
+</div>
+
+<script>
+function copyPrompt(btn){
+  const pre = btn.parentElement.querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(()=>{ btn.textContent = '請手動選取'; });
+}
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } });
+}, {threshold:0.12});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示）
+═══════════════════════════════════════════
+· 用途：Claude Prompt 實戰指令包 落地頁，可放置頂留言 / 留言關鍵字 DM
+· 來源素材：materials/research/jason/Claude_Prompt_實戰指令包.md
+· Skool 按鈕已接 https://www.skool.com/d11-lab/about
+· 視覺：Claude 赤陶橘 #D97757 + 暖奶油底 #F7F3EF + 深色 Prompt 框（與 diagnosis/fortune 同一套淺色系結構，換 Claude 品牌色）
+· 13 套 Prompt 全部可一鍵複製
+· 發布 slug 建議：prompts → evoke728.github.io/jason-pages/prompts
+═══════════════════════════════════════════
+-->
+</body>
+</html>
