@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason｜商業診斷 Prompt｜把事業丟給 Claude，找出你在漏的錢</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.mark{color:var(--gold);font-weight:700;}
+.fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+
+.hero{position:relative;z-index:1;padding:70px 30px 44px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.26em;color:var(--gold);margin-bottom:24px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:28px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:28px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:34px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.05em;}
+.stat-op{font-size:22px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:30px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:3px;}
+
+.sec{position:relative;z-index:1;padding:40px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:18px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:25px;line-height:1.42;margin-bottom:16px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:18px;color:var(--gold);margin:26px 0 14px;}
+
+.cols{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0 6px;}
+.col{flex:1;min-width:240px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;}
+.col.good{border-color:var(--gold-dim);}
+.col .ct{font-size:12px;font-weight:700;color:var(--dim);margin-bottom:10px;letter-spacing:0.05em;}
+.col.good .ct{color:var(--gold);}
+.col .cc{font-size:14px;line-height:1.8;color:var(--text);}
+.col .cc b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:22px 24px;margin:22px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:10px;}
+.insight .it{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.checks{margin:8px 0;}
+.ck{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;}
+.ck .bx{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--gold);color:#1a1406;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;}
+.ck .tx{font-size:14.5px;line-height:1.75;color:var(--text);}
+.ck .tx b{color:var(--gold);}
+
+.prompt{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:18px 18px;margin:18px 0;position:relative;}
+.prompt .pl{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--gold-bright);margin-bottom:12px;display:flex;align-items:center;gap:8px;max-width:calc(100% - 76px);}
+.prompt .pl::before{content:"\25B6";font-size:9px;}
+.prompt pre{font-family:var(--mono);font-size:12.5px;line-height:1.9;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.prompt .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:11px;font-weight:700;padding:5px 13px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.04em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.tip{font-size:13px;color:var(--dim);line-height:1.8;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0;}
+.tip b{color:var(--gold);}
+
+.cta{position:relative;z-index:1;padding:48px 30px 56px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+</style>
+</head>
+<body>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">BUSINESS DIAGNOSIS · PROMPT</div>
+    <h1>把你的事業<br>丟給 Claude<br><span class="g">它會告訴你錢漏在哪</span></h1>
+    <div class="hero-sub">你在貼文底下留了「診斷」，這就是那套我自己在用的商業診斷 Prompt<br>三個步驟，照著貼就能跑——不用顧問，不用花一分錢</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">2</div><div class="l">分鐘 · 跑完</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">個漏洞 · 被點出</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">顧問費</div></div>
+    </div>
+    <div class="author-card"><div class="a">Jason 哥</div><div class="b">從底層翻身的短影音老闆——用 AI，一個人做完一個團隊的事</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">開始之前</span>
+    <h2>這不是魔法<br>是讓你<span class="g">看清問題</span></h2>
+    <p>先說清楚——這套 Prompt 不會憑空幫你變出錢。它做的事很簡單：<span class="hl">把你心裡那些「好像怪怪的、但說不上來」的地方，攤開來給你看</span>。</p>
+    <p>很多生意不是賺不到錢，是一直在漏錢。而漏錢的地方，通常是你每天看著、卻已經看到麻木的東西。</p>
+    <div class="cols">
+      <div class="col"><div class="ct">✗ 多數人會這樣用</div><div class="cc">丟一句「幫我看看我生意有什麼問題」，然後得到一堆教科書廢話。<br><br>因為你沒給它真東西，它只能給你罐頭答案。</div></div>
+      <div class="col good"><div class="ct">✦ 這套的做法</div><div class="cc">先讓 Claude 當<b>顧問</b>，逼它<b>反問你</b>，再讓它<b>診斷</b>、最後<b>給你一週的補洞清單</b>。<br><br>順序對了，它才看得到你看不到的洞。</div></div>
+    </div>
+    <div class="insight"><div class="il">先講一句重話</div><div class="it">你越誠實，他越能幫你。數字不敢攤、問題藏著掖著——Claude 也救不了你。</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">STEP 1 · 餵資料</span>
+    <h2>先讓它<br><span class="g">當你的顧問</span></h2>
+    <p>第一步不是叫它給答案，是叫它<span class="hl">當一個會反問你的顧問</span>。把你的事業現況丟給它，讓它先搞懂全貌。</p>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">PROMPT 1 / 3 — 設定角色 + 餵資料</div><pre>你現在是一位資深的營運顧問，專門幫中小事業和個人創業者，找出「正在悄悄漏錢」的地方。
+
+我會把我的事業現況給你，請你像一個真正的顧問一樣——先聽、再問，不要急著給建議。
+
+我的事業：<span class="ph">【一句話講你在做什麼】</span>
+每月營收大概：<span class="ph">【金額】</span>
+主要成本有：<span class="ph">【人事 / 廣告 / 租金 / 工具訂閱 / 進貨…列出來】</span>
+我花最多時間在：<span class="ph">【描述】</span>
+我最賺錢的客戶或產品是：<span class="ph">【描述】</span>
+
+請先不要給建議。
+先問我 5 個「身為顧問，你最需要釐清」的問題，幫你看清我的全貌。</pre></div>
+    <div class="tip"><b>為什麼要它先問你？</b>因為真正的漏洞藏在細節裡。它問得越多，後面診斷得越準——把它的問題老實回答完，再進下一步。</div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">STEP 2 · 找漏洞</span>
+    <h2>叫它<br><span class="g">不客氣地說真話</span></h2>
+    <p>資料夠了，這一步讓它<span class="hl">直接點出三個最可能在漏錢的地方</span>。記得加上「講真話、不要安慰我」——不然它會客氣到沒用。</p>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">PROMPT 2 / 3 — 找出三個漏洞</div><pre>根據我剛才的回答，請幫我找出 3 個最可能「正在漏錢」的地方。
+
+每一個漏洞，請告訴我：
+1. 它是什麼、為什麼會發生
+2. 它每個月大概在吃掉我多少錢、或多少時間
+3. 我「這禮拜」就能做的一個具體動作
+
+請用直白、不客氣的方式講。
+我要的是真話，不是安慰——該戳的地方就戳。</pre></div>
+    <div class="tip"><b>你大概會看到這幾種洞：</b>一筆重複付、但其實沒人在用的費用；你最賺的客戶，反而被你花最少時間；還有你以為的成本，其實是另一個地方在燒。</div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">STEP 3 · 補洞</span>
+    <h2>把診斷<br><span class="g">變成這週的行動</span></h2>
+    <p>看清楚不夠，要動。最後一步，<span class="hl">挑一個最快能補、效果最明顯的洞</span>，讓它幫你拆成七天就能做完的小動作。</p>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">PROMPT 3 / 3 — 七天補洞清單</div><pre>從這 3 個漏洞裡，挑一個「最快能補、而且效果最明顯」的。
+
+幫我列一份 7 天的補洞行動清單：
+- 每天只給我一個小動作
+- 動作要具體到「我今天打開電腦就能做」
+- 不要喊口號，不要寫「思考一下」這種
+
+我照著做就好。</pre></div>
+    <div class="tip"><b>重點不是工具多強，是你有沒有真的動。</b>把第 1 天的動作，今天就做掉——這份診斷才算沒白做。</div>
+  </div>
+
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>如果你想，<span class="g">一個人也能像一個團隊</span></h2>
+      <div class="cta-lead">這套 Prompt 只是開始。真正讓你拉開差距的，是一整套「把 AI 放進你工作流」的方法——而那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">工作穩定、但一直找不到突破口的人</div>
+        <div class="f">想用 AI 把自己變成「一人團隊」的創作者、老闆</div>
+        <div class="f">收藏了一堆 AI 文章，卻從來沒真的用起來的你</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">從「執行者」變「決策者」的完整 AI 工作流</div>
+        <div class="gi">可以直接抄的 Prompt 庫，不只這一套</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">@jasonxtsai</div>
+    <div class="fc">一起打造快樂生活</div>
+  </div>
+
+</div>
+
+<script>
+function copyPrompt(btn){
+  const pre = btn.parentElement.querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(()=>{ btn.textContent = '請手動選取'; });
+}
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } });
+}, {threshold:0.12});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：輪播「我把公司丟給 Claude 找漏洞」留言「診斷」後，自動 DM 回傳這頁連結
+· Skool 按鈕連結：目前 href="#"，奇點研究所 × D11 Skool 上線後，把 id="skool-link" 的 href 換成正式網址
+· 視覺：Jason 深藍黑 #0a0d14 + 金橘 #D4902A，對齊輪播色系
+· 三段 Prompt 皆可一鍵複製
+═══════════════════════════════════════════
+-->
+</body>
+</html>
