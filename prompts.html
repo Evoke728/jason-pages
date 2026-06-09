@@ -28,8 +28,7 @@ body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidde
 .g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
   background:radial-gradient(circle, rgba(232,155,130,0.14), rgba(232,155,130,0));bottom:-14%;left:-12%;filter:blur(22px);}
 .wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
-.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
-.fade.vis{opacity:1;transform:translateY(0);}
+.fade{opacity:1;transform:none;}
 
 .hero{position:relative;z-index:1;padding:70px 30px 44px;}
 .logo-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
@@ -110,7 +109,6 @@ body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidde
 </style>
 </head>
 <body>
-<script>document.documentElement.className+=' js';</script>
 <div class="glow"><div class="g1"></div><div class="g2"></div></div>
 <div class="wrap">
 
@@ -531,22 +529,6 @@ function copyPrompt(btn){
     setTimeout(()=>{ btn.textContent = old; btn.classList.remove('done'); }, 1800);
   }).catch(()=>{ btn.textContent = '請手動選取'; });
 }
-function revealOnScroll(){
-  var vh = window.innerHeight || document.documentElement.clientHeight;
-  var els = document.querySelectorAll('.fade:not(.vis)');
-  for(var i=0;i<els.length;i++){
-    if(els[i].getBoundingClientRect().top < vh*0.92){ els[i].classList.add('vis'); }
-  }
-}
-window.addEventListener('scroll', revealOnScroll, {passive:true});
-window.addEventListener('resize', revealOnScroll);
-window.addEventListener('load', revealOnScroll);
-revealOnScroll();
-// 保險：任何環境下 2.5 秒後一律顯示，避免內建瀏覽器卡在 opacity:0
-setTimeout(function(){
-  var all = document.querySelectorAll('.fade');
-  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
-}, 2500);
 </script>
 
 <!--
