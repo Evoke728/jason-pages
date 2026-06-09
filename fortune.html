@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jason｜AI 算命 Prompt｜把八字丟給 AI，做一份人生策略報告</title>
+<meta name="description" content="AI 應用 — 一段 Prompt 把八字、大運、事業、感情一次拆給你，不是迷信，是換個角度看自己">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#7C5CD4; --gold-bright:#A98BEA; --gold-dim:rgba(124,92,212,0.32);
+  --bg:#F4F0FB; --bg2:#FAF7FE; --card:#FFFFFF; --card2:#F8F4FE;
+  --code:#1b1430; --code-tx:#e9e4f5;
+  --text:#2e2a3c; --dim:#6f6982; --faint:#a8a2ba;
+  --line:rgba(60,40,110,0.14);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(124,92,212,0.18) 0%, rgba(124,92,212,0.06) 34%, rgba(244,240,251,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;
+  background:radial-gradient(circle, rgba(124,92,212,0.17), rgba(124,92,212,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
+  background:radial-gradient(circle, rgba(168,139,234,0.15), rgba(168,139,234,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+
+.hero{position:relative;z-index:1;padding:70px 30px 44px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.26em;color:var(--gold);margin-bottom:24px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2342;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:28px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:28px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:32px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:22px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:30px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:3px;}
+
+.sec{position:relative;z-index:1;padding:40px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:18px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:25px;line-height:1.42;margin-bottom:16px;color:#2a2342;}
+.sec h2 .g{color:var(--gold);}
+.sec p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--gold);margin:24px 0 12px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:22px 24px;margin:22px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:10px;}
+.insight .it{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.7;color:#2a2342;}
+
+.prompt{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:18px 18px;margin:16px 0;position:relative;}
+.prompt .pl{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--gold-bright);margin-bottom:12px;display:flex;align-items:center;gap:8px;max-width:calc(100% - 76px);}
+.prompt .pl::before{content:"\25B6";font-size:9px;}
+.prompt pre{font-family:var(--mono);font-size:12.5px;line-height:1.9;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.prompt .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:12px;right:12px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:11px;font-weight:700;padding:5px 13px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.04em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#fff;}
+.copy-btn.done{background:var(--gold);color:#fff;}
+
+.tip{font-size:13px;color:var(--dim);line-height:1.8;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0;}
+.tip b{color:var(--gold);}
+
+.cta{position:relative;z-index:1;padding:48px 30px 56px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2342;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(124,92,212,0.08);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(124,92,212,0.30);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(124,92,212,0.42);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+</style>
+</head>
+<body>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">AI FORTUNE · LIFE STRATEGY</div>
+    <h1>把你的八字<br>丟給 AI<br><span class="g">做一份人生策略報告</span></h1>
+    <div class="hero-sub">不是要你信命，是換個角度，把自己看得更清楚一點<br>一段 Prompt，連大運、事業、感情一次拆給你</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">30</div><div class="l">年命理功力 · AI 扮演</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">大面向 · 一次拆</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">算命費</div></div>
+    </div>
+    <div class="author-card"><div class="a">Jason 哥</div><div class="b">從底層翻身的短影音老闆——用 AI，一個人做完一個團隊的事</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">開始之前</span>
+    <h2>先說清楚<br><span class="g">這不是迷信</span></h2>
+    <p>我自己不是那種很迷的人。但你把八字丟給 AI，它不是在「算你的命」——它是用一套累積了幾千年的<span class="hl">人性分類系統</span>，幫你看清你的性格、慣性，還有你最容易卡住的地方。</p>
+    <p>把它當成一份「換個語言寫的自我分析報告」就對了。準不準不是重點，重點是它說的那些，會不會讓你「啊，好像真的是這樣」。</p>
+    <div class="insight"><div class="il">為什麼值得試</div><div class="it">看清自己是一切改變的起點。連你是什麼樣的人都還沒看懂，談什麼突破。</div></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">主 Prompt</span>
+    <h2>把這段<br><span class="g">原封不動貼給 AI</span></h2>
+    <p>填好三個括號（<span class="hl">性別、出生年月日時辰、出生地</span>）就能跑。建議用有推理能力的模型，像 Claude 或 GPT，分析會更細。</p>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">主 PROMPT — 八字人生策略報告</div><pre>請你扮演一位擁有 30 年經驗的資深命理顧問，精通子平八字與紫微斗數，並能結合現代生活給予策略建議。
+
+我是<span class="ph">【男/女】</span>，出生於西元<span class="ph">【年/月/日/時辰】</span>，出生地為<span class="ph">【國家/城市】</span>。
+
+請根據我的八字結構，進行以下分析：
+
+1. 先天特質：運用 SWOT 分析列出我的優勢與性格盲點。
+2. 運勢推演：結合大運，分析我近期的事業方向與財富潛力。
+3. 感情模式：解析我的感情觀與適合的伴侶類型。
+
+請用白話、生活化且客觀的語氣回覆，避免過於艱澀的古文術語。</pre></div>
+    <div class="tip"><b>不知道時辰？</b>就寫「時辰不確定」，請它用「日柱」為主分析，一樣有參考價值——只是大運的精準度會打一點折。</div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">進階追問</span>
+    <h2>報告出來後<br><span class="g">這樣追問更有用</span></h2>
+    <p>第一段報告通常偏「概況」。真正能用的，是你針對它的回答<span class="hl">繼續往下挖</span>。挑你最在意的那塊，貼下面對應的追問。</p>
+
+    <div class="sub-h">① 事業方向，要更具體</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">追問 1 — 事業落地</div><pre>針對你剛才提到的事業方向，幫我講得更具體：
+未來 3 年最適合我發展的 2 個領域，
+以及每個領域，我要補強的 1 項能力。
+請給我能馬上行動的版本，不要空泛。</pre></div>
+
+    <div class="sub-h">② 財富，看你適合哪種賺法</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">追問 2 — 財富節奏</div><pre>根據我的八字，我比較適合靠固定收入，
+還是多元 / 創業型的收入結構？
+請給我一個符合我性格的理財與賺錢節奏，
+並提醒我最容易破財或踩雷的地方。</pre></div>
+
+    <div class="sub-h">③ 感情盲點，轉成可調整的行為</div>
+    <div class="prompt"><button class="copy-btn" onclick="copyPrompt(this)">複製</button><div class="pl">追問 3 — 感情落地</div><pre>把你說的感情盲點，
+轉成 3 個我在關係裡可以「馬上調整」的具體行為。
+不要講大道理，給我做得到的小動作。</pre></div>
+
+    <div class="tip"><b>玩法提醒：</b>把另一半、或正在曖昧的人的資料也丟進去，叫 AI 分析「我們兩個的相處模式」——通常會聊到停不下來。</div>
+  </div>
+
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>覺得 AI 比你想的<span class="g">還好玩、還能用？</span></h2>
+      <div class="cta-lead">算命只是個入口。同一套「叫 AI 扮演專家、再一層層追問」的方法，能幫你做商業診斷、做內容、做決策——一個人也能像一個團隊。</div>
+      <div class="fit">
+        <div class="f">工作穩定、但一直找不到突破口的人</div>
+        <div class="f">想用 AI 把自己變成「一人團隊」的創作者、老闆</div>
+        <div class="f">收藏了一堆 AI 文章，卻從來沒真的用起來的你</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">從「執行者」變「決策者」的完整 AI 工作流</div>
+        <div class="gi">可以直接抄的 Prompt 庫，不只這一套</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">@jasonxtsai</div>
+    <div class="fc">一起打造快樂生活</div>
+  </div>
+
+</div>
+
+<script>
+function copyPrompt(btn){
+  const pre = btn.parentElement.querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(()=>{ btn.textContent = '請手動選取'; });
+}
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('vis'); io.unobserve(e.target); } });
+}, {threshold:0.12});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示）
+═══════════════════════════════════════════
+· 用途：AI 算命 Prompt 落地頁，可放置頂留言 / 留言關鍵字 DM
+· Skool 按鈕已接 https://www.skool.com/d11-lab/about
+· 視覺：與 diagnosis 落地頁同一套淺色系（暖白 #F4F1EA + 金橘 #D4902A + 深色 Prompt 框）
+· 主 Prompt + 3 段追問皆可一鍵複製
+· 發布 slug 建議：fortune → evoke728.github.io/jason-pages/fortune
+═══════════════════════════════════════════
+-->
+</body>
+</html>
