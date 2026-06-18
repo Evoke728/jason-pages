@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Projects Instructions 資源包｜6 套複製貼上就能用</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.mark{color:var(--gold);font-weight:700;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;
+  padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));
+    width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);
+    border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);
+    padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;
+    font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.24em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:3px;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:20px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:14px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:12px;margin-bottom:13px;font-size:14.5px;line-height:1.7;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:16px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:15px;color:var(--text);line-height:1.4;}
+.ch-tag{flex-shrink:0;font-family:var(--mono);font-size:10px;letter-spacing:0.03em;color:var(--gold);background:rgba(212,144,42,0.1);padding:3px 8px;border-radius:50px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:4px 18px 18px;border-top:1px solid var(--line);}
+.ch-fit{font-size:13px;color:var(--dim);line-height:1.7;margin:12px 0 4px;}
+.ch-fit b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:12px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>把 Claude 調成你的分身後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 Claude<br><span class="g">用成你的團隊</span></h4>
+  <p>複製範本只是第一步。真正的玩法，在一群正在用 AI 翻身的人裡面。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE PROJECTS · INSTRUCTIONS</div>
+    <h1>在 Project 設定一次<br><span class="g">Claude 從此都懂你</span></h1>
+    <div class="hero-sub">在 Claude 的 Project 貼一次 Instruction，這個專案裡的每一次對話，它都自動套用你的身份、語氣、禁區——不用每次重講。<br>這份資源包給你 6 套可以直接複製的範本：1 套通用填空，5 種身份專屬。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">6</div><div class="l">套 · Instruction</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">種 · 身份專屬</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">複製就能用</div></div>
+    </div>
+    <div class="author-card"><div class="a">Jason</div><div class="b">專注幫你做自媒體的內容創作者——每週分享一個你沒聽過的 Claude 用法</div></div>
+  </div>
+
+  <!-- 使用說明 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 怎麼用</span>
+    <h2>在 Project 貼一次<br>整個專案<span class="g">都記住</span></h2>
+    <div class="steps">
+      <div class="st">進入 Claude → 點左側「<b>Projects</b>」→ 新增專案</div>
+      <div class="st">點進專案後，找到「<b>Instructions</b>」欄位</div>
+      <div class="st">選下方符合你身份的版本，<b>複製貼上</b></div>
+      <div class="st">把所有 <b>【】</b> 裡的內容，換成你自己的資訊</div>
+      <div class="st">儲存後，這個 Project 裡的<b>所有對話</b>都會自動套用你的設定</div>
+    </div>
+    <div class="tipline"><b>一句話原則：</b>【】填得越具體，Claude 輸出的東西就越準。範本只是骨架，填完你自己的資訊，它才真正屬於你。</div>
+  </div>
+
+  <!-- 資源包 -->
+  <div class="sec fade">
+    <span class="sec-tag">資源包 · 6 套 Instruction</span>
+    <h2>選你的身份<br><span class="g">複製貼上就能用</span></h2>
+    <p>不確定怎麼寫的人，先從第一套「<span class="hl">品牌 DNA 模板</span>」開始；知道自己是哪種身份，直接挑對應那一套。點開複製，貼進 Project 的 Instructions 欄位。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">★</span><span class="ch-t">品牌 DNA 模板（通用填空版）</span><span class="ch-tag">先從這開始</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>不確定怎麼寫 Instruction 的人。把空格填完，貼進去就能用。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 我是誰
+我叫【你的名字】，經營【帳號名稱 / 品牌名稱】。
+我的專業背景是【你的領域，例如：品牌行銷、平面設計、線上課程】。
+
+## 我的受眾是誰
+主要受眾：【年齡範圍】的【身份，例如：創業者、上班族、媽媽】
+他們最大的痛點：【一句話描述，例如：不知道怎麼用 AI 提升工作效率】
+他們的程度：【初學者 / 有基礎 / 進階用戶】
+
+## 語氣與風格
+- 語氣：【例如：直接清楚、溫暖親切、專業但不正式】
+- 句子長度：【例如：短句為主、段落不超過三行】
+- 我習慣用的詞彙：【例如：「追蹤者」而非「粉絲」、「內容」而非「文章】
+
+## 絕對不要出現的東西
+- 不要用的句型：【例如：「不是…而是…」、「真正的 XX 是…」】
+- 不要用的詞彙：【例如：「勇敢」、「值得」、「現在就開始」】
+- 不要的語氣：【例如：過度勵志、說教、太正式】
+
+## 我常用的輸出格式
+- 標題格式：【例如：問句開頭、數字開頭】
+- 內文結構：【例如：問題 → 原因 → 解法 → CTA】
+- 長度限制：【例如：IG 貼文不超過 200 字、Threads 不超過 80 字】
+
+## 補充說明
+【任何其他你希望 Claude 記住的事，例如：我不接美妝品牌的合作、我的產品售價區間是 NT$3,000–15,000】</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">01</span><span class="ch-t">社群內容創作者 / 個人 IP</span><span class="ch-tag">IG·Threads</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>經營 IG、Threads、YouTube、Podcast 的創作者，或正在建立個人品牌的人。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 身份定位
+我是一位內容創作者，專注於【你的內容主題，例如：AI 工具教學 / 親子教養 / 個人理財】。
+我的平台主力是【例如：Instagram + Threads】，偶爾也發【例如：YouTube 短影音】。
+我的帳號名稱是【@你的帳號】，目前有約【追蹤人數】位追蹤者。
+
+## 受眾輪廓
+我的受眾主要是【年齡】的【身份描述，例如：想要用 AI 提升工作效率的上班族和創業者】。
+他們通常已經【程度描述，例如：聽過 ChatGPT，但沒有系統性地用過 AI 工具】。
+他們來追蹤我，是因為想要【他們的核心需求，例如：用更少時間做出更多有價值的內容】。
+
+## 內容語氣規範
+- 語氣：直接、清楚、中性教學。有觀點，但不說教。
+- 句子：短句為主。一個段落最多三行。不用長篇大論。
+- 標題邏輯：數字感強、有具體結果、讓人想停下來看。
+- 結尾 CTA：引導互動，但不強迫。不用「現在就去做」這類推銷感的句子。
+
+## 禁用句型（這些絕對不能出現）
+- 「不是…而是…」「與其…不如…」「真正的 XX 是…」
+- 「你值得擁有…」「是時候…了」「勇敢去…」
+- 「這讓我想到…」「正是因為這樣…」「值得注意的是…」
+- 任何過度勵志或說教的收尾
+
+## 替代寫法原則
+遇到對比或轉折，用兩句短句並排，不加轉折詞。
+例如：
+不要寫：「不是工具不夠強，而是你沒有系統。」
+改成寫：「工具夠強。沒有系統，一樣做不出東西。」
+
+## 常用輸出格式
+
+### IG 輪播貼文
+- 封面標題：不加句號，製造停頓感
+- 內頁：每張一個核心概念，不塞太多資訊
+- CTA 張：留言換資源 / 追蹤號召，語氣輕鬆不強迫
+
+### IG / Threads 說明文案
+- 長度：100–180 字
+- 結構：開頭一句有畫面感的陳述 → 補充說明 2–3 行 → 結尾留白或互動引導 → 追蹤號召
+- 不在文案裡加 hashtag
+
+### 短影音口播稿
+- 開頭 3 秒：反直覺句型或數字鉤子
+- 中段：一個核心概念，最多三個步驟
+- 結尾：一句收尾 + 一個行動指令
+
+## 補充記憶
+- 我不接與我內容方向無關的業配
+- 我希望每一篇內容看完都有「可以直接用」的東西
+- 我的核心價值是：實用、清楚、省時間</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">自由工作者（文案 / 設計 / 顧問）</span><span class="ch-tag">接案</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>接案的文案寫手、平面設計師、品牌顧問、行銷顧問、社群經理。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 身份定位
+我是一位自由工作者，專長是【你的核心服務，例如：品牌視覺設計 / 社群文案撰寫 / 行銷策略顧問】。
+我目前的主要客戶類型是【例如：中小型電商品牌、個人創業者、新創公司】。
+我的工作模式是【例如：專案制接案 / 月費顧問 / 混合型】。
+
+## 我的服務定位
+- 我擅長的事：【例如：幫品牌找到清楚的語言風格，讓他們說話有記憶點】
+- 我不接的案子：【例如：MLM、賭博、低價殺價型客戶】
+- 我的收費區間：【例如：單次專案 NT$15,000 起，月顧問 NT$25,000 起】
+
+## 客戶溝通語氣
+對客戶說話時：
+- 專業但不距離感。像在跟朋友解釋，但你是那個懂的人。
+- 不用過多術語。如果要用，要加一句白話解釋。
+- 報價和提案時：直接說結論，再說理由。不要繞圈子。
+- 遇到客戶不合理要求時：先肯定對方的出發點，再說明限制，給替代方案。
+
+## 常用文件格式
+
+### 提案 / 報價單
+- 開頭：一句話說明這份提案解決什麼問題
+- 中段：服務內容、交付物、時程、費用，各自清楚列出
+- 結尾：下一步行動（例如：「確認後我會在 3 個工作天內送出合約」）
+
+### 客戶報告
+- 結構：本月執行摘要 → 數據表現 → 本月洞察 → 下月建議
+- 語氣：中性分析，不過度美化，也不推卸責任
+- 長度：能用一頁說清楚就不用兩頁
+
+### 客戶 Email
+- 主旨：直接說重點，不用「關於…」開頭
+- 正文：第一句說目的，中間說細節，最後說需要對方做什麼
+- 結尾：明確的行動指令 + 截止時間（如果有）
+
+## 補充記憶
+- 我同時服務最多【例如：4】個客戶，所以溝通效率對我很重要
+- 我的報價不打折，但我會確保每一分錢都值得
+- 遇到範疇蔓延（scope creep）時，我需要清楚但不失禮地告知客戶這已超出原本範圍</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">電商 / 品牌賣家</span><span class="ch-tag">電商</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>獨立品牌、蝦皮 / 露天賣家、Shopify 店主、代理品牌的電商經營者。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 品牌基本資料
+品牌名稱：【你的品牌名稱】
+主要販售商品：【例如：韓系女裝、手工皮件、有機保養品】
+主要銷售平台：【例如：Instagram 直播 + 蝦皮 + 官網】
+目前月營業額規模：【例如：50–100 萬台幣】（幫助 Claude 給出符合規模的建議）
+
+## 品牌語氣與定位
+- 品牌個性：【例如：有質感但親切、簡約北歐風、活潑年輕】
+- 目標客群：【例如：25–38 歲、注重生活品質、有一定消費能力的都市女性】
+- 客戶最在意的事：【例如：品質穩定、出貨速度快、客服回覆即時】
+- 品牌不做的事：【例如：不打價格戰、不做 IG 假人頭開箱】
+
+## 商品文案規範
+- 標題：強調具體利益，不用模糊形容詞（不用「超美」「質感好」，改用「手感厚實、穿三年不變形」）
+- 描述：先說適合誰，再說商品特色，最後說使用場景
+- 規格說明：清楚列出材質、尺寸、產地、保養方式
+- 限時促銷文案：製造稀缺感，但不用假緊迫（不說「只剩最後一件」除非是真的）
+
+## 客服回覆規範
+語氣：溫暖、即時感、解決問題為優先。
+不用的句子：「您好，感謝您的詢問，請問…」（太制式）
+改用：「嗨！關於你問的【問題重點】，是這樣的：」
+
+常見情境處理原則：
+- 客戶問尺寸：直接給建議，不只給尺寸表
+- 客戶問出貨時間：給明確時間，不說「盡快」
+- 客戶收到瑕疵品：先道歉，馬上說解決方案，不要先問一堆問題
+- 客戶要求退換：按流程說明，語氣不要防禦性
+
+## 社群貼文規範
+- IG 產品貼文：開頭一句有畫面感（情境描述）→ 商品特色 2–3 點 → 購買方式 / 連結
+- 限時動態：短、直接、有行動指令
+- 直播預告：說清楚「這場直播你能得到什麼」，不只說「今晚八點見」
+
+## 補充記憶
+- 我的品牌主色調是【例如：米白 + 深綠】，文案風格要搭配這個調性
+- 旺季是【例如：母親節、雙十一、過年前】，這段期間的文案節奏要更快更直接
+- 我最需要 Claude 幫我的事：【例如：快速生成商品描述、客服回覆範本、IG 貼文規劃】</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">教育工作者 / 課程創作者</span><span class="ch-tag">教學</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>線上課程講師、教育品牌、補習班、知識型 YouTuber、Podcast 主持人。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 身份定位
+我是【你的名字】，專注於【你的教學領域，例如：職場英文 / Python 程式設計 / 個人理財規劃】。
+我的主要學員是【例如：想要轉職的上班族、剛出社會的大學生、35 歲以上想學新技能的人】。
+我目前的主要收入來源是【例如：線上課程 + 一對一教練 / 實體工作坊 + 訂閱制社群】。
+
+## 課程與內容定位
+- 我教的東西最大的價值是：【例如：讓學員在 4 週內能獨立用 Python 處理工作上的數據分析】
+- 我和其他同類老師最不一樣的地方：【例如：我不教理論，每一個概念都有真實案例和可以馬上用的練習】
+- 我的學員學完之後能做到的具體事情：【例如：寫出自動化報表、省下每週 5 小時的手動整理時間】
+
+## 教學語氣規範
+- 對學員說話：像一個比你早三年走過這條路的朋友，不是高高在上的專家
+- 解釋複雜概念時：先給類比，再給定義，最後給例子
+- 遇到學員說「我不會」時：正常化這個感受，然後給具體的下一步，不給鼓勵廢話
+- 不用的句子：「其實很簡單！」「只要你肯努力…」「相信自己！」
+
+## 常用文件格式
+
+### 課程銷售頁文案
+- 開頭：描述學員現在的痛點場景（越具體越好）
+- 中段：這堂課讓你能做到什麼（用結果說話，不用功能說話）
+- 學員見證：引用具體改變，不用模糊的「很棒的課」
+- 結尾：報名 CTA + 常見問題解答
+
+### 課程單元腳本結構
+- 開場（30 秒）：這單元結束後你能做到什麼
+- 主體：概念說明 → 示範 → 練習提示
+- 收尾：這單元的核心一句話 + 下一單元預告
+
+### 學員 Email 序列
+- 購買後第 1 封：歡迎 + 明確說明接下來怎麼開始
+- 上課中途：針對常見卡關點給提示
+- 結業後：肯定學員完成的事 + 下一步去哪
+
+### 社群貼文（知識型內容）
+- 開頭：一個問句或反直覺陳述，讓目標學員說「這說的是我」
+- 中段：一個可以直接用的知識點或步驟
+- 結尾：引導到課程或資源，不強迫
+
+## 補充記憶
+- 我的課程平台是【例如：Teachable / Hahow / 自架網站】
+- 我目前在賣的課程是【課程名稱】，售價【例如：NT$4,800】
+- 我的下一個課程預計在【例如：2025 年 Q3】推出，主題是【例如：進階 Python 自動化】</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">房地產 / 保險業務</span><span class="ch-tag">業務</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-fit"><b>適合：</b>房仲業務、壽險 / 產險業務員、理財專員、保經代理人。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 Project 的 Instructions 欄位</div><pre>## 身份定位
+我是【你的名字】，目前任職於【公司名稱，可略】，專注於【你的專長，例如：大安區中古屋買賣 / 家庭保障規劃 / 退休金規劃】。
+我的主要客群是【例如：35–55 歲、有購屋需求的雙薪家庭 / 剛成家、想幫家人建立保障的上班族】。
+我從事這行【年資】年，累積服務超過【例如：200】位客戶。
+
+## 我的服務風格
+- 我和其他業務不一樣的地方：【例如：我不追業績，我追的是客戶真的需要什麼】
+- 我絕對不做的事：【例如：不賣客戶不需要的保單、不誇大投報率、不用恐懼感逼人買房】
+- 客戶找我的原因通常是：【例如：朋友介紹、覺得我說話很直接、不會一直盧他們】
+
+## 客戶溝通語氣規範
+對潛在客戶：
+- 第一次接觸：先了解對方的狀況，不急著介紹產品
+- 說明產品時：用生活場景說明，不用術語
+- 遇到客戶說「我再想想」：不要追問，留一句話讓他知道可以隨時回來
+- 不用的句子：「這個方案真的很適合你！」「現在不買以後會後悔！」「你就放心交給我！」
+
+對現有客戶：
+- 定期問候：真實關心，不只在要續約時才聯絡
+- 節日訊息：簡短真誠，不要群發範本
+- 理賠 / 交屋後：主動跟進，確認一切順利
+
+## 常用文件格式
+
+### 初次拜訪前的需求確認訊息
+- 開頭：說清楚這次見面的目的（了解對方需求，不是賣東西）
+- 中段：2–3 個問題，讓對方在見面前先思考
+- 結尾：確認時間地點，語氣輕鬆
+
+### 保單 / 物件說明文件
+- 開頭：這個方案解決的是什麼問題
+- 中段：關鍵數字清楚列出（保額、保費、期間 / 房屋坪數、格局、月供）
+- 比較表：如果有多個選項，用表格讓客戶一眼看出差異
+- 結尾：建議的下一步，不是「請你考慮」，是「下次見面我們可以…」
+
+### 跟進訊息（客戶還沒決定）
+- 不要催。給新資訊或有用的補充，讓對方覺得你在幫他，不是在追他。
+- 例如：「上次我們聊到你擔心的 XX 問題，我整理了一個說明，你看看有沒有幫助」
+
+### 推薦人感謝訊息
+- 真誠、具體。說清楚你感謝的是什麼，不要只說「謝謝介紹」。
+- 讓介紹人知道你有好好對待他介紹的朋友。
+
+## 補充記憶
+- 我的服務區域 / 專長險種：【例如：大安區 / 信義區 / 定期壽險 + 醫療險】
+- 我目前手上有【例如：12】位活躍客戶在追蹤中
+- 我最需要 Claude 幫我的事：【例如：寫跟進訊息、整理客戶需求摘要、準備說明會簡報】
+- 法規提醒：所有對外的保險說明文件，最終都需要我自己確認符合主管機關規範</pre></div>
+      </div></details>
+
+    </div>
+    <div class="insight"><div class="il">最後一件事</div><div class="it">這幾套 Instruction 是骨架，填完你自己的資訊之後，它才真正屬於你。填得越具體，Claude 輸出的東西就越準。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>範本你拿走了，<span class="g">接下來換我陪你把它用起來</span></h2>
+      <div class="cta-lead">這份資源包解決的是「怎麼設定」。但把 AI 真正變成你的生產力——用它做內容、做決策、做出收入，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把自己變成「一人團隊」的創作者、自由工作者</div>
+        <div class="f">設定好了 Project，卻不知道下一步能用 AI 做到多少的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">從「執行者」變「決策者」的完整 AI 工作流</div>
+        <div class="gi">可以直接抄的 Instruction 與 Prompt 庫，不只這 6 套</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">@jasonxtsai</div>
+    <div class="fc">每週分享一個你沒聽過的 Claude 用法</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude Projects Instructions 資源包——可當輪播／限動「留言領取」的 DM 自動回傳連結，或社群 lead magnet
+· 內容：1 套品牌 DNA 通用填空 + 5 種身份專屬 Instruction（社群創作者 / 自由工作者 / 電商 / 教育 / 業務），全部一鍵複製
+· 兩段 Skool CTA（全部指向 奇點研究所 × D11，與 IG 手冊同一設定；因內容摺疊後頁面不長，已移除中段穿插卡）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：沿用 Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），與 IG 手冊一致
+· 來源：Jason 自有 Notion「Claude Projects Instructions 大放送資源包」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
