@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 新手路線圖｜5 天學會用 Claude，建立你的 AI 工作系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;
+  background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.24em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--gold);margin:20px 0 6px;}
+.sub-d{font-size:13.5px;color:var(--dim);line-height:1.75;margin-bottom:8px;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+.why{background:var(--card2);border:1px solid var(--gold-dim);border-radius:12px;padding:13px 16px;margin:14px 0 4px;font-size:13.5px;line-height:1.72;color:var(--text);}
+.why b{color:var(--gold);}
+
+.deflist{margin:10px 0 4px;}
+.deflist .row{display:flex;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line);font-size:13.7px;line-height:1.6;}
+.deflist .row:last-child{border-bottom:none;}
+.deflist .t{flex-shrink:0;min-width:118px;font-weight:700;color:var(--gold);}
+.deflist .t.mono{font-family:var(--mono);font-size:12.5px;}
+.deflist .d{color:var(--text);}
+
+.check{margin:12px 0 2px;}
+.check .ck{display:flex;gap:10px;align-items:flex-start;font-size:13.7px;line-height:1.7;margin-bottom:8px;color:var(--text);}
+.check .ck::before{content:"\2713";flex-shrink:0;width:18px;height:18px;border:1.5px solid var(--gold-dim);border-radius:5px;color:var(--gold);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;background:rgba(212,144,42,0.06);}
+.chk-h{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.04em;margin:18px 0 8px;text-transform:uppercase;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:30px;height:30px;padding:0 7px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:15px;color:var(--text);line-height:1.4;}
+.ch-t .zh{font-weight:500;color:var(--dim);font-size:13px;margin-left:4px;}
+.ch-tag{flex-shrink:0;font-family:var(--mono);font-size:10px;letter-spacing:0.03em;color:var(--gold);background:rgba(212,144,42,0.1);padding:3px 8px;border-radius:50px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:4px 18px 18px;border-top:1px solid var(--line);}
+.ch-body>p{font-size:14px;line-height:1.82;color:var(--text);margin:13px 0;}
+.ch-body>p .hl{color:var(--gold);font-weight:500;}
+.goal{display:flex;gap:10px;align-items:flex-start;background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0;font-size:14px;line-height:1.7;}
+.goal .gl{font-weight:700;color:var(--gold);flex-shrink:0;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.1em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--dim);line-height:1.8;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:31px;}
+  .sec h2{font-size:21px;}
+  .deflist .t{min-width:96px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>跟完 5 天路線圖後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 Claude<br><span class="g">用成你的團隊</span></h4>
+  <p>跟著做完只是基本。真正的玩法，在一群正在用 AI 翻身的人裡面。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE · BEGINNER ROADMAP</div>
+    <h1>5 天<br><span class="g">學會用 Claude</span></h1>
+    <div class="hero-sub">跟著這份 5 天路線圖，把 Claude 從「偶爾問問題」變成每天幫你省時間的個人 AI 工作系統。<br>每天 20–30 分鐘，5 天後你用得比 99% 的人更有系統——不需要任何技術背景。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">天 · 完整路線</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">10</div><div class="l">個 · 萬用 Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">0</div><div class="l">技術背景</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">AI 工具教學者與個人品牌經營者，專注幫上班族和內容創作者用 AI 做更多事、花更少時間。這份資料包是他多年用 Claude 的核心心法，拿到就能直接用。</div></div>
+  </div>
+
+  <!-- 怎麼使用 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 怎麼用</span>
+    <h2>每天 20 分鐘<br><span class="g">5 天跟著做完</span></h2>
+    <p>這份資料包對應 IG 輪播的 5 天路線圖。每一天都有三塊：<span class="hl">這天要做什麼</span>（目標）、<span class="hl">具體怎麼做</span>（步驟）、<span class="hl">可以直接複製</span>的檔案範本或 Prompt。</p>
+    <div class="tipline"><b>建議做法：</b>每天花 20–30 分鐘，跟著做完一個步驟。5 天之後你的 Claude 就會比 99% 的人用得更有系統。</div>
+  </div>
+
+  <!-- 5 天路線圖 -->
+  <div class="sec fade">
+    <span class="sec-tag">路線圖 · 5 天</span>
+    <h2>一天一步<br><span class="g">把系統建起來</span></h2>
+    <p>點開每一天，照著做。範本與 Prompt 都能一鍵複製。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">DAY 1</span><span class="ch-t">開始上路</span><span class="ch-tag">安裝</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>在你的設備上裝好 Claude，建立你的 AI 基礎架構。</span></div>
+        <div class="sub-h">Step 1｜下載 Claude 桌面版 App</div>
+        <p>前往 <span class="hl">claude.ai</span> 註冊帳號，下載桌面版 App（Mac / Windows 都有）。</p>
+        <div class="tipline">建議用<b>桌面版</b>而非網頁版——桌面版支援更多進階功能，後續設定也更方便。</div>
+        <div class="sub-h">Step 2｜建立你的四個 Project 資料夾</div>
+        <p>進入 Claude → 點左側「Projects」→ 建立以下四個 Project：</p>
+        <div class="deflist">
+          <div class="row"><div class="t">📁 About Me</div><div class="d">放你的個人背景檔案，讓 Claude 認識你</div></div>
+          <div class="row"><div class="t">📁 Projects</div><div class="d">放你目前在進行的工作或專案</div></div>
+          <div class="row"><div class="t">📁 Templates</div><div class="d">放你常用的 Prompt 模板</div></div>
+          <div class="row"><div class="t">📁 Resources</div><div class="d">放參考資料、SOP、產品說明等</div></div>
+        </div>
+        <div class="why"><b>為什麼要這樣做？</b>Claude 的 Project 功能可以讓你在每個對話中自動載入特定背景資料。設定好之後，你就不用每次都重新介紹自己和你的工作。</div>
+        <div class="chk-h">Day 1 Checklist</div>
+        <div class="check">
+          <div class="ck">完成 Claude 帳號註冊</div>
+          <div class="ck">下載並登入桌面版 App</div>
+          <div class="ck">建立四個 Project 資料夾（About Me、Projects、Templates、Resources）</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">DAY 2</span><span class="ch-t">建立關係</span><span class="ch-tag">記住你</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>讓 Claude 永久記住你是誰、你怎麼工作。</span></div>
+        <p><span class="hl">核心概念：</span>Claude 預設對你一無所知，每次對話都是全新開始。解法是建立兩個 <code>.md</code> 檔案，放進「About Me」Project，讓 Claude 每次對話自動讀取。</p>
+        <div class="sub-h">檔案一：about-me.md（告訴 Claude 你是誰）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">填入你的資料，放進 About Me Project</div><pre># 關於我
+
+## 基本資料
+- 姓名：<span class="ph">[你的名字]</span>
+- 職業：<span class="ph">[你的職稱或工作類型]</span>
+- 產業：<span class="ph">[你所在的產業]</span>
+- 工作地點：<span class="ph">[城市]</span>
+
+## 我的工作內容
+<span class="ph">[用 2–3 句話描述你每天在做什麼]</span>
+
+## 我的主要目標
+- <span class="ph">[目標 1]</span>
+- <span class="ph">[目標 2]</span>
+- <span class="ph">[目標 3]</span>
+
+## 我目前最大的挑戰
+<span class="ph">[描述你工作上最常遇到的問題或痛點]</span>
+
+## 我的專業背景
+<span class="ph">[簡短說明你的經歷或專長]</span></pre></div>
+        <div class="sub-h">檔案二：ai-style.md（告訴 Claude 怎麼跟你溝通）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">填入你的偏好，放進 About Me Project</div><pre># 我的 AI 溝通風格偏好
+
+## 語氣
+- 直接、清楚，不要廢話
+- 不需要每次都說「當然！」或「很好的問題！」
+- 用繁體中文回覆（除非我特別指定英文）
+
+## 格式
+- 重要資訊用條列式呈現
+- 長篇回答請加標題分段
+- 程式碼或指令請用 code block 格式
+
+## 回答風格
+- 先給結論，再給說明
+- 如果有多個選項，請標明哪個是你最推薦的
+- 遇到我問得不清楚，直接問我要釐清的問題，不要亂猜
+
+## 特別注意
+- <span class="ph">[你的特殊需求，例如：不要用太多英文術語、回答要短一點等]</span></pre></div>
+        <div class="sub-h">怎麼把檔案放進 Project</div>
+        <div class="steps">
+          <div class="st">打開「About Me」Project</div>
+          <div class="st">點「Add content」或「Upload file」</div>
+          <div class="st">把 about-me.md 和 ai-style.md 的內容貼上或上傳</div>
+          <div class="st">之後在這個 Project 開的所有對話，Claude 都會自動讀取</div>
+        </div>
+        <div class="chk-h">Day 2 Checklist</div>
+        <div class="check">
+          <div class="ck">寫好 about-me.md 並放入 About Me Project</div>
+          <div class="ck">寫好 ai-style.md 並放入 About Me Project</div>
+          <div class="ck">開新對話測試：問 Claude「你對我了解多少？」確認它有讀到資料</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">DAY 3</span><span class="ch-t">做真正的工作</span><span class="ch-tag">執行任務</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>讓 Claude 從「回答問題」變成「幫你執行任務」。</span></div>
+        <p><span class="hl">切換工作模式：</span>很多人的用法是「問問題 → 得到答案 → 自己去做」。更有效率的是「<span class="hl">給 Claude 真實文件 → 讓它直接幫你產出結果</span>」。</p>
+        <div class="sub-h">任務 1｜上傳文件，讓 Claude 幫你處理</div>
+        <div class="sub-d">可上傳：會議錄音逐字稿、合約或報告 PDF、競品截圖或文字、你的草稿。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">上傳文件後，貼這段</div><pre>這是我們上週的會議記錄。請幫我：
+1. 整理出所有待辦事項，並標明負責人
+2. 列出還沒有結論的討論點
+3. 摘要整個會議的重點，不超過 150 字</pre></div>
+        <div class="sub-h">任務 2｜讓 Claude 分析競品</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼上競品文字後，接這段</div><pre>以下是 <span class="ph">[競品名稱]</span> 的官網文案：
+<span class="ph">[貼上競品文字]</span>
+
+請幫我分析：
+1. 他們主打的核心賣點是什麼？
+2. 他們針對的目標客群是誰？
+3. 和我們的產品相比，他們的差異化在哪？
+4. 他們用了哪些說服技巧？</pre></div>
+        <div class="sub-h">任務 3｜讓 Claude 起草文件</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">填入背景，貼這段</div><pre>我需要一封給客戶的跟進 Email。
+背景：
+- 客戶：<span class="ph">[客戶名稱或類型]</span>
+- 上次接觸：<span class="ph">[上次會議/通話的結果]</span>
+- 這封信的目的：<span class="ph">[你想達成什麼]</span>
+- 語氣：<span class="ph">[正式/友善/簡短]</span>
+
+請幫我寫一封不超過 150 字的跟進信。</pre></div>
+        <div class="chk-h">Day 3 Checklist</div>
+        <div class="check">
+          <div class="ck">找一份真實工作文件（會議記錄、報告、Email）上傳給 Claude</div>
+          <div class="ck">讓 Claude 幫你產出一個你平常需要自己做的成果</div>
+          <div class="ck">感受「給文件 → 直接得到結果」和「問問題 → 自己整理」的差異</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">DAY 4</span><span class="ch-t">串接一切</span><span class="ch-tag">MCP</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>透過 MCP 連接器，讓 Claude 直接讀取和操作你的工作工具。</span></div>
+        <p><span class="hl">什麼是 MCP？</span>MCP（Model Context Protocol）是讓 Claude 連接外部工具的橋樑。簡單說：裝了 MCP，Claude 就能直接幫你操作 Google Drive、Gmail、Notion 等工具，<span class="hl">不需要你複製貼上</span>。</p>
+        <div class="sub-h">目前最實用的 MCP 連接器</div>
+        <div class="deflist">
+          <div class="row"><div class="t">Google Drive</div><div class="d">讓 Claude 讀取你的雲端文件、試算表、簡報</div></div>
+          <div class="row"><div class="t">Gmail</div><div class="d">讓 Claude 幫你讀信、整理信件、起草回覆</div></div>
+          <div class="row"><div class="t">Notion</div><div class="d">讓 Claude 讀取和新增你的 Notion 頁面</div></div>
+          <div class="row"><div class="t">Slack</div><div class="d">讓 Claude 讀取頻道訊息、幫你寫回覆</div></div>
+          <div class="row"><div class="t">Asana</div><div class="d">讓 Claude 查看和建立任務</div></div>
+          <div class="row"><div class="t">GitHub</div><div class="d">讓 Claude 讀取 code、幫你 review PR</div></div>
+        </div>
+        <div class="sub-h">怎麼安裝</div>
+        <div class="steps">
+          <div class="st">打開 Claude 桌面版</div>
+          <div class="st">點左下角設定（齒輪）→「Integrations」或「連接器」</div>
+          <div class="st">選你想連接的工具</div>
+          <div class="st">按照指示完成授權</div>
+        </div>
+        <div class="tipline"><b>建議先裝這兩個：</b>Google Drive（最多人用、立即有感）、Gmail（讓你的 Email 工作流直接提速）。</div>
+        <div class="sub-h">裝好之後怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連接 Google Drive 後</div><pre>幫我找上個月所有和 <span class="ph">[客戶名稱]</span> 相關的文件，
+列出每份文件的標題和最後修改日期。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連接 Gmail 後</div><pre>幫我整理今天收到的所有信件，
+分類成「需要我回覆」「只是通知」「可以忽略」三類。</pre></div>
+        <div class="chk-h">Day 4 Checklist</div>
+        <div class="check">
+          <div class="ck">安裝至少一個 MCP 連接器（建議 Google Drive 或 Gmail）</div>
+          <div class="ck">實際用 Claude 操作看看，感受「不需要複製貼上」的差異</div>
+          <div class="ck">思考你的工作流中，還有哪些工具值得連接</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">DAY 5</span><span class="ch-t">完全解鎖</span><span class="ch-tag">Claude Code</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>用 Claude Code 讓 Claude 直接操作你的電腦，自動完成重複性工作。</span></div>
+        <p><span class="hl">什麼是 Claude Code？</span>它是一個讓 Claude 直接存取你電腦檔案系統的工具，可以讀取整理檔案、執行批量操作、建立自動化腳本定期跑任務。<span class="hl">不需要會寫程式</span>——你用中文告訴它你想做什麼，它自己寫程式、自己執行。</p>
+        <div class="sub-h">場景 1｜自動清理下載資料夾</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">對 Claude Code 說</div><pre>幫我整理桌面的「下載」資料夾。
+規則：
+- 圖片檔（jpg、png、gif）→ 移到「圖片」子資料夾
+- 文件檔（pdf、docx、xlsx）→ 移到「文件」子資料夾
+- 壓縮檔（zip、rar）→ 移到「壓縮檔」子資料夾
+- 超過 6 個月沒開過的檔案 → 移到「待刪除」子資料夾</pre></div>
+        <div class="sub-h">場景 2｜批量重新命名檔案</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">對 Claude Code 說</div><pre>我有一堆截圖檔，名稱都是「截圖 2024-xx-xx」這種格式。
+請幫我按照日期順序重新命名成「screenshot_001」「screenshot_002」這樣的格式。
+檔案位置：<span class="ph">[你的資料夾路徑]</span></pre></div>
+        <div class="sub-h">場景 3｜建立每週自動執行的任務</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">對 Claude Code 說</div><pre>幫我建立一個每週一早上 8 點自動執行的任務：
+1. 掃描「工作」資料夾，列出上週新增的所有檔案
+2. 把清單存成一個 txt 檔，命名為「週報_[日期].txt」
+3. 放到「週報」資料夾裡</pre></div>
+        <div class="sub-h">怎麼安裝 Claude Code</div>
+        <div class="steps">
+          <div class="st">確認電腦有裝 Node.js（nodejs.org 免費下載）</div>
+          <div class="st">打開終端機（Mac：Terminal；Windows：命令提示字元）</div>
+          <div class="st">輸入下方指令安裝</div>
+          <div class="st">安裝完成後輸入 <b>claude</b> 啟動</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">終端機指令</div><pre>npm install -g @anthropic-ai/claude-code</pre></div>
+        <div class="tipline">第一次啟動會要求輸入 Anthropic API Key，到 <b>console.anthropic.com</b> 申請即可。</div>
+        <div class="chk-h">Day 5 Checklist</div>
+        <div class="check">
+          <div class="ck">安裝 Node.js</div>
+          <div class="ck">安裝 Claude Code</div>
+          <div class="ck">試著讓 Claude Code 整理你電腦裡的某個資料夾</div>
+          <div class="ck">想想看：哪些每週重複的電腦操作可以交給它？</div>
+        </div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">給想少走彎路的你</div>
+      <h3>自己摸 5 天可以<br><span class="g">有人帶你一次走對更快</span></h3>
+      <p>這份 roadmap 你跟著做沒問題。但想把整套 AI 工作流調到最適合你、少踩坑——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 附錄 -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 A · 你的系統長這樣</span>
+    <h2>5 天完成後<br><span class="g">你擁有的系統</span></h2>
+    <p>跟完 5 天，你的 Claude 工作環境會長這樣——這不是「偶爾用用」的工具，是一套<span class="hl">每天幫你省時間的個人 AI 工作系統</span>。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">你的 Claude 工作系統</div><pre>Claude 工作系統
+│
+├── About Me Project
+│   ├── about-me.md（Claude 認識你）
+│   └── ai-style.md（Claude 知道怎麼跟你說話）
+│
+├── Projects Project（依任務分類）
+│
+├── Templates Project（你的常用 Prompt 庫）
+│
+├── Resources Project（參考資料、SOP）
+│
+├── MCP 連接器（Google Drive、Gmail 等）
+│
+└── Claude Code（本機自動化）</pre></div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">附錄 B · 10 個萬用 Prompt</span>
+    <h2>放進 Templates<br><span class="g">隨時叫出來用</span></h2>
+    <p>把這 10 個 Prompt 放進你的「Templates」Project，之後直接叫出來用。點開複製。</p>
+    <div class="acc">
+      <details class="ch"><summary><span class="ch-n">01</span><span class="ch-t">會議記錄整理</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 01</div><pre>這是今天的會議記錄：<span class="ph">[貼上文字]</span>
+請幫我：
+1. 列出所有決定事項
+2. 列出所有待辦事項（標明負責人和截止日）
+3. 列出還需要討論的未解決問題
+4. 用 3 句話摘要整個會議</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">Email 快速起草</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 02</div><pre>幫我寫一封 Email。
+收件人：<span class="ph">[對象和關係]</span>
+目的：<span class="ph">[這封信要達成什麼]</span>
+背景：<span class="ph">[對方需要知道的上下文]</span>
+語氣：<span class="ph">[正式/友善/簡短]</span>
+長度：不超過 <span class="ph">[X]</span> 字</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">文件摘要</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 03</div><pre><span class="ph">[貼上或上傳文件]</span>
+請幫我：
+1. 用 5 句話內摘要核心內容
+2. 列出 3–5 個最重要的資訊點
+3. 標出任何需要我特別注意或跟進的地方</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">簡報大綱生成</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 04</div><pre>我需要一份簡報的大綱。
+主題：<span class="ph">[主題]</span>
+對象：<span class="ph">[聽眾是誰、他們的背景]</span>
+目的：<span class="ph">[這份簡報要讓對象做什麼或相信什麼]</span>
+時間：<span class="ph">[幾分鐘的簡報]</span>
+張數限制：<span class="ph">[大概幾張]</span>
+請給我一份有說服力的簡報架構，每頁說明重點和建議放什麼內容。</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">競品分析</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 05</div><pre>以下是競品的資料：<span class="ph">[貼上文字/截圖說明]</span>
+請從這幾個角度分析：
+1. 他們的核心賣點
+2. 目標客群
+3. 定價策略（如果看得出來）
+4. 他們最強的地方
+5. 他們的弱點或缺口</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">想法快速擴展</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 06</div><pre>我有一個初步想法：<span class="ph">[描述你的想法]</span>
+請幫我：
+1. 找出這個想法最大的 3 個潛在問題
+2. 提出 3 個讓這個想法更強的改進方向
+3. 如果要執行，最重要的第一步是什麼？</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">社群貼文優化</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 07</div><pre>這是我寫的貼文草稿：<span class="ph">[貼上草稿]</span>
+平台：<span class="ph">[Instagram / Threads / LinkedIn]</span>
+目標：<span class="ph">[希望觀眾做什麼]</span>
+請幫我：
+1. 讓開頭的第一句更有吸引力
+2. 讓整體更簡短有力
+3. 提供 2 個不同版本讓我選</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">08</span><span class="ch-t">數據解讀</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 08</div><pre>以下是我的數據：<span class="ph">[貼上數字或表格]</span>
+請幫我：
+1. 找出最值得注意的 3 個趨勢或異常
+2. 用白話解釋這些數字代表什麼意思
+3. 根據這些數據，建議我下一步應該關注什麼</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">09</span><span class="ch-t">決策輔助</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 09</div><pre>我正在考慮：<span class="ph">[描述你的決策]</span>
+選項 A：<span class="ph">[說明]</span>
+選項 B：<span class="ph">[說明]</span>
+我的主要考量是：<span class="ph">[你最在意的因素]</span>
+我的限制是：<span class="ph">[時間/預算/資源等]</span>
+請幫我分析兩個選項的優缺點，並給我你的建議。</pre></div></div></details>
+      <details class="ch"><summary><span class="ch-n">10</span><span class="ch-t">學習加速</span><span class="ch-mk"></span></summary><div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 10</div><pre>我想學習：<span class="ph">[主題]</span>
+我目前的程度：<span class="ph">[完全新手 / 有基礎 / 中級]</span>
+我的目標：<span class="ph">[學完想用來做什麼]</span>
+我能花的時間：<span class="ph">[每天幾分鐘，持續幾週]</span>
+請幫我設計一個實際可執行的學習計畫，包含每天要做什麼。</pre></div></div></details>
+    </div>
+  </div>
+
+  <div class="sec fade">
+    <span class="sec-tag">附錄 C · 常見問題</span>
+    <h2>開始前<br><span class="g">你可能想問</span></h2>
+    <div class="faq">
+      <div class="q">Claude 免費版可以做這些事嗎？</div>
+      <div class="a">大部分功能免費版都能用。MCP 連接器和 Claude Code 需要付費版（Pro 方案，月費約 $20 USD）。如果你每天都在用，這個投資非常值得。</div>
+      <div class="q">我的資料上傳到 Claude 安全嗎？</div>
+      <div class="a">Anthropic 有明確的資料隱私政策。企業敏感資料建議使用 Claude Team 或 Enterprise 方案，有更強的資料保護。</div>
+      <div class="q">每次開新對話都要重新設定嗎？</div>
+      <div class="a">不需要。只要你在設定好的 Project 裡開對話，Claude 會自動讀取你放進去的所有背景資料。</div>
+      <div class="q">Claude 和 ChatGPT 差在哪？</div>
+      <div class="a">兩個都很強，適合不同任務。Claude 在長文件處理、指令遵循和繁體中文輸出上表現特別穩定，這也是傑森所長主要推薦 Claude 的原因。</div>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">最後一句話</div>
+      <h2>資料包你拿到了，<span class="g">但拿到不等於學會</span></h2>
+      <div class="cta-lead">每天 20 分鐘，跟著做完 5 天。做完之後，你的工作方式會不一樣。<br>而如果你想走得更遠、把 AI 變成真正的生產力——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把自己變成「一人團隊」的上班族、創作者</div>
+        <div class="f">跟完 5 天、想知道下一步能用 AI 做到多少的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">從「執行者」變「決策者」的完整 AI 工作流</div>
+        <div class="gi">可以直接抄的 Prompt 與系統範本，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週更新更多 AI 資訊</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude 新手 5 天路線圖資料包——對應 IG 輪播「5 天學會用 Claude」，可當留言領取的 DM 承接頁／lead magnet
+· 內容：5 天路線圖（摺疊，含 about-me.md / ai-style.md 範本 + 各天任務 prompt 可複製）+ 附錄 A 系統圖 + 附錄 B 10 萬用 Prompt（摺疊）+ 附錄 C FAQ
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「Claude 新手官方路線圖」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
