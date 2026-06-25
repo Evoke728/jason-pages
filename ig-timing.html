@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IG 最佳發文時間完整指南｜一週七天什麼時候發、發什麼</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.24em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.36;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--gold);margin:20px 0 6px;}
+
+.tblwrap{overflow-x:auto;margin:14px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:11px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .tm{font-family:var(--mono);font-size:12.5px;color:var(--gold);font-weight:500;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:14px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+.bul{margin:10px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.78;color:var(--text);margin-bottom:9px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:30px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:15px;color:var(--text);line-height:1.4;}
+.ch-t .zh{font-weight:500;color:var(--dim);font-size:12.5px;margin-left:5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-intro{font-size:13.7px;line-height:1.78;color:var(--dim);background:var(--card2);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0;}
+.slot{margin:14px 0;padding-left:14px;border-left:3px solid var(--gold-dim);}
+.slot .tm{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:2px;}
+.slot .ds{font-size:13.7px;line-height:1.72;color:var(--text);}
+.slot .ds b{color:var(--gold);font-weight:500;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>學會抓對時間後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想用 AI<br><span class="g">做自媒體變現</span></h4>
+  <p>抓對發文時間只是基本。怎麼用 AI 把內容做起來、做出收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">IG · BEST POSTING TIME</div>
+    <h1>IG 最佳發文時間<br><span class="g">完整指南</span></h1>
+    <div class="hero-sub">一週七天，什麼時候發、發什麼，一次講清楚。<br>同樣的內容，發對時間，觸及差很多——這份指南幫你把每一篇貼文都發在對的時段。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">天 · 完整排程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">19</div><div class="l">個 · 黃金時段</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">免費</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注分享 AI 工具與自媒體變現方法，核心只有一個：用更少的時間，做更多有價值的事。AI × 自媒體，是現在普通人最有機會起步的變現路徑。</div></div>
+  </div>
+
+  <!-- 每週總覽 -->
+  <div class="sec fade">
+    <span class="sec-tag">每日策略 · 一眼看懂</span>
+    <h2>一週七天<br><span class="g">發文策略總覽</span></h2>
+    <p>先看這張表抓大方向，下面再逐日拆解每個時段該發什麼。</p>
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>星期</th><th>最佳時段</th><th>當天特性</th><th>適合內容</th></tr></thead>
+        <tbody>
+          <tr><td>星期一</td><td class="tm">15・17・19 點</td><td>下班後互動高峰</td><td>實用技巧、工具教學</td></tr>
+          <tr><td>星期二</td><td class="tm">13・16・19 點</td><td>週間穩定流量</td><td>知識型、清單整理</td></tr>
+          <tr><td>星期三</td><td class="tm">14・17・20 點</td><td>週中滑手機最長</td><td>深度內容、輪播貼文</td></tr>
+          <tr><td>星期四</td><td class="tm">14・16・21 點</td><td>週末期待感升溫</td><td>預告型、互動型</td></tr>
+          <tr><td>星期五</td><td class="tm">10・13・15 點</td><td>週末前最後高峰</td><td>娛樂性、分享型</td></tr>
+          <tr><td>星期六</td><td class="tm">11・14 點</td><td>休閒瀏覽模式</td><td>情感故事、生活感</td></tr>
+          <tr><td>星期日</td><td class="tm">10・19 點</td><td>懶散滑動＋睡前收尾</td><td>激勵感、下週備戰</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 逐日詳細 -->
+  <div class="sec fade">
+    <span class="sec-tag">逐日拆解 · 7 天</span>
+    <h2>每個時段<br><span class="g">到底該發什麼</span></h2>
+    <p>點開每一天，看那個時段觀眾的狀態、跟最適合的內容類型。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">一</span><span class="ch-t">星期一<span class="zh">下班後互動高峰</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週一是觀眾回到工作節奏的第一天，下班後特別需要「有用的資訊」緩解壓力。耐心較低，但對實用內容的接受度最高。</div>
+        <div class="slot"><div class="tm">下午 3 點</div><div class="ds">下午疲勞期，開始滑手機找刺激。適合：<b>短輪播、快速 Tip 型</b>（例：「3 個讓你少加班的 AI 工具」）</div></div>
+        <div class="slot"><div class="tm">下午 5 點</div><div class="ds">下班通勤，滑手機頻率最高。適合：<b>強標題的輪播</b>，第一張封面要在縮圖就抓住眼球。</div></div>
+        <div class="slot"><div class="tm">下午 7 點</div><div class="ds">晚餐後放鬆，停留時間變長。適合：<b>有情感溫度的內容</b>、故事型輪播、觀點型貼文。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">二</span><span class="ch-t">星期二<span class="zh">週間穩定流量</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週二流量最穩定，觀眾情緒平穩，對知識型內容耐心好，適合發需要「慢慢看」的內容。</div>
+        <div class="slot"><div class="tm">下午 1 點</div><div class="ds">午休時間，適合<b>快速掃過的清單型輪播</b>（例：「Claude 的 5 個隱藏功能你還沒用過」）</div></div>
+        <div class="slot"><div class="tm">下午 4 點</div><div class="ds">下午茶時段，輕度瀏覽模式。適合：<b>工具比較型</b>、帶圖表或清單的知識卡片。</div></div>
+        <div class="slot"><div class="tm">下午 7 點</div><div class="ds">晚間黃金時段，互動率全天最高之一。適合：<b>你希望高互動的主力貼文</b>，這時段最容易被演算法推送。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">三</span><span class="ch-t">星期三<span class="zh">週中滑手機最長</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週三是一週的心理中點，觀眾容易倦怠，滑手機時間反而最長。適合發「有深度、值得收藏」的內容，收藏率通常比其他天高。</div>
+        <div class="slot"><div class="tm">下午 2 點</div><div class="ds">午後低潮期，主動找「有價值的事情看」。適合：<b>深度教學輪播</b>、工作流拆解型內容。</div></div>
+        <div class="slot"><div class="tm">下午 5 點</div><div class="ds">下班前衝刺結束、開始放鬆。適合：<b>系統性整理型內容</b>（例：「AI 工作流完整架構」），收藏率最高的時段。</div></div>
+        <div class="slot"><div class="tm">下午 8 點</div><div class="ds">晚間瀏覽高峰，停留時間長。適合：<b>個人觀點型貼文</b>，引發討論、帶動留言。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">四</span><span class="ch-t">星期四<span class="zh">週末期待感升溫</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週四觀眾開始進入「週末模式」，心情比週一到三輕鬆，對娛樂性與互動性內容接受度提高。適合發輕鬆一點的內容、或預告週末。</div>
+        <div class="slot"><div class="tm">下午 2 點</div><div class="ds">午後輕鬆時段，適合<b>互動型貼文</b>（問問題、投票型內容）。</div></div>
+        <div class="slot"><div class="tm">下午 4 點</div><div class="ds">開始期待週末、心情偏輕鬆。適合：<b>娛樂性較強的 AI 應用案例</b>，或帶趣味感的教學。</div></div>
+        <div class="slot"><div class="tm">晚上 9 點</div><div class="ds">睡前瀏覽高峰，停留時間長、容易深度閱讀。適合：<b>故事型、情感型貼文</b>，或有「共鳴感」的觀點。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">五</span><span class="ch-t">星期五<span class="zh">週末前最後高峰</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週五觀眾注意力分散，準備進入放鬆模式，但上午到下午仍有高流量。要在下午 3 點前完成發文，避開晚間流量低谷。</div>
+        <div class="slot"><div class="tm">上午 10 點</div><div class="ds">還在工作狀態，但週五上午對「有幫助的資訊」接受度高。適合：<b>本週精華整理型輪播</b>（例：「這週學到的 3 個 AI 技巧」）</div></div>
+        <div class="slot"><div class="tm">下午 1 點</div><div class="ds">午休時間，週五午休滑手機比例特別高。適合：<b>分享率高的內容</b>（實用清單、可截圖的資訊卡片）</div></div>
+        <div class="slot"><div class="tm">下午 3 點</div><div class="ds">週五下午最後流量高峰，之後快速下降。適合：<b>呼籲收藏或分享的內容</b>，搭配明確 CTA。</div></div>
+        <div class="warn">⚠️ 週五晚間不建議發重要貼文——觀眾進入社交模式，IG 使用率下降。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">六</span><span class="ch-t">星期六<span class="zh">休閒瀏覽模式</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週六觀眾「完全放鬆」，滑 IG 是為了享受、不是學習。適合發情感溫度高、有生活感的內容，在輕鬆狀態下建立好感。</div>
+        <div class="slot"><div class="tm">上午 11 點</div><div class="ds">睡醒後的悠閒瀏覽。適合：<b>有溫度的故事型內容</b>、情感輪播、生活觀點分享。</div></div>
+        <div class="slot"><div class="tm">下午 2 點</div><div class="ds">午餐後懶散時段。適合：<b>輕鬆好看的內容</b>、有趣的 AI 使用案例、「你不知道的小技巧」。</div></div>
+        <div class="warn">⚠️ 避免發太硬的教學——週六觀眾沒耐心看複雜資訊。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">日</span><span class="ch-t">星期日<span class="zh">懶散滑動＋睡前收尾</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="ch-intro">週日分兩個截然不同的時段：上午是「最懶散的瀏覽時間」，晚間是「下週備戰前的心理準備期」。善用這兩個情緒節點，效果很好。</div>
+        <div class="slot"><div class="tm">上午 10 點</div><div class="ds">最懶散的時刻，躺著滑手機。適合：<b>視覺衝擊強的封面</b>、能快速理解的短輪播——門檻低、不用動腦就看完。</div></div>
+        <div class="slot"><div class="tm">晚上 7 點</div><div class="ds">「準備面對新一週」的心理節點，對「下週能用上的知識」接受度極高。適合：<b>下週備戰型內容</b>（例：「下週用這 3 個方法讓效率翻倍」），也適合激勵感／正能量觀點——週日晚分享率特別高。</div></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">時間抓對了 然後呢</div>
+      <h3>發對時間 只是第一步<br><span class="g">內容做得起來 才有變現</span></h3>
+      <p>時段幫你拉觸及，但要把流量變成收入，靠的是一整套 AI × 自媒體的做法——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 進階建議 -->
+  <div class="sec fade">
+    <span class="sec-tag">進階使用建議</span>
+    <h2>讓這份表<br><span class="g">發揮到最大</span></h2>
+
+    <div class="sub-h">選時段的優先順序</div>
+    <div class="steps">
+      <div class="st">先看<b>你自己的洞察數據</b>——IG 後台的「最佳發文時間」比任何通用建議都準</div>
+      <div class="st">沒有數據時，<b>週三下午 5 點</b>和<b>週二下午 7 點</b>是最穩健的起點</div>
+      <div class="st">每次只改一個變數——先固定時間，再測試內容類型</div>
+    </div>
+
+    <div class="sub-h">發文後的 30 分鐘黃金期</div>
+    <p style="font-size:14px;margin-bottom:6px;">發文後立刻做這三件事，可以顯著提升觸及：</p>
+    <ul class="bul">
+      <li>回覆前幾則留言（讓演算法判定這篇「有互動」）</li>
+      <li>在限時動態分享這篇貼文（引導既有追蹤者來互動）</li>
+      <li><b>不要</b>在發文後立刻編輯貼文（可能影響推送）</li>
+    </ul>
+
+    <div class="sub-h">內容類型 × 最佳星期</div>
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>內容類型</th><th>最適合的星期</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td>深度教學輪播</td><td>週三</td><td>觀眾耐心最高，收藏率最佳</td></tr>
+          <tr><td>快速實用 Tip</td><td>週一、週二</td><td>觀眾需要即戰力內容</td></tr>
+          <tr><td>故事情感型</td><td>週四晚、週六</td><td>觀眾情緒最放鬆</td></tr>
+          <tr><td>觀點輸出型</td><td>週三、週日晚</td><td>觀眾有餘裕思考和討論</td></tr>
+          <tr><td>分享型、清單型</td><td>週五</td><td>週末前的分享意願最高</td></tr>
+          <tr><td>激勵備戰型</td><td>週日晚</td><td>準備面對新一週的心理節點</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>抓對時間之後，<span class="g">換我陪你把內容做起來</span></h2>
+      <div class="cta-lead">這份表幫你把貼文發在對的時段。但要把流量變成個人品牌、變成收入——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想透過個人品牌建立收入來源的上班族、創作者</div>
+        <div class="f">會發文、卻不知道怎麼用 AI 把內容規模化的你</div>
+        <div class="f">收藏了一堆技巧，卻從來沒真的做起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI × 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接抄的內容與 Prompt 庫，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 起步的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">想學怎麼用 AI 做自媒體——追蹤起來，下一篇就是你需要的</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週更新 AI 工具教學、IG 成長技巧、個人品牌變現</div>
+  </div>
+
+</div>
+
+<script>
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：IG 最佳發文時間完整指南——可當輪播／限動「留言領取」的 DM 承接頁或 lead magnet
+· 內容：每週總覽表 + 7 天逐日拆解（摺疊，每天含時段×內容）+ 進階建議（選時段順序、30 分鐘黃金期、內容類型×星期表）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「IG 最佳發文時間表」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
