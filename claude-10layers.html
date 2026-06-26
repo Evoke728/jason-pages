@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 10 層解鎖｜完整 Prompt 實戰包</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--gold);margin:20px 0 6px;}
+.sub-d{font-size:13.5px;color:var(--dim);line-height:1.75;margin-bottom:6px;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+.bul{margin:10px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.78;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.tblwrap{overflow-x:auto;margin:14px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:500px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:11px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.entry{position:relative;z-index:1;margin:0 30px 8px;background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 24px 24px;}
+.entry .ek{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;color:var(--gold-bright);margin-bottom:10px;font-weight:500;}
+.entry h3{font-family:var(--serif);font-weight:900;font-size:22px;color:#fff;line-height:1.4;margin-bottom:10px;}
+.entry p{font-size:13.5px;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:8px;}
+.entry .cp{margin-top:14px;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:54px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;letter-spacing:0.02em;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .zh{font-weight:500;color:var(--dim);font-size:12.5px;margin-left:5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.concept{display:flex;gap:10px;align-items:flex-start;background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0;font-size:13.8px;line-height:1.72;}
+.concept .cl{font-weight:700;color:var(--gold);flex-shrink:0;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.82;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:20px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;margin-bottom:8px;}
+.insight p{font-size:13.8px;color:var(--dim);line-height:1.8;margin-top:6px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>打通這 10 層後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把這套<br><span class="g">變成變現系統</span></h4>
+  <p>10 層打通只是基本。怎麼用 AI ＋ 自媒體做出收入——我在 Skool 帶你做。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE · 10 LAYERS UNLOCK</div>
+    <h1>Claude 10 層解鎖<br><span class="g">完整 Prompt 實戰包</span></h1>
+    <div class="hero-sub">從基本對話到手機遠端指揮，把 Claude 的 10 個使用層級一次打通。每一層都附可以直接複製貼上的完整 Prompt——不用一次讀完，哪層用到就翻哪層。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">10</div><div class="l">層 · 從入門到精通</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">25</div><div class="l">＋ · 完整 Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">複製就能用</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注於 AI 工具應用與自媒體經營的實戰導師。他相信「工具本身不值錢，用對工具的人才值錢」，帶你用 AI ＋ 自媒體建立個人品牌、創造被動收入。</div></div>
+  </div>
+
+  <!-- 怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 怎麼用</span>
+    <h2>哪層用到<br><span class="g">就翻哪層</span></h2>
+    <div class="steps">
+      <div class="st">把這份 <b>.md</b> 檔導入 Notion（Notion → Import → Text &amp; Markdown）</div>
+      <div class="st">從「第 0 層」開始，把你的職業填進去，貼進 Claude 跑一次</div>
+      <div class="st">之後依序往下，每一層都有可直接複製貼上的完整 Prompt</div>
+      <div class="st">不需要一次讀完——書籤存好，哪層用到就翻哪層</div>
+    </div>
+    <div class="tipline"><b>傑森的建議：</b>最有感的起點不是第 1 層，是<b>第 2 層（Memory）＋ 第 3 層（Projects）</b>。先讓 Claude「懂你」，後面才會越用越順。</div>
+  </div>
+
+  <!-- 第 0 層入口 -->
+  <div class="sec fade" style="padding-bottom:18px;">
+    <span class="sec-tag">第 0 層 · 入口</span>
+    <h2>先跑這個<br><span class="g">它幫你客製後面 10 層</span></h2>
+    <p>把下面這個 Prompt 貼進 Claude，填入你的職業，它會自動幫你解釋後面 10 層在<span class="hl">你的工作裡</span>長什麼樣。</p>
+  </div>
+  <div class="entry fade">
+    <div class="ek">LAYER 0 — 入口 Prompt</div>
+    <h3>讓 Claude 幫你客製這 10 層</h3>
+    <p>填入你的職業，貼進 Claude，它會逐層給你「核心功能＋2 個應用場景＋今天就能試的微任務」。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第 0 層 · 貼進 Claude</div><pre>你是一位頂尖的 Claude 使用教練，專門幫助各行各業的人理解如何從基礎到進階地使用 Claude。
+
+我的職業 / 內容領域是：[在這裡填入你的職業，例如：IG 個人品牌經營者、行銷企劃、自由接案設計師]
+
+請根據我的職業，逐一說明 Claude 的 10 個使用層級，每一層包含：
+1. 這層的核心功能（一句話）
+2. 針對我的職業，2 個具體且立刻可以執行的應用場景
+3. 一個「今天就能試」的微任務
+
+10 個層級依序為：
+LAYER 1 — CHATS：基本對話
+LAYER 2 — MEMORY：長期記憶
+LAYER 3 — PROJECTS：專屬工作室
+LAYER 4 — SKILLS：自訂技能
+LAYER 5 — ARTIFACTS：直接產出成品
+LAYER 6 — CONNECTORS (MCP)：接上外部工具
+LAYER 7 — SCHEDULED TASKS：自動排程任務
+LAYER 8 — PLUGINS：工作流打包
+LAYER 9 — COWORK：直接操作電腦
+LAYER 10 — DISPATCH：手機遠端指揮
+
+每一層的範例必須具體、真實、跟我的職業直接相關，不要給我泛用的廢話。</pre></div>
+  </div>
+
+  <!-- 1-5 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 1–5 層 · 打底</span>
+    <h2>從問對問題<br><span class="g">到直接產出成品</span></h2>
+    <p>點開每一層，核心觀念＋可直接複製的 Prompt 都在裡面。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">L1</span><span class="ch-t">Chats<span class="zh">問對問題，答案就不一樣</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>問題的品質決定答案的品質。加入「角色、任務、格式、限制條件」四個元素，輸出品質立刻提升 3 倍。</span></div>
+        <div class="sub-h">Prompt 1｜高品質提問框架</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 1</div><pre>你是一位[角色設定，例如：資深 IG 內容策略師，專注於台灣個人品牌市場]。
+我的任務是：[具體任務，例如：為一個教 AI 工具的創作者規劃本週的內容主題]
+背景資訊：
+- 我的帳號定位：[填入]
+- 目標受眾：[填入]
+- 本週已發的主題：[填入，或填「無」]
+請給我 [數量] 個符合以下條件的結果：
+- [條件 1，例如：主題要有資訊落差感，讓人想點進來看]
+- [條件 2，例如：避免說教語氣，要實用可執行]
+- [條件 3，例如：符合 IG 演算法偏好的短影音或輪播貼文形式]
+輸出格式：
+每個主題一行，格式為「主題標題 ｜ 一句鉤子文案」</pre></div>
+        <div class="sub-h">Prompt 2｜個人品牌內容選題生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 2</div><pre>你是一位專注於台灣自媒體市場的內容策略師。
+我的帳號是 IG 個人品牌，主題圍繞 AI 工具應用與效率工作流。
+目標受眾：25–40 歲的上班族與創業者，想用 AI 節省時間、建立副業收入。
+
+幫我生成 10 個這週可以發的 IG 輪播貼文選題，要求：
+- 每個題目要有「資訊落差」：讓人看了標題就想翻下去
+- 避免勵志廢話和過度正面的標題
+- 每個題目附上一句建議的鉤子文案（不要用問句開場，改用陳述句）
+- 題目類型要多元：教學型、觀點型、清單型各至少 2 個
+輸出格式：
+1. [選題標題] ｜ 鉤子文案：[一句話]</pre></div>
+        <div class="sub-h">Prompt 3｜反直覺切入角度生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 3</div><pre>主題：[填入你要發的主題，例如：Claude Projects 功能介紹]
+
+針對這個主題，給我 5 個「反直覺」的切入角度。
+所謂反直覺，是指：大多數人的直覺做法是 X，但實際上 Y 才有效。
+每個角度請包含：
+- 大多數人的做法（錯誤假設）
+- 反直覺的洞見（真實做法）
+- 一句適合做成輪播貼文封面標題的文案
+語氣要直接、有點挑釁感，讓人看了想說「等等，這不是我以為的那樣」。</pre></div>
+        <div class="sub-h">進階｜追問 Prompt 模板</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">拿到第一個答案後，用這個深挖</div><pre>這個答案還不夠具體。請把第 [N] 個選項展開，給我：
+1. 完整的輪播貼文結構（封面標題 + 每張大意 + CTA）
+2. 針對我的受眾可能會有的反對意見，預先寫出一個「但是…」的破解句
+3. 這個主題最適合搭配的視覺風格建議</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L2</span><span class="ch-t">Memory<span class="zh">讓 Claude 永久記住你是誰</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Memory 檔案是你的「Claude 說明書」。設定好之後，每次對話 Claude 都從正確的起點開始，不用再重新介紹自己。</span></div>
+        <div class="sub-h">完整個人品牌 Memory 檔案模板</div>
+        <div class="sub-d">填入一個 .md 檔，上傳到 Claude Memory。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">my-brand.md</div><pre># 我的個人品牌說明書
+
+## 基本身份
+- 名字 / 帳號名稱：[填入]
+- 主要平台：Instagram（@[帳號]）、Threads
+- 帳號定位：[一句話，例如：教上班族用 AI 工具建立副業收入的個人品牌]
+- 核心價值主張：[例如：用更少時間做更多事，讓 AI 幫你跑系統]
+
+## 目標受眾
+- 主要受眾：[例如：25–40 歲台灣上班族，有副業意願，對 AI 工具有興趣但不知從何開始]
+- 受眾痛點：[例如：時間不夠、不知道 AI 工具怎麼實際應用、看了很多教學但沒真的用起來]
+- 受眾渴望：[例如：一套可以直接套用的系統，不用每次從零開始]
+
+## 語氣設定
+- 整體語氣：直接、清楚、中性教學，有點乾話感，不煽情，不說教
+- 文案風格：短句為主，資訊密度高，讓人看完有收穫
+- 禁用句型：
+  - 不用「真正的 X 是…」「最終你會發現…」
+  - 不用「你值得擁有…」「現在就開始…」
+  - 不用「不是 A 而是 B」的對比句型
+  - 不用「你是否曾經…」的假設共鳴開場
+
+## 內容策略
+- 主要內容類型：AI 工具教學（輪播）、工作流分享、個人觀點
+- 次要內容類型：親子情感故事型貼文
+- 每週發文頻率：[填入，例如：IG 3 次、Threads 5 次]
+- CTA 機制：留言關鍵字換 Lead Magnet（Markdown 檔格式）
+
+## 平台規則
+### Instagram
+- 輪播貼文：每組 8–12 張，每張資訊不過載
+- 說明文案：100–180 字，開頭一句有畫面感的陳述
+- 不在說明文案內加 hashtag
+### Threads
+- 長度：50–120 字
+- 語氣比 IG 更口語、更碎
+- 可使用「標示劇透」功能製造鉤子
+
+## 正在進行的項目
+- [例如：Claude 10 層解鎖輪播系列]
+- [例如：每週 AI 工具實戰 Prompt 包]</pre></div>
+        <div class="sub-h">每月 Memory 複審 Prompt</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">每月跑一次</div><pre>請根據我目前的 Memory 檔案，幫我做一次複審：
+1. 哪些資訊可能已經過期或需要更新？
+2. 有沒有我在對話中提到但還沒存進 Memory 的重要資訊？
+3. 給我 3 個建議，讓這份 Memory 檔案更能幫助你每次給我更精準的回應
+以條列式輸出，每點不超過 2 行。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L3</span><span class="ch-t">Projects<span class="zh">建立你的 IG 創作專案</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Project 是你的 AI 工作室。把相關文件放進去，Claude 每次都在正確的脈絡裡工作，不用重新交代背景。</span></div>
+        <div class="sub-h">建議放進 Project 的三類文件</div>
+        <ul class="bul">
+          <li><b>品牌文件：</b>個人品牌說明書、語氣範例（5–10 篇你最滿意的貼文）、禁用句型清單</li>
+          <li><b>數據文件：</b>近 3 個月互動率數據、表現最好/最差各 5 篇全文 + 你的分析</li>
+          <li><b>參考文件：</b>競品帳號分析、本月內容日曆、進行中的系列說明</li>
+        </ul>
+        <div class="sub-h">Project System Prompt 完整範本</div>
+        <div class="sub-d">貼進 Project 設定頁的「Instructions」欄位。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Project Instructions</div><pre>你是 [帳號名稱] 的專屬 IG 內容策略師。
+你了解這個帳號的：
+- 定位：[一句話]
+- 受眾：[一句話]
+- 語氣：直接、清楚、中性教學，短句為主，不說教
+- 禁用句型：[列出 3–5 條]
+
+每次我開始對話，你都從這些前提出發，不需要我再重新解釋。
+
+當我說「幫我寫貼文」，請主動確認：
+1. 這是哪種內容類型（教學 / 觀點 / 情感）
+2. 目標平台（IG / Threads）
+3. 這篇的核心訊息是什麼
+
+當我給你草稿要修改，請先說明你修改了哪些地方、為什麼，再給我修改後的版本。</pre></div>
+        <div class="sub-h">進階｜多 Project 分類邏輯</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>Project</th><th>放什麼</th><th>適合做什麼</th></tr></thead><tbody>
+          <tr><td>IG 創作專案</td><td>品牌文件＋數據＋日曆</td><td>日常內容生產</td></tr>
+          <tr><td>客戶專案</td><td>客戶簡報＋合約＋溝通紀錄</td><td>客戶服務與交付</td></tr>
+          <tr><td>學習專案</td><td>讀書筆記＋課程摘要＋想法</td><td>知識整理與輸出</td></tr>
+          <tr><td>產品開發專案</td><td>課程大綱＋受眾調查＋定價研究</td><td>數位產品開發</td></tr>
+        </tbody></table></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L4</span><span class="ch-t">Skills<span class="zh">建立你的專屬助理軍團</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Skill 是你訓練好的員工。設定一次，之後一個指令它就知道怎麼跑，不用每次重新說明。</span></div>
+        <div class="sub-h">Skill 1｜輪播貼文生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">新增 Skill，貼入 Instruction</div><pre>你是一位專精於台灣 IG 輪播貼文的內容設計師，熟悉 @jasonxtsai 的品牌風格。
+當我給你一個主題，你會輸出一組完整的輪播貼文方案，包含：
+1. 建議張數（8–12 張）與每張的角色定義
+2. 每張的內容：
+   - 標題（無標點符號）
+   - 正文要點（2–4 行）
+   - 視覺指令說明
+語氣規則：
+- 直接、清楚、中性教學
+- 短句優先，每行不超過 20 字
+- 禁止使用：「真正的 X 是…」「你是否曾經…」「現在就開始…」「不是 A 而是 B」
+結構規則：
+- 第 1 張：封面，鉤子標題，製造資訊落差
+- 中間張：每張聚焦一個核心觀點，有遞進關係
+- 最後 1–2 張：總結 + CTA，CTA 為留言關鍵字換資源
+收到主題後，先輸出整體結構規劃讓我確認，確認後再輸出每張完整內容。</pre></div>
+        <div class="sub-h">Skill 2｜IG 說明文案生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">新增 Skill，貼入 Instruction</div><pre>你是一位熟悉 @jasonxtsai 語氣的 IG 文案寫手。
+當我給你輪播貼文的主題或摘要，你會輸出一段 IG 說明文案，規格如下：
+長度：100–180 字
+結構：
+- 第 1 句：有畫面感的陳述句（不用問句開場）
+- 中間 2–3 行：補充觀點或說明，資訊密度高
+- 倒數第 2 行：留白或互動引導（簡短，不要解釋太多）
+- 最後一行：追蹤號召 + @jasonxtsai
+禁止：
+- 過度勵志的收尾
+- 解釋性的總結句（「所以這就是為什麼…」）
+- 所有禁用句型（不是 A 而是 B / 真正的 X / 你是否曾經）
+不需要加 hashtag，由我自行決定。</pre></div>
+        <div class="sub-h">Skill 3｜Threads 文案生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">新增 Skill，貼入 Instruction</div><pre>你是一位熟悉 @jasonxtsai 語氣的 Threads 文案寫手。
+當我給你一個主題或 IG 貼文摘要，你會輸出一段 Threads 文案，規格如下：
+長度：50–120 字
+語氣：比 IG 更口語、更碎、像在自言自語或直接跟粉絲說話
+結構：
+- 第 1 句：引發好奇或共鳴的開場（明著說，不遮蔽）
+- 中間 1–2 句：補充或轉折
+- 最後 1 句：收尾或互動引導
+劇透功能使用規則：
+- 用【劇透】文字【/劇透】標記要遮蔽的部分
+- 只遮蔽最有衝擊力的那句話（結論、數字、反轉）
+- 每篇最多用一次
+- 開場句絕對不遮蔽
+禁止：勵志收尾、解釋性總結句、所有禁用句型、hashtag</pre></div>
+        <div class="sub-h">Skill 4｜Lead Magnet 大綱生成器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">新增 Skill，貼入 Instruction</div><pre>你是一位數位內容產品設計師，專門幫個人品牌創作者設計高品質的 Lead Magnet。
+當我給你一個貼文主題，你會設計一份完整的 Lead Magnet 大綱，要求：
+1. 定位：受眾拿到之後要覺得「這就是我需要的東西」，而不是「噢，一份模板」
+2. 結構：有封面介紹、核心內容區塊、總結與下一步
+3. 每個區塊都要有「可直接使用的 Prompt 或模板」，不是只有說明
+4. 長度感：預計 3,000–5,000 字的完整文件
+5. 格式：輸出為可導入 Notion 的 Markdown 結構
+輸出大綱時，先問我：
+- 這份 Lead Magnet 的 CTA 關鍵字是什麼？
+- 受眾的主要職業 / 使用場景是什麼？
+- 有沒有特別想強調的區塊？
+確認後輸出完整大綱。</pre></div>
+        <div class="sub-h">如何安裝這些 Skills</div>
+        <div class="steps">
+          <div class="st">打開 Claude → 左側選單 → Skills（或 Directory → Skills）</div>
+          <div class="st">點「＋」新增 Personal Skill</div>
+          <div class="st">填入 Skill 名稱 + 把上方 Instruction 貼入</div>
+          <div class="st">儲存後，在任何對話輸入 <b>/[Skill名稱]</b> 即可啟用</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L5</span><span class="ch-t">Artifacts<span class="zh">讓 Claude 直接產出可用成品</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Artifacts 不是給你看的建議，是可以直接用的東西——從互動式網頁到結構化表格，Claude 在你聊天的同時直接生成。</span></div>
+        <div class="sub-h">Prompt 1｜生成互動式輪播結構稿</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">輸出為 Artifact</div><pre>請幫我生成一個互動式的 HTML 輪播貼文結構稿，輸出為 Artifact。
+主題：[填入，例如：Claude Projects 功能介紹]
+張數：[填入，例如：10 張]
+品牌顏色：暖米白 #F5EDE0、磚紅橘 #C85A2A、深炭灰 #1C1C1C
+每張投影片要顯示：
+- 頁碼（X / 總張數）
+- 這張的角色（封面 / 內容 / CTA）
+- 標題
+- 正文要點
+- 視覺備註
+做成可以左右切換的互動介面，讓我可以逐張審閱內容。</pre></div>
+        <div class="sub-h">Prompt 2｜生成內容策略試算表</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">輸出為 Artifact</div><pre>請幫我生成一份內容日曆試算表，輸出為 Artifact（CSV 或 Markdown 表格格式）。
+時間範圍：[例如：2025 年 7 月，共 4 週]
+發文頻率：IG 每週 3 篇，Threads 每週 5 篇
+主題方向：AI 工具教學、工作流分享、個人觀點、親子情感
+欄位包含：
+- 日期 / 平台（IG / Threads）/ 內容類型（教學 / 觀點 / 情感）
+- 主題標題 / 鉤子文案草稿 / CTA 關鍵字 / 狀態（規劃中 / 製作中 / 已發布）
+幫我預先填入合理的主題建議，我之後再修改。</pre></div>
+        <div class="sub-h">Prompt 3｜生成品牌 DNA 視覺化文件</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">輸出為 Markdown Artifact</div><pre>請根據以下資訊，幫我生成一份「品牌 DNA 文件」，輸出為格式清楚的 Markdown Artifact。
+帳號：@[帳號]
+定位：[填入] / 受眾：[填入] / 語氣：[填入] / 核心價值主張：[填入]
+文件要包含：
+1. 品牌使命（一句話）
+2. 目標受眾畫像（3–5 個具體描述）
+3. 語氣指南（Do / Don't 各 5 條）
+4. 內容支柱（3–4 個主題方向，各附說明）
+5. 差異化定位（我跟同類帳號的不同在哪）
+格式要清楚，可以直接給協作夥伴或 AI 工具看懂。</pre></div>
+        <div class="tipline"><b>組合技：</b>把生成的 Artifact 下載後上傳到 IG 創作 Project，下次 Claude 生成內容會直接參照這份品牌 DNA，不用再解釋設定。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">打底完成 準備進階</div>
+      <h3>後面 5 層 是把 AI<br><span class="g">變成自動運轉的系統</span></h3>
+      <p>Connectors、排程、Cowork、Dispatch——這些把 Claude 變成幫你跑系統的幕僚。想把整套接成變現引擎，我在 Skool 帶你做。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 6-10 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 6–10 層 · 自動化</span>
+    <h2>從接上工具<br><span class="g">到手機遠端指揮</span></h2>
+    <div class="acc">
+
+      <details class="ch"><summary><span class="ch-n">L6</span><span class="ch-t">Connectors<span class="zh">接上你的工具生態系</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Connectors 讓 Claude 從「聊天」變成「行動」——連上工具後可以直接讀真實資料、執行真實操作。</span></div>
+        <div class="sub-h">個人品牌創作者必裝的 5 個 Connector</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>Connector</th><th>用途</th><th>最有感的第一個應用</th></tr></thead><tbody>
+          <tr><td>Notion</td><td>內容日曆、知識管理</td><td>讀本週日曆，生成發文提醒</td></tr>
+          <tr><td>Google Drive</td><td>素材存放、文件管理</td><td>讀品牌資料夾，生成更新摘要</td></tr>
+          <tr><td>Gmail</td><td>客戶溝通、合作邀約</td><td>讀未回信件，生成回覆草稿</td></tr>
+          <tr><td>Google Calendar</td><td>行程管理</td><td>讀本週行程，幫你規劃工作時間</td></tr>
+          <tr><td>Canva</td><td>設計素材</td><td>依文案內容，建議設計模板</td></tr>
+        </tbody></table></div>
+        <div class="sub-h">連上 Notion 後的第一個 Prompt</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連 Notion 後</div><pre>請讀取我的 Notion 工作區，找到「IG 內容日曆」這個資料庫。
+告訴我：
+1. 本週（[填入日期範圍]）規劃了哪些貼文主題
+2. 哪些主題還沒有鉤子文案
+3. 根據上週的發文表現（如果有數據），這週哪個主題最有潛力
+之後幫我把缺少的鉤子文案補上，直接更新到 Notion 裡。</pre></div>
+        <div class="sub-h">進階｜Connector + Memory 組合技</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連 Google Drive 後</div><pre>你已經了解我的品牌定位（請參照 Memory 裡的品牌說明書）。
+現在請連上我的 Google Drive，讀取「[資料夾名稱]」裡的所有文件。
+根據我的品牌定位和這些文件的內容，告訴我：
+1. 這些文件裡有哪些素材可以直接轉化成 IG 貼文？
+2. 給我 5 個具體的選題建議，每個附上建議的切入角度</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L7</span><span class="ch-t">Scheduled Tasks<span class="zh">建立你的自動內容系統</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Scheduled Tasks 是你的 AI 幕僚，不需要你在場。設定好排程，它自動執行、整理、生成，讓你早上起來就有東西可用。</span></div>
+        <div class="sub-h">排程 1｜每日內容表現摘要（每天 7:00）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連 IG 數據 + Notion/Gmail</div><pre>你是我的 IG 內容數據分析師。
+每天早上請執行以下任務：
+1. 讀取昨天發出的 IG 貼文數據（觸及人數、互動率、留言數、追蹤成長）
+2. 與過去 30 天的平均值比較，標記表現高於或低於平均
+3. 如果有留言，摘要出最常出現的 3 個回應主題
+4. 給我一句話的今日建議：「今天最值得跟進的一個動作是…」
+輸出格式：條列式，總長不超過 150 字，存到 Notion「每日數據紀錄」資料庫。</pre></div>
+        <div class="sub-h">排程 2｜每週選題與鉤子生成（每週一 9:00）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連 Notion 內容日曆</div><pre>你是我的 IG 內容策略師，負責每週一的內容規劃。
+請執行以下任務：
+1. 讀取 Notion 內容日曆，確認本週已規劃的主題
+2. 如果本週主題不足（少於 3 個 IG 主題），根據以下方向補充：
+   - 上週表現最好的主題的延伸或深度版本
+   - 最近 AI 工具圈有什麼值得聊的新話題
+   - 我的帳號還沒深入拆解過的 Claude 功能
+3. 為每個主題生成一句鉤子文案（陳述句，不用問號）
+4. 把結果更新到 Notion 內容日曆對應的欄位
+如果沒有 Notion 連接，把結果整理成清單格式發到我的 Gmail。</pre></div>
+        <div class="sub-h">排程 3｜每月內容複盤報告（每月 1 號 8:00）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">連 IG 數據 + Notion</div><pre>你是我的月度內容策略顧問。
+每月第一天，請執行以下任務：
+1. 讀取上個月所有 IG 貼文的數據
+2. 找出：
+   - 觸及率前 3 名的貼文（附分析：為什麼它表現好？）
+   - 互動率前 3 名的貼文（同上）
+   - 表現最差的 3 篇（附分析：問題可能在哪？）
+3. 根據數據，給我下個月的內容策略建議：
+   - 應該繼續做的主題方向 / 應該調整或放棄的方向
+   - 一個這個月還沒試過、值得嘗試的新格式
+4. 把報告存到 Notion「月度複盤」資料庫
+報告長度：500–800 字，有數據、有分析、有建議，不要廢話。</pre></div>
+        <div class="tipline"><b>注意：</b>Scheduled Tasks 需要你的電腦在線、Claude 有開啟，才能正常執行。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L8</span><span class="ch-t">Plugins<span class="zh">把工作流打包成產品</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Plugin 是你的工作流標準化工具。把 Skills + Connectors 打包，你自己用更順，也可以分享給學員，讓他們複製你的系統。</span></div>
+        <div class="sub-h">「個人品牌內容生產 Plugin」設計邏輯</div>
+        <ul class="bul">
+          <li><b>Skills 清單：</b>輪播生成器、IG 說明文案、Threads 文案、Lead Magnet 大綱、鉤子文案生成器</li>
+          <li><b>Connectors 清單：</b>Notion（內容日曆）、Google Drive（素材庫）、Gmail（溝通與發送）</li>
+          <li><b>使用說明文件：</b>這套 Plugin 的設計邏輯、每個 Skill 適合的場景、建議的工作流順序</li>
+        </ul>
+        <div class="sub-h">進階｜把 Plugin 分享給學員</div>
+        <div class="steps">
+          <div class="st">在 Claude Desktop App 建立 Plugin（Skills + Connectors 打包）</div>
+          <div class="st">匯出為 <b>.zip</b> 檔案</div>
+          <div class="st">學員下載後，在自己的 Claude Desktop App 安裝</div>
+          <div class="st">安裝完成，學員的 Claude 就擁有和你一樣的技能組合</div>
+        </div>
+        <div class="tipline">這是目前最有效率的「複製老師系統」方式，不需要學員從頭設定每一個 Skill。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L9</span><span class="ch-t">Cowork<span class="zh">讓 Claude 直接動你的電腦</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Cowork 是 Claude 從「建議」變「執行」的臨界點——直接讀取、整理、建立你電腦上的真實檔案，像一個真正在你電腦前工作的幕僚。</span></div>
+        <div class="sub-h">第一個 Cowork 任務｜整理素材資料夾</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">對 Cowork 說</div><pre>請幫我整理「[資料夾路徑，例如：Desktop/IG 素材]」這個資料夾。
+任務：
+1. 掃描資料夾內所有檔案，列出清單
+2. 依照以下分類建立子資料夾：
+   - 輪播貼文素材 / 封面圖 / 數據截圖 / 參考資料 / 已發布存檔
+3. 把每個檔案移動到對應的子資料夾
+4. 如果有檔案名稱不清楚的，先列出來問我要怎麼分類，不要自行判斷
+完成後給我一份整理報告：移動了幾個檔案，每個子資料夾現在有幾個檔案。</pre></div>
+        <div class="sub-h">Cowork 啟動 Prompt 模板</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">每次啟動 Cowork 用</div><pre>今天的 Cowork 任務如下：
+工作目錄：[填入主要工作資料夾路徑]
+今天的目標：[填入，例如：整理本週的 IG 貼文素材，並把已發布的內容存檔]
+執行前請先：
+1. 列出你即將要做的動作清單，讓我確認
+2. 我確認後才開始執行
+3. 每完成一個步驟，告訴我進度
+如果遇到你不確定的情況，暫停並問我，不要自行決定。</pre></div>
+        <div class="sub-h">適合 Cowork 的任務 vs. 不適合的</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>適合</th><th>不適合</th></tr></thead><tbody>
+          <tr><td>整理、分類、重新命名檔案</td><td>需要創意判斷的內容寫作</td></tr>
+          <tr><td>批次處理重複性工作</td><td>需要你個人觀點的決策</td></tr>
+          <tr><td>讀取本地文件並整理摘要</td><td>涉及敏感或重要帳號操作</td></tr>
+          <tr><td>建立資料夾結構</td><td>你不確定後果的操作</td></tr>
+        </tbody></table></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">L10</span><span class="ch-t">Dispatch<span class="zh">手機遠端指揮你的 AI 幕僚</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><span class="cl">核心</span><span>Dispatch 把 Cowork 的能力延伸到手機。通勤、午休、等人——這些零碎時間，都可以用來推進你的內容系統。</span></div>
+        <div class="sub-h">場景 1｜上班途中</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">手機指令</div><pre>幫我生成今天要發的 Threads 文案草稿。
+參考方向：昨天 IG 發的那篇主題（[填入昨天的主題]）的延伸或反面觀點。
+語氣：口語、直接，像我在自言自語。
+長度：60–100 字。
+劇透功能：把最有衝擊力的那句結論遮起來。
+給我 2 個版本讓我選。</pre></div>
+        <div class="sub-h">場景 2｜午休</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">手機指令</div><pre>讀取我的 Notion 內容日曆，告訴我：
+1. 本週還有哪些主題還沒製作（狀態是「規劃中」）
+2. 這些主題裡，哪一個最適合今晚回家做
+3. 給我那個主題的輪播貼文結構草稿（封面標題 + 每張大意，不需要完整文案）
+30 秒內給我答案，簡短清楚。</pre></div>
+        <div class="sub-h">場景 3｜下班途中</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">手機指令</div><pre>幫我整理今天的工作成果，生成明天的任務清單。
+今天完成的事：[簡短列出，例如：寫完了 Claude Skills 那篇輪播的文案]
+今天沒做完的事：[例如：Prompt 包還沒寫]
+明天的優先事項：[例如：先把 Prompt 包完成，再處理下週的選題]
+請生成一份「明日任務清單」，格式：
+- 最重要的 1 件事（必做）
+- 次要的 2–3 件事（有空做）
+- 可以考慮 Cowork 自動處理的 1 件事
+簡短，讓我明天早上看一眼就知道從哪裡開始。</pre></div>
+        <div class="tipline"><b>建立你的 Dispatch 指令庫：</b>把最常用的手機指令存成模板，貼到 Notion 或手機備忘錄，需要時直接複製發出。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 總結 -->
+  <div class="sec fade">
+    <span class="sec-tag">總結 · 升級路線圖</span>
+    <h2>你的 Claude<br><span class="g">升級路線圖</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>層級</th><th>功能</th><th>上手順序</th><th>時間</th></tr></thead><tbody>
+      <tr><td>1. Chats</td><td>基本對話</td><td>今天就試</td><td>立刻</td></tr>
+      <tr><td>2. Memory</td><td>長期記憶</td><td>第 1 週</td><td>30 分鐘</td></tr>
+      <tr><td>3. Projects</td><td>專屬工作室</td><td>第 1 週</td><td>1 小時</td></tr>
+      <tr><td>4. Skills</td><td>自訂技能</td><td>第 2 週</td><td>2–3 小時</td></tr>
+      <tr><td>5. Artifacts</td><td>直接產出成品</td><td>第 2 週</td><td>30 分鐘</td></tr>
+      <tr><td>6. Connectors</td><td>接上外部工具</td><td>第 3 週</td><td>1–2 小時</td></tr>
+      <tr><td>7. Scheduled</td><td>自動排程</td><td>第 3 週</td><td>2 小時</td></tr>
+      <tr><td>8. Plugins</td><td>工作流打包</td><td>第 4 週</td><td>2–3 小時</td></tr>
+      <tr><td>9. Cowork</td><td>直接操作電腦</td><td>第 4 週</td><td>1 小時</td></tr>
+      <tr><td>10. Dispatch</td><td>手機遠端指揮</td><td>穩定後</td><td>30 分鐘</td></tr>
+    </tbody></table></div>
+    <div class="insight">
+      <div class="il">傑森所長的建議：從哪層開始最有感？</div>
+      <div class="it">最有感的起點不是第 1 層，是第 2 層（Memory）＋ 第 3 層（Projects）。</div>
+      <p>大多數人用 Claude 沒感覺，是因為每次對話都要重新解釋自己是誰、要什麼語氣、受眾是誰。設定好 Memory 和 Projects 之後，你會突然覺得 Claude「懂你了」——那個感覺才是讓你繼續往下走的動力。先把第 2、3 層設定好，再去碰第 4 層的 Skills，這時候設定出來的 Skill 才會真的好用。</p>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>10 層你拿到了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這份實戰包給你完整的 Prompt 與工作流。但要把這套變成個人品牌、變成被動收入——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造被動收入的人</div>
+        <div class="f">會用 Claude、卻不知道怎麼把它接成變現系統的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">每一層的深度實戰教學與最新 Prompt，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">工具本身不值錢，用對工具的人才值錢</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週更新每一層的深度實戰教學</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude 10 層解鎖完整 Prompt 實戰包——對應 IG 輪播系列，可當留言領取的 DM 承接頁／lead magnet
+· 內容：第 0 層入口 Prompt + 10 層摺疊卡（每層核心觀念＋可複製 Prompt＋表格）+ 升級路線圖表 + 傑森建議
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid，第 5/6 層之間）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「Claude 10 層解鎖 完整 Prompt 實戰包」2025-07
+═══════════════════════════════════════════
+-->
+</body>
+</html>
