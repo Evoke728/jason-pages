@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 隱藏指令懶人包｜5 個讓輸出跳一個等級的關鍵字</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:18px 0 6px;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14.2px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:23px;height:23px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.steps .st code{font-family:var(--mono);font-size:12.5px;color:var(--gold);font-weight:600;}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:7px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+
+.tblwrap{overflow-x:auto;margin:14px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:500px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:11px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-family:var(--mono);font-weight:600;color:var(--gold);white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;width:30px;height:30px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-family:var(--mono);font-weight:700;font-size:15px;color:var(--gold);line-height:1.4;}
+.ch-t .zh{font-family:var(--sans);font-weight:500;color:var(--text);font-size:13px;margin-left:7px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.concept{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:13px 15px;margin:13px 0;font-size:13.8px;line-height:1.74;color:var(--text);}
+.concept b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cmd{color:var(--gold-bright);font-weight:600;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:31px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>學會這 5 個指令後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">做成變現系統</span></h4>
+  <p>會用幾個指令只是基本。怎麼用 AI ＋ 自媒體做出被動收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE · HIDDEN COMMANDS</div>
+    <h1>Claude 隱藏指令<br><span class="g">懶人包</span></h1>
+    <div class="hero-sub">大多數人用 Claude 只有 60 分——打一段話、等回覆。其實只要在 Prompt 裡加上特定關鍵字，輸出品質就直接跳一個等級。<br>這份懶人包整理 5 個最實用的指令，每個都附可以直接複製的範本。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · 實用指令</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">1</div><div class="l">套 · 決策流程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">複製就能用</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">以「AI ＋ 自媒體變現」為核心的個人品牌——用 AI 壓縮工作時間，把省下的時間拿去做自媒體，讓一個人也能做出過去一個團隊的產出量。</div></div>
+  </div>
+
+  <!-- 前言 -->
+  <div class="sec fade">
+    <span class="sec-tag">前言 · 為什麼要學</span>
+    <h2>同樣是用 Claude<br><span class="g">差別在你會不會下指令</span></h2>
+    <p>大多數人用 Claude 的方式，就是打一段話然後等回覆。這樣用當然有效，但效果只有 60 分。</p>
+    <p>Claude 有一組「隱藏指令」——<span class="hl">不是功能選單裡找得到的那種，而是你在 Prompt 裡加上特定的關鍵字或指令格式</span>，Claude 的輸出品質就會直接跳一個等級。</p>
+    <p>這份懶人包整理了 5 個最實用的指令，每一個都附上「是什麼、什麼時候用、怎麼用（可直接複製的範本）」。點開就能抄。</p>
+  </div>
+
+  <!-- 5 指令 -->
+  <div class="sec fade">
+    <span class="sec-tag">5 個指令 · 點開就抄</span>
+    <h2>一個關鍵字<br><span class="g">換一種輸出品質</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">/ghost<span class="zh">讓 AI 寫的像真人寫的</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>是什麼：</b>在 Prompt 結尾加上 <code>/ghost</code>，Claude 會重新審視整段輸出，主動去除 AI 慣用的套路——過度禮貌的開場、空洞的過渡句、不自然的排比、一眼看出是機器寫的固定語氣。結果會更像一個真人在說話：有不完美、有個性、有停頓感。</div>
+        <div class="sub-h">什麼時候用</div>
+        <ul class="bul">
+          <li>開發信、陌生 DM，不能讓對方一眼看出是 AI 寫的</li>
+          <li>IG 貼文或 Threads 文案，需要有個人語氣</li>
+          <li>正式信件，但又不想太制式</li>
+          <li>任何你要以「本人」名義發出去的文字</li>
+        </ul>
+        <div class="sub-h">怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">直接生成</div><pre>幫我寫一封開發信，對象是電商品牌主，
+主旨是介紹我的 AI 內容製作服務。
+語氣要像一個朋友在推薦而不是業務在推銷。
+<span class="cmd">/ghost</span></pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第二輪收尾草稿</div><pre>把以下這段文字修改成更像真人說話的版本，
+去除所有 AI 腔，保留原意：
+[貼上你的草稿]
+<span class="cmd">/ghost</span></pre></div>
+        <div class="sub-h">進階用法</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">餵自己的語氣樣本給它模仿</div><pre>以下是我平常寫文案的範本：
+[貼上 3 段你自己寫的文字]
+現在幫我用同樣的語氣，寫一篇介紹 Claude 使用技巧的 IG 貼文。
+<span class="cmd">/ghost</span></pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">/redteam<span class="zh">站到你的對立面找漏洞</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>是什麼：</b><code>/redteam</code> 是軍事術語——讓己方一支隊伍扮演敵軍，主動攻擊自己的防線。加上之後，Claude 不再幫你說好話，而是切換成強硬的批評者，從競爭對手、潛在客戶、媒體記者、懷疑者的角度，找出你的計畫、文案、提案裡最脆弱的地方。</div>
+        <div class="sub-h">什麼時候用</div>
+        <ul class="bul">
+          <li>即將公開發布產品或服務，想先找出可能被批評的點</li>
+          <li>準備簡報或提案，想預測對方會問什麼</li>
+          <li>寫了一篇文章或貼文，想知道哪裡論點不夠站得住腳</li>
+          <li>做了商業決策，想在行動前看到反面論點</li>
+        </ul>
+        <div class="sub-h">怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">預測質疑</div><pre>以下是我計畫推出的線上課程介紹：
+[貼上你的課程說明]
+請站在一個對這類課程抱持懷疑態度的潛在學員角度，
+列出他可能提出的所有質疑，越具體越好。
+<span class="cmd">/redteam</span></pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">文案三角色審核</div><pre>以下是我的 IG 貼文草稿：
+[貼上文案]
+請從以下三個角色的角度分別提出批評：
+1. 不信任自媒體教學的人
+2. 已經用過類似工具但沒效果的人
+3. 覺得 AI 工具只是炒話題的懷疑者
+<span class="cmd">/redteam</span></pre></div>
+        <div class="tipline"><b>用完之後：</b>拿到批評清單，回頭修改內容，或針對每個質疑準備回應——你的內容會更有說服力，提案也更難被推翻。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">/premortem<span class="zh">在投入前先想像它已經失敗</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>是什麼：</b><code>/premortem</code> 讓 Claude 進入「假設失敗」的思考模式。你給它一個計畫，它假設這個計畫在六個月後已經失敗了，然後從終點往回推，找出最可能的失敗原因。不是唱衰你，而是在你還有時間調整的時候，把潛在風險提前攤開。</div>
+        <div class="sub-h">什麼時候用</div>
+        <ul class="bul">
+          <li>要開始一個新的內容計畫或產品</li>
+          <li>要做比較大的投資決定（時間或金錢）</li>
+          <li>剛建立新工作流程，不確定長期能否持續</li>
+          <li>要跟別人合作，想提前想清楚可能的破局點</li>
+        </ul>
+        <div class="sub-h">怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">假設失敗、倒推原因</div><pre>我計畫在接下來三個月內，每週在 Instagram 發布三篇 AI 工具教學貼文，
+目標是增加 1000 個追蹤者。
+請假設三個月後這個計畫失敗了——追蹤者幾乎沒有增加，
+我也已經放棄更新。
+從這個終點往回推，列出最可能導致失敗的五個原因，
+並且對每一個原因提出一個具體的預防方法。
+<span class="cmd">/premortem</span></pre></div>
+        <div class="tipline"><b>進階：</b>同時做 <code>/redteam</code> ＋ <code>/premortem</code>——先讓外部視角找漏洞，再讓預死亡分析找內部執行風險，兩種批評合在一起，幾乎可以把盲點清乾淨。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">/tripwire<span class="zh">找出那件會讓計畫崩盤的事</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>是什麼：</b><code>/tripwire</code> 不是要你列出所有風險，而是找到「那一個」。Claude 會分析你的計畫，找出最關鍵的單一變數——如果這件事出問題，其他所有努力都會跟著垮。把注意力集中在這個點上，比列十個風險清單更有用。</div>
+        <div class="sub-h">什麼時候用</div>
+        <ul class="bul">
+          <li>計畫環節很多，不知道要先顧哪裡</li>
+          <li>跟人合作，想知道最容易出問題的節點</li>
+          <li>資源有限必須取捨，需要知道什麼絕對不能出錯</li>
+          <li>決定很複雜、變數太多，需要找到核心</li>
+        </ul>
+        <div class="sub-h">怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">只找那一個關鍵點</div><pre>我計畫用三個月時間建立一個 Notion 模板店，
+靠販售 AI 工作流模板賺取被動收入。
+主要流量來源是 Instagram 和口碑推薦。
+在這個計畫裡，哪一件事一旦出問題，
+整個計畫就幾乎確定會失敗？
+只告訴我那一件事，並解釋為什麼。
+<span class="cmd">/tripwire</span></pre></div>
+        <div class="sub-h">用完之後</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">針對關鍵點要應對方案</div><pre>針對這個 tripwire，給我三個具體的應對方案，
+讓這個點即使出現問題，也有機會止血或轉向。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">/ultrathink<span class="zh">強迫它真正思考，不只給答案</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>是什麼：</b><code>/ultrathink</code> 是 Claude 的深層推理模式觸發詞。一般情況下它給的是快速回覆——流暢、看起來完整，但思考深度有限。加上之後，Claude 會放慢輸出、更仔細拆解問題、考慮更多角度。差別是：一個給你「看起來合理的答案」，一個是真的在替你想問題。</div>
+        <div class="sub-h">什麼時候用</div>
+        <ul class="bul">
+          <li>問複雜的策略問題，不想要表面答案</li>
+          <li>想讓它分析一個兩難選擇，真的權衡利弊</li>
+          <li>在寫重要文章或提案，需要論點有更強的邏輯支撐</li>
+          <li>任何你覺得它答得「太快了、不夠深」的時候</li>
+        </ul>
+        <div class="sub-h">怎麼用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">深入分析兩難</div><pre>我現在同時在考慮兩件事：
+A. 把時間集中在把 Instagram 帳號做大，累積自然流量
+B. 直接開始做付費廣告，加速獲客
+我的資源有限，只能選一個方向主攻。
+請幫我深入分析這兩個選項，
+考慮短期和長期的差異，以及我可能沒想到的隱性成本。
+<span class="cmd">/ultrathink</span></pre></div>
+        <div class="tipline"><b>注意：</b>它輸出會更長、結構更複雜，建議用在真正值得深想的問題上——簡單問題用它反而多餘。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">會下指令 然後呢</div>
+      <h3>指令讓輸出變好<br><span class="g">系統才讓你變現</span></h3>
+      <p>這 5 個指令幫你把每次輸出做到位。但要把 AI 接成一套能帶來被動收入的內容系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 速查表 + 組合技 -->
+  <div class="sec fade">
+    <span class="sec-tag">速查表 · 一眼對照</span>
+    <h2>5 個指令<br><span class="g">什麼時候用哪個</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>指令</th><th>核心功能</th><th>最適場景</th></tr></thead><tbody>
+      <tr><td>/ghost</td><td>去除 AI 腔，讓文字像真人寫的</td><td>開發信、貼文、任何要以本人名義發出的文字</td></tr>
+      <tr><td>/redteam</td><td>站在對立面找漏洞</td><td>公開發布前、提案前、重要決策前</td></tr>
+      <tr><td>/premortem</td><td>假設失敗倒推原因</td><td>新計畫啟動前、重大投入前</td></tr>
+      <tr><td>/tripwire</td><td>找出計畫的核心脆弱點</td><td>複雜計畫、多變數決策、合作關係</td></tr>
+      <tr><td>/ultrathink</td><td>觸發深層推理模式</td><td>複雜策略、兩難選擇、需要邏輯深度的分析</td></tr>
+    </tbody></table></div>
+
+    <h2 style="margin-top:30px;">組合起來<br><span class="g">一個下午打磨一個計畫</span></h2>
+    <p>這 5 個指令單獨用都有效，組合起來更強。一個標準的「高品質決策流程」可以這樣走：</p>
+    <div class="steps">
+      <div class="st">先用 <code>/ultrathink</code> 深入分析你的選項</div>
+      <div class="st">用 <code>/redteam</code> 找出外部可能的批評</div>
+      <div class="st">用 <code>/premortem</code> 找出內部執行的風險</div>
+      <div class="st">用 <code>/tripwire</code> 鎖定最關鍵的那個風險點</div>
+      <div class="st">輸出最終文案時用 <code>/ghost</code> 讓語氣像真人</div>
+    </div>
+    <div class="tipline">五個步驟，一個下午，把一個粗糙的想法打磨成一個準備好被執行的計畫。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>指令你拿到了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這份懶人包給你 5 個能直接用的指令。但要把 AI 接成一套會自己運轉、帶來被動收入的內容系統——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造被動收入的人</div>
+        <div class="f">會用幾個指令、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接套用的 Prompt 範本與招式，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">都是可以直接套用的乾貨，不是理論</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週更新 AI 工具教學、Prompt 範本、自媒體變現方法</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude 隱藏指令懶人包——對應 IG 輪播，可當留言領取的 DM 承接頁／lead magnet
+· 內容：前言（誠實定調「不是功能選單，是 Prompt 裡的關鍵字」）+ 5 指令摺疊（/ghost /redteam /premortem /tripwire /ultrathink，各含是什麼/時機/可複製範本）+ 速查表 + 5 步決策流程組合技
+· 護欄：保留原文「不是功能選單裡找得到的那種，而是你在 Prompt 裡加上特定關鍵字」定調，維持清醒派人設
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「Claude 隱藏指令懶人包」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
