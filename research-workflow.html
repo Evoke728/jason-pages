@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NotebookLM × Claude 研究工作流｜把兩個 AI 串成可信賴的研究系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:18px 0 6px;}
+
+.vs{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 4px;}
+.vs .col{flex:1;min-width:230px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px;}
+.vs .col .t{font-weight:700;color:var(--gold);font-size:14px;margin-bottom:6px;}
+.vs .col .d{font-size:13.5px;color:var(--text);line-height:1.7;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:7px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:58px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;letter-spacing:0.02em;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body>p{font-size:14px;line-height:1.82;color:var(--text);margin:12px 0;}
+.ch-body>p .hl{color:var(--gold);font-weight:500;}
+.todo{display:flex;gap:10px;align-items:flex-start;background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0;font-size:14px;line-height:1.72;}
+.todo .tl{font-weight:700;color:var(--gold);flex-shrink:0;}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.flow .cp pre{text-align:center;font-size:13px;line-height:2;color:var(--gold-bright);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:12px;margin-bottom:14px;font-size:14.2px;line-height:1.7;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.steps .st b{color:var(--gold);display:block;margin-bottom:1px;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+  .flow .cp pre{font-size:11.5px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>學會這套工作流後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">做成變現系統</span></h4>
+  <p>會串工作流只是基本。怎麼用 AI ＋ 自媒體做出被動收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">NOTEBOOKLM × CLAUDE</div>
+    <h1>NotebookLM × Claude<br><span class="g">研究工作流</span></h1>
+    <div class="hero-sub">你讀了很多資料，寫出來的東西卻還是空洞——通常不是不夠努力，是工具用錯了順序。<br>把 NotebookLM（讀懂來源、不幻覺）跟 Claude（深度推理、寫成品）串起來，各司其職，跑出一個真正可信賴的研究工作流。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">4</div><div class="l">步驟 · 完整流程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">2</div><div class="l">工具 · 各司其職</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">照著做就行</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注於「AI ＋ 自媒體變現」的內容創作者，內容以實用、直接、可立即套用為核心——幫創作者和上班族用更少的時間做更多有價值的事。</div></div>
+  </div>
+
+  <!-- 為什麼卡關 -->
+  <div class="sec fade">
+    <span class="sec-tag">為什麼你的研究一直卡關</span>
+    <h2>不是你不夠努力<br><span class="g">是工具用錯順序</span></h2>
+    <p>你讀了很多資料，但寫出來的東西還是感覺空洞。原因通常不是不夠努力，而是<span class="hl">兩個工具該怎麼分工，你沒搞對</span>。</p>
+    <div class="vs">
+      <div class="col"><div class="t">Claude</div><div class="d">推理能力強，但它不知道你手邊有哪些資料——容易憑空想像。</div></div>
+      <div class="col"><div class="t">NotebookLM</div><div class="d">能紮實讀懂你的來源、每句都有引用，但它沒辦法幫你深度思考或寫出成品。</div></div>
+    </div>
+    <p style="margin-top:14px;">這份筆記教你的，就是把這兩個工具串在一起，<span class="hl">讓它們各司其職</span>，跑出一個真正可信賴的研究工作流。</p>
+  </div>
+
+  <!-- 4 步驟 -->
+  <div class="sec fade">
+    <span class="sec-tag">完整工作流 · 4 步驟</span>
+    <h2>讀懂 → 深思 → 查證 → 寫成<br><span class="g">一個閉環</span></h2>
+    <p>點開每一步，照著做。提示語都能一鍵複製。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">STEP 1</span><span class="ch-t">把資料餵給 NotebookLM，讓它整合</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="todo"><span class="tl">你要做的事</span><span>把所有相關資料上傳進 NotebookLM 的 Notebook。</span></div>
+        <p style="margin:8px 0 4px;font-size:13.5px;">支援的格式：</p>
+        <ul class="bul">
+          <li>PDF</li><li>Google Doc / Word 文件</li><li>網頁連結</li><li>YouTube 影片連結</li><li>逐字稿文字檔</li>
+        </ul>
+        <div class="tipline"><b>關鍵優勢：</b>NotebookLM 只讀你上傳的來源，不會憑空捏造事實——每個論點都有來源可以追溯。</div>
+        <div class="sub-h">上傳後，這樣提示它</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">整理關鍵主題</div><pre>幫我整理這些資料的關鍵主題，每個主題請附上對應的引用來源。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">找出支持與衝突</div><pre>這些資料裡，哪些論點是互相支持的？哪些有衝突？請整理出來並標注來源。</pre></div>
+        <div class="tipline"><b>你會得到：</b>一份有引用標註的整合摘要，每個論點都知道從哪裡來。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 2</span><span class="ch-t">把整合結果帶進 Claude</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="todo"><span class="tl">你要做的事</span><span>把 NotebookLM 輸出的整合摘要，完整複製貼到 Claude 的對話框，然後開始提問。</span></div>
+        <div class="sub-h">這樣提示 Claude</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼上摘要後接這段</div><pre>以下是我針對[主題]整理的資料摘要，內容來自多個來源並附有引用。
+請幫我：
+1. 分析這些論點之間的邏輯關係
+2. 找出任何矛盾或值得深究的地方
+3. 建議一個清楚的文章架構</pre></div>
+        <div class="tipline"><b>為什麼有效：</b>現在 Claude 不是在憑空想像，它有你的實際資料作為基礎。它的推理能力 ＋ 你的真實來源 ＝ 有深度又可信賴的分析。</div>
+        <div class="sub-h">這個階段可以請 Claude 做</div>
+        <ul class="bul">
+          <li>比較不同來源的論點差異</li>
+          <li>找出資料裡沒明說、但可以推論的結論</li>
+          <li>建立反駁論點（讓你的文章更有說服力）</li>
+          <li>產出文章大綱、段落架構、簡報架構</li>
+        </ul>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 3</span><span class="ch-t">送回 NotebookLM 做查證</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="todo"><span class="tl">你要做的事</span><span>Claude 的分析很有深度，但你需要確認它沒有偏離原始來源。</span></div>
+        <div class="sub-h">先這樣問 Claude</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">讓它標出不確定處</div><pre>在你剛才的分析裡，哪些論點需要回到原始資料查證？請列出來。</pre></div>
+        <p>Claude 會告訴你哪些地方它不確定、或哪些論點需要更強的支撐。<span class="hl">接著回到 NotebookLM</span>，把那些需要查證的論點丟進去搜尋，找到對應的原始引用位置，確認 Claude 的推論有資料撐腰。</p>
+        <div class="tipline"><b>這步的價值：</b>你不是在盲目相信 AI，你是在用一個工具查驗另一個工具，讓推理和事實形成閉環。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 4</span><span class="ch-t">讓 Claude 寫出最終版本</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="todo"><span class="tl">你要做的事</span><span>回到 Claude，把查證完畢的資料和大綱交給它，產出最終成品。</span></div>
+        <div class="sub-h">這樣提示 Claude</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">產出最終成品</div><pre>根據我們剛才整理的架構和確認過的論點，請幫我寫出一篇[文章/串文/報告/簡報腳本]。
+語氣要[你的語氣需求，例如：清晰專業、口語易讀、有說服力]。
+長度大約[字數或段落數]。</pre></div>
+        <div class="sub-h">為什麼最終成品品質更高</div>
+        <ul class="bul">
+          <li><b>NotebookLM</b> 確保每個論點有來源，不會幻覺</li>
+          <li><b>Claude</b> 確保文章有邏輯、有結構、有可讀性</li>
+          <li>兩個工具合作，你得到的是既可信又好讀的成果</li>
+        </ul>
+      </div></details>
+
+    </div>
+
+    <div class="sub-h" style="margin-top:24px;">整個工作流一覽</div>
+    <div class="flow">
+      <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">研究工作流</div><pre>你的資料（PDF / 文件 / 連結）
+        ↓
+  NotebookLM 整合摘要（有引用）
+        ↓
+   Claude 深度分析 + 建立架構
+        ↓
+  回 NotebookLM 查證關鍵論點
+        ↓
+   Claude 產出最終成品</pre></div>
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">會做研究 然後呢</div>
+      <h3>工作流幫你做出內容<br><span class="g">系統才讓你變現</span></h3>
+      <p>這套流程幫你把研究做到可信又好讀。但要把產出變成個人品牌、變成被動收入——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 3 個小技巧 -->
+  <div class="sec fade">
+    <span class="sec-tag">3 個小技巧 · 讓它更順</span>
+    <h2>細節做對<br><span class="g">品質差很多</span></h2>
+    <div class="steps">
+      <div class="st"><span><b>Notebook 按主題分開建</b>不要把所有資料全丟進同一個 Notebook。一個研究主題一個 Notebook，整合結果更精準。</span></div>
+      <div class="st"><span><b>把 Claude 的整合對話存成範本</b>每次開始新研究，直接用同一套提示語結構，省下重新想 Prompt 的時間。</span></div>
+      <div class="st"><span><b>查證步驟不要省略</b>Step 3 看起來麻煩，但它是整個工作流品質的關鍵。跳過它，你的成品就只是「聽起來有道理」而不是「真的有根據」。</span></div>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工作流你拿到了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這套流程讓你的研究既可信又好讀。但要把產出變成自媒體、變成被動收入——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造被動收入的人</div>
+        <div class="f">會用工具、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接套用的 Prompt 與工作流拆解，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">都是可以直接套用的乾貨，不是理論</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週分享 AI 工具實戰用法、工作流拆解與自媒體變現策略</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：NotebookLM × Claude 研究工作流——對應 IG 輪播，可當留言領取的 DM 承接頁／lead magnet
+· 內容：問題框架（兩工具分工）+ 4 步驟工作流摺疊（各含你要做的事＋可複製提示語）+ 工作流一覽圖 + 3 個小技巧
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「NotebookLM × Claude 研究工作流」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
