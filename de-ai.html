@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>去 AI 感 Prompt 包｜讓你的文字再也沒有 AI 感</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:18px 0 6px;}
+
+.steps{margin:14px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:12px;margin-bottom:13px;font-size:14.5px;line-height:1.7;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:15px;color:var(--text);line-height:1.4;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.concept{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:13px 15px;margin:13px 0;font-size:13.8px;line-height:1.74;color:var(--text);}
+.concept b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.flow .cp pre{text-align:left;font-size:12.5px;line-height:2;color:var(--gold-bright);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>學會把文字去 AI 感後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">做成變現系統</span></h4>
+  <p>會去 AI 感只是基本。怎麼用 AI ＋ 自媒體做出被動收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">DE-AI · PROMPT PACK</div>
+    <h1>去 AI 感<br><span class="g">Prompt 包</span></h1>
+    <div class="hero-sub">AI 寫的文字一眼就被看穿——句子等長、過渡詞重複、結尾愛昇華。這 7 個 Prompt 專門打掉這些痕跡，讓你的文字讀起來像真人寫的。<br>直接複製貼進 Claude 或 ChatGPT，把【】換成你的內容就能用。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 去 AI 感 Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">個 · 就夠用</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">複製就能用</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">以「AI × 自媒體變現」為核心的個人品牌——幫你用更少的時間做更多有價值的事。內容不講理論，只講可以直接套用的方法。</div></div>
+  </div>
+
+  <!-- 使用說明 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 怎麼用</span>
+    <h2>複製貼上<br>把<span class="g">【】換成你的內容</span></h2>
+    <p>以下 7 個 Prompt 可以直接複製貼到 <span class="hl">Claude 或 ChatGPT</span> 使用。每個都是固定結構：<span class="hl">角色設定 ＋ 任務描述 ＋ 輸出規則</span>。你只要把【】裡的變數換成自己的內容，其他不用動。</p>
+    <div class="tipline"><b>建議順序：</b>先用 Prompt 1 去掉 AI 腔，再用 Prompt 7 做最後的真人感測試。中間的依需求選用——大多數情況，<b>Prompt 1 ＋ 2 ＋ 7</b> 就夠了。</div>
+  </div>
+
+  <!-- 7 個 Prompt -->
+  <div class="sec fade">
+    <span class="sec-tag">7 個 Prompt · 點開就抄</span>
+    <h2>一個一個關<br><span class="g">把 AI 感拆掉</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">去 AI 腔</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 寫的文字有三個固定特徵——句子等長、過渡詞重複、結尾愛昇華總結。這個 Prompt 專門打掉這三件事。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 1 · 去 AI 腔</div><pre>你是一個文字編輯。把以下文字改寫成更自然的口語版本。
+
+規則：
+① 打破句子的等長節奏，長短混用
+② 刪掉「首先、其次、此外、總結來說」這類過渡詞
+③ 結尾不要昇華，就停在事實上
+④ 保留原本的核心資訊，不要加料
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>直接貼上你想改寫的段落，不需要額外說明。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">語調複製</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 不知道你怎麼說話。你要先給它樣本，它才能模仿你的節奏和用詞習慣。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 2 · 語調複製</div><pre>以下是我平時的寫作樣本：
+【貼上你自己寫的 2–3 段文字】
+
+現在把這段 AI 文字改寫成符合上面語氣的版本：
+【貼上要改寫的內容】
+
+規則：
+① 保留我用詞的粗細程度
+② 句子長度接近我的習慣
+③ 不要幫我「升級」語言，我說簡單就簡單</pre></div>
+        <div class="tipline"><b>變數說明：</b>樣本選「最像你的文字」，不是「最好的文字」。你平常發 IG 限動的語氣、Line 傳訊息的方式，都可以當樣本。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">簡化濾鏡</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 預設會把文字寫得「完整」，但完整不等於好讀。這個 Prompt 強制它刪掉所有用來填充的字。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 3 · 簡化濾鏡</div><pre>把以下文字精簡化。
+
+規則：
+① 每個句子超過 20 字就拆成兩句
+② 刪掉所有形容詞修飾語，除非沒了意思會不清楚
+③ 刪掉開頭的鋪陳句，直接進主題
+④ 每一行只留一個重點
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>適合用在段落太長、讀起來喘不過氣的情況。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">節奏重組</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 寫出來的文字節奏太穩，讀起來像機器在唸。這個 Prompt 讓它學會「呼吸」——短句停頓、長句拉伸、偶爾不對稱。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 4 · 節奏重組</div><pre>改寫以下文字的節奏。
+
+規則：
+① 加入至少 2 個單句（10 字以內）作為停頓點
+② 讓相鄰句子長度有明顯差異
+③ 把任何連續三句以上的相同句型打散
+④ 讀起來要像一個人在說話，不是在播報新聞
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>改完之後建議大聲唸一遍，確認有沒有卡頓感。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">個性注入</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 的預設輸出是「沒有個性的正確」。這個 Prompt 強迫它加入觀點、態度、甚至一點點立場。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 5 · 個性注入</div><pre>改寫以下文字，讓它有個性。
+
+規則：
+① 加入至少一個具體的比喻或類比
+② 可以有輕微的主觀語氣，但不要說教
+③ 刪掉「重要的是」「值得注意的是」這類中性過渡句
+④ 讓讀者感覺這是一個有想法的人在說話，而不是一篇說明文
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>如果你本來就有固定的說話風格（例如喜歡用反問、習慣舉台灣例子），可以在指令裡補一行說明，效果會更精準。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">反 AI 偵測</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>AI 偵測工具抓的是「可預測性」——下一個字出現的機率太高就會被標記。這個 Prompt 讓輸出變得更難預測。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 6 · 反 AI 偵測</div><pre>改寫以下文字，降低它被 AI 偵測工具標記的機率。
+
+規則：
+① 在語意清楚的前提下，偶爾用非標準的字詞順序
+② 加入一個小細節或具體例子，讓文字有「現場感」
+③ 至少有一句話是不完整的，像真人說話會停頓的樣子
+④ 不要讓每一段結尾都是總結句
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>這個 Prompt 不是要讓文字變差，是讓它「不那麼完美」——真人寫的東西都有一點毛邊。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">真人感測試</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="concept"><b>核心邏輯：</b>最後一關。用這個 Prompt 讓 AI 自己檢查輸出，把所有還有「生成感」的地方找出來改掉。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 7 · 真人感測試</div><pre>閱讀以下文字，找出所有讀起來「像 AI 寫的」的部分，然後逐一改寫。
+
+判斷標準：
+① 任何過於圓滑、沒有立場的句子
+② 任何你在日常對話中不會說出口的詞
+③ 任何結構太對稱、讀起來像範本的段落
+
+改完後輸出兩個版本：
+— 標出修改處的版本
+— 乾淨版本
+
+文字：【貼上你的內容】</pre></div>
+        <div class="tipline"><b>變數說明：</b>建議放在最後用，當作品質把關的最後一步。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">會去 AI 感 然後呢</div>
+      <h3>文字像真人 是基本<br><span class="g">系統能變現 才是目的</span></h3>
+      <p>這 7 個 Prompt 幫你把每篇文字去掉 AI 痕跡。但要把內容做成個人品牌、做出被動收入——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 建議使用流程 -->
+  <div class="sec fade">
+    <span class="sec-tag">建議使用流程</span>
+    <h2>不用每次<br><span class="g">都跑完全部</span></h2>
+    <div class="flow">
+      <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">完整流程</div><pre>Step 1｜Prompt 1  →  先去掉 AI 腔
+Step 2｜Prompt 2  →  調整成你的語調
+Step 3｜Prompt 3 或 4  →  視需要精簡或調整節奏
+Step 4｜Prompt 5  →  注入個性與觀點
+Step 5｜Prompt 6  →  降低被偵測的機率（需要時用）
+Step 6｜Prompt 7  →  最終真人感檢查</pre></div>
+    </div>
+    <div class="tipline"><b>不用每次跑完：</b>大多數情況下，<b>Prompt 1 ＋ Prompt 2 ＋ Prompt 7</b> 就夠用了。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>Prompt 你拿到了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這份包給你 7 個能直接用的去 AI 感 Prompt。但要把內容做成自媒體、做出被動收入——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造被動收入的人</div>
+        <div class="f">會用 AI 寫東西、卻總被一眼看穿是 AI 寫的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接套用的 Prompt 與內容招式，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">不定期釋出完整資源包，限定追蹤者優先取得</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現｜每週新的 AI 工具用法與 Prompt 包</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：去 AI 感 Prompt 包——對應 IG 輪播，可當留言領取的 DM 承接頁／lead magnet
+· 內容：使用說明 + 7 個 Prompt 摺疊（各含核心邏輯＋可複製完整指令＋變數說明）+ 建議使用流程圖
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    中段 → 穿插卡 .mid-cta（id=skool-mid）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「去 AI 感 Prompt 包」
+═══════════════════════════════════════════
+-->
+</body>
+</html>
