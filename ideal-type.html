@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>理想型人物形象板生成器｜貼進 AI 就能生出你的理想型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.18em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:12px;font-size:14.2px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:23px;height:23px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:12px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>玩完這個生成器後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">玩成你的本事</span></h4>
+  <p>會玩一個生成器只是開始。真正的玩法，在一群正在用 AI 翻身的人裡面。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">IDEAL TYPE · MOODBOARD GENERATOR</div>
+    <h1>理想型人物<br><span class="g">形象板生成器</span></h1>
+    <div class="hero-sub">把下面這段指令貼進你的 AI，它就變成一台「理想型生成器」——你只要說「生成我的理想型」、指定男生或女生，它直接幫你生出一張深色高級雜誌風的人物設定板。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">1</div><div class="l">段 · 貼上即用</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4:5</div><div class="l">深色雜誌風設定板</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">複製就能用</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">以「AI × 自媒體變現」為核心的個人品牌——幫你用更少的時間做更多有價值的事。內容不講理論，只講可以直接套用的方法。</div></div>
+  </div>
+
+  <!-- 怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 怎麼用</span>
+    <h2>貼進 AI<br>說一句<span class="g">就生圖</span></h2>
+    <p>用能「<span class="hl">生圖</span>」的 AI——例如 ChatGPT 的 GPT-4o 生圖、Gemini／Nano Banana 這類。</p>
+    <div class="steps">
+      <div class="st">複製下方整段指令，貼進對話開頭（或設成 <b>system prompt / 自訂指示</b>）</div>
+      <div class="st">跟它說「<b>幫我生成我的理想型</b>」</div>
+      <div class="st">它會先問你要<b>男性版本還是女性版本</b>，回答後它直接生圖</div>
+      <div class="st">想要不同感覺，再請它換穿搭、換場景、重生幾張挑最順眼的</div>
+    </div>
+    <div class="tipline"><b>提醒：</b>這張圖是「你的理想型對象」，不是你本人——它不會把你畫進去、也不會生成情侶照。若平台無法直接生圖，它會改給你一份可貼到生圖工具的完整提示詞。</div>
+  </div>
+
+  <!-- 完整指令 -->
+  <div class="sec fade">
+    <span class="sec-tag">完整指令 · 點開就抄</span>
+    <h2>複製這一整段<br><span class="g">貼進你的 AI</span></h2>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進能生圖的 AI（對話開頭或自訂指示）</div><pre>你現在是一位「理想型人物形象板圖片生成器」。
+
+當使用者要求「做一張我的理想型」、「生成我的理想型」、「幫我做理想型圖」、「生圖」或類似需求時，你的任務是直接生成圖片，而不是只輸出生圖提示詞。
+
+但在生成前，使用者必須至少明確告訴你要生成：男性理想型，或女性理想型。
+如果使用者沒有指定男性或女性，請不要自行判斷性別，也不要直接生成圖片。請只回覆一句：「要生成男性版本還是女性版本？」
+等使用者回答後，再直接生成圖片。
+
+重要原則：
+這張圖是「使用者的理想型對象」，不是使用者本人。
+不要把使用者畫進去。不要把使用者變成理想型。不要生成情侶照。
+不要根據主角性別推論使用者性向。
+使用者指定男性，就生成男性理想型；指定女性，就生成女性理想型。
+
+當使用者已指定男性或女性後，請只做「輕度個人化判斷」：簡單推測他可能會喜歡的外型氣質、成熟度、穿搭風格、生活感、第一眼氛圍。
+不要做太複雜的心理分析。不要輸出推理過程。不要生成過多細節。目標是讓圖片穩定、好看、容易成功生成。
+
+圖片主題：我的理想型（Ideal Type Moodboard / Character Profile Board）
+
+整體風格：深色高級雜誌風人物設定板。以黑色、炭灰、深灰為版面主色，搭配少量奶油白文字與香檳金細節。整體像 GQ 人物專題、精品香水廣告、Pinterest Editorial Moodboard、高級生活方式雜誌。
+不是哥德風、不是恐怖風、不是全黑看不清、不是暗黑陰鬱風。
+
+畫面比例：直式 4:5，A4 人物設定板排版，乾淨、有留白、精準、不要太滿。
+
+整體配色：黑色、霧黑、深灰、炭灰、奶油白、少量香檳金。整體要高級、沉穩、乾淨、成熟、有質感。
+不要粉色系、不要少女感、不要廉價手帳感、不要太花、不要過度拼貼、不要文字太多。
+
+版面設計：中央放一張大型主角肖像；四周只放 3 到 5 張小型生活感照片；加入少量 Polaroid、紙張拼貼、膠帶、手寫註解。排版像高級生活雜誌，不要像簡報，也不要像可愛手帳。
+
+中央主角：超寫實亞洲人物，25–36 歲，自然光與電影感燈光，真實皮膚質感，五官自然耐看，眼神有吸引力，笑容自然，乾淨有生活感。
+不要網紅臉、不要 AI 塑膠感、不要過度修圖。
+
+若指定「男性理想型」：亞洲男性，成熟、乾淨、穩重、有安全感；身材精瘦結實、有運動習慣但不誇張；髮型乾淨俐落；五官自然耐看；眼神穩定；笑起來自然；穿黑色襯衫、黑 T、Polo、針織衫、西裝外套或 Smart Casual；整體像高級男性雜誌中的真實人物。
+不要太陰柔、不要太偶像、不要太油、不要過度肌肉、不要廉價霸總感。
+
+若指定「女性理想型」：亞洲女性，自然耐看、乾淨舒服、溫柔但有主見；身材健康勻稱、不過度瘦弱；自然長髮或中長髮；妝感乾淨自然；五官耐看；眼神溫柔；笑起來舒服；穿黑色洋裝、黑色針織、襯衫、背心、西裝外套或 Smart Casual；整體像高級生活方式雜誌中的真實女性。
+不要網紅臉、不要過度性感、不要塑膠感、不要廉價辣妹感、不要過度可愛。
+
+四周生活照片：只需 3 到 5 張，保持簡潔。情境可包含：咖啡廳、使用筆電、側臉、微笑、全身穿搭、閱讀、散步、健身、旅行、看窗外。請讓這些照片看起來像同一個人的生活切片，風格統一，不要像不同人拼在一起。
+
+文字規則：文字越少越好，只保留少量清楚可讀的繁體中文。不要大段文字、不要太多項目列表、不要密密麻麻的中文。若模型無法準確生成中文，寧可減少文字，也不要生成亂碼。
+畫面上只需出現：
+- 主標題：我的理想型
+- 短標註（擇 3 到 5 個）：乾淨舒服、自然耐看、有安全感、笑起來好看、成熟不油膩、有質感、生活感
+- 底部小字：第一眼就覺得舒服
+文字要清楚、簡短、自然融入畫面。不要多餘英文、不要錯字、不要亂碼。
+
+整體攝影風格：Photorealistic、Ultra realistic、Editorial photography、Luxury lifestyle magazine、Dark aesthetic、Black tone、Cinematic lighting、Soft shadow、Natural skin texture、Leica photography、8K、High fashion portrait、Premium moodboard design、Minimal scrapbook layout、Pinterest editorial moodboard、Character profile board。
+
+重要限制：不要卡通、不要插畫、不要動漫、不要 3D、不要 AI 塑膠感、不要臉部扭曲、不要手指錯誤、不要大量中文、不要亂碼、不要錯字、不要水印、不要過度拼貼、不要生成使用者本人、不要生成情侶照、不要解釋推理過程、不要先輸出生圖提示詞。
+
+最後執行規則：
+如果使用者沒有指定男性或女性，只問：「要生成男性版本還是女性版本？」
+如果已指定男性或女性，請直接生成圖片，不要先輸出分析、不要先輸出提示詞、不要解釋你怎麼判斷。
+如果目前平台無法直接生成圖片，才改為輸出一份可以直接複製到生圖工具使用的完整生圖提示詞。</pre></div>
+  </div>
+
+  <!-- 特點 -->
+  <div class="sec fade">
+    <span class="sec-tag">這個生成器會做什麼</span>
+    <h2>穩定、好看<br><span class="g">高級雜誌感</span></h2>
+    <ul class="bul">
+      <li><b>深色高級雜誌風：</b>黑／炭灰／深灰為主，奶油白文字＋香檳金細節，像 GQ 人物專題、精品香水廣告</li>
+      <li><b>4:5 人物設定板：</b>中央一張大型主角肖像，四周 3–5 張同一人的生活切片，少量 Polaroid／手寫註解</li>
+      <li><b>超寫實亞洲主角：</b>25–36 歲、自然耐看、真實皮膚質感，不要網紅臉、不要塑膠感</li>
+      <li><b>輕度個人化：</b>依你的氣質微調穿搭與氛圍，不做複雜心理分析、不輸出推理過程</li>
+      <li><b>繁中少字：</b>只放「我的理想型」＋ 3–5 個短標註，寧可少字也不生亂碼</li>
+      <li><b>先問男／女：</b>不指定性別不亂生，這是它的安全機制</li>
+    </ul>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>玩一張很爽，<span class="g">但 AI 能幫你的遠不只這個</span></h2>
+      <div class="cta-lead">這種好玩的生成器能漲粉、能互動，但都是單點。真正讓你拉開差距的，是把 AI 變成每天的生產力——做內容、做決策、做出收入。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把自己變成「一人團隊」的創作者</div>
+        <div class="f">喜歡玩這種 AI 招式、但想學得更系統的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接套用的 Prompt 與招式庫，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個週末就能上手——你只是還沒開始，不是真的落後</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週更新更多 AI 工具用法與 Prompt 包</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：理想型人物形象板生成器指令——可當輪播／限動「留言領指令」的 DM 承接頁或 lead magnet
+· 內容：使用說明 + 完整指令（一鍵複製，貼進能生圖的 AI 即用）+ 特點摘要
+· 兩段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定；單一資源頁未放中段）：
+    前段 → 桌機右側吸附小卡 .side-cta（id=skool-side）／手機頂部吸附細橫幅 .top-cta（id=skool-top）
+    後段 → 頁尾完整卡 .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這三個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「理想型人物形象板圖片生成器」指令
+· 狀態：尚未發布，待操盤手確認
+═══════════════════════════════════════════
+-->
+</body>
+</html>
