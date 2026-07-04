@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>用 NotebookLM 打造你的 Claude 技能工廠｜一次設定，永久生效</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:18px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:420px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.check{margin:10px 0 2px;}
+.check .ck{display:flex;gap:10px;align-items:flex-start;font-size:13.7px;line-height:1.7;margin-bottom:8px;color:var(--text);}
+.check .ck::before{content:"\2713";flex-shrink:0;width:18px;height:18px;border:1.5px solid var(--gold-dim);border-radius:5px;color:var(--gold);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;background:rgba(212,144,42,0.06);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:58px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;letter-spacing:0.02em;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body>p{font-size:14px;line-height:1.82;color:var(--text);margin:12px 0;}
+.ch-body>p .hl{color:var(--gold);font-weight:500;}
+.goal{display:flex;gap:10px;align-items:flex-start;background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0;font-size:14px;line-height:1.7;}
+.goal .gl{font-weight:700;color:var(--gold);flex-shrink:0;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--dim);line-height:1.8;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>建好你的技能工廠後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">做成變現系統</span></h4>
+  <p>會建技能只是基本。怎麼用 AI ＋ 自媒體做出被動收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">NOTEBOOKLM × CLAUDE · SKILL FACTORY</div>
+    <h1>用 NotebookLM 打造<br><span class="g">你的 Claude 技能工廠</span></h1>
+    <div class="hero-sub">每次都要重新教 Claude 你的語氣和格式？問題不在它不夠強，在於它每次都從零開始。<br>這份教學教你用 NotebookLM ＋ skill.md 系統，把你的標準寫成「食譜」——一次設定，永久生效。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">步驟 · 完整流程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">1</div><div class="l">份範例 · 直接改</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">照著做就行</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注於「AI × 自媒體變現」的個人品牌經營者——從 Claude、ChatGPT 到 NotebookLM，每一篇都以「可以直接套用」為核心原則。</div></div>
+  </div>
+
+  <!-- 問題 + 核心概念 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份教學要解決的問題</span>
+    <h2>Claude 不是不強<br><span class="g">是每次都從零開始</span></h2>
+    <p>你有沒有遇過這種情況：</p>
+    <ul class="bul">
+      <li>每次叫 Claude 寫 Email，都要重新解釋一次你的語氣和格式要求</li>
+      <li>每次叫 Claude 做 FAQ，輸出的品質忽好忽壞</li>
+      <li>你知道 AI 可以幫你省時間，但每次都要花大量時間「調教」它</li>
+    </ul>
+    <p style="margin-top:12px;">解法是 Claude Code 的「技能（Skill）」——放在技能資料夾裡的 <span class="hl">.md 檔案</span>，Claude 執行任務前會先讀它：輸出格式是什麼、語氣標準是什麼、哪些規則必須遵守、範例長什麼樣。</p>
+    <div class="insight"><div class="il">核心概念</div><div class="it">一個技能檔案 ＝ 一個任務類型的完整說明書。你不用每次重新解釋，Claude 讀完直接照著走。</div></div>
+    <div class="sub-h">為什麼用 NotebookLM 來寫 Skill？</div>
+    <p>手寫一份好的 skill.md 很花時間、容易漏細節。NotebookLM 的強項是<span class="hl">只根據你提供的來源回答、不捏造</span>——所以它很適合：從你的現有資料萃取規則 → 整理成 Claude 看得懂的格式 → 輸出一份可直接使用的 skill.md。</p>
+    <div class="tipline"><b>一句話：</b>你提供資料，NotebookLM 幫你把規則文件化，Claude 照著執行。</div>
+  </div>
+
+  <!-- 5 步驟 -->
+  <div class="sec fade">
+    <span class="sec-tag">完整教學 · 5 步驟</span>
+    <h2>從上傳資料<br><span class="g">到技能庫成形</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">STEP 1</span><span class="ch-t">開啟 NotebookLM，上傳你的最佳資料來源</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>讓 NotebookLM 有足夠的「原料」來理解你的任務標準。</span></div>
+        <div class="sub-h">依任務類型準備資料</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>任務類型</th><th>建議上傳的資料</th></tr></thead><tbody>
+          <tr><td>電子郵件</td><td>你過去寫過的優質 Email 範例（5–10 封）</td></tr>
+          <tr><td>落地頁文案</td><td>你認為寫得好的落地頁截圖或文字稿</td></tr>
+          <tr><td>FAQ</td><td>客戶常問的問題清單 ＋ 你的標準回覆</td></tr>
+          <tr><td>客服回覆</td><td>過去的客服對話紀錄（已脫敏）</td></tr>
+          <tr><td>社群貼文</td><td>你的高互動貼文 10–20 篇</td></tr>
+          <tr><td>課程講義</td><td>課程大綱、簡報、教學影片逐字稿</td></tr>
+        </tbody></table></div>
+        <div class="sub-h">操作步驟</div>
+        <div class="steps">
+          <div class="st">前往 <b>notebooklm.google.com</b></div>
+          <div class="st">點「新增記事本（New Notebook）」</div>
+          <div class="st">點「新增來源（Add Sources）」</div>
+          <div class="st">上傳資料——支援 PDF、Google Doc、貼上文字、YouTube 連結、網站網址</div>
+          <div class="st">等處理完成（通常 30 秒到 2 分鐘）</div>
+        </div>
+        <div class="tipline"><b>重要原則：</b>品質比數量重要；上傳你自己認為「這是好的輸出」的範例；有固定格式要求的話一定要包含進去。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 2</span><span class="ch-t">請 NotebookLM 撰寫 skill.md</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>讓 NotebookLM 根據你的來源資料，生成一份結構完整的技能說明文件。</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">核心 Prompt 模板 · 貼進 NotebookLM</div><pre>請根據我上傳的所有來源資料，幫我撰寫一份給 AI 助理使用的技能說明文件（skill.md）。
+這份文件的目的是讓 AI 在執行「<span class="ph">[你的任務類型，例如：撰寫電子郵件]</span>」時，能夠完全依照我的風格與格式標準輸出結果。
+
+請包含以下章節：
+1. 任務概述（這個技能是做什麼的）
+2. 輸出格式規範（結構、長度、段落安排）
+3. 語氣與風格原則（必須遵守 + 絕對禁止）
+4. 必填資訊清單（每次執行前需要提供的資訊）
+5. 輸出範例（直接從來源資料中擷取一個最佳範例）
+6. 常見錯誤與避免方式
+
+請只根據我上傳的來源資料來撰寫，不要自行補充或推測我沒有提供的內容。</pre></div>
+        <div class="sub-h">調整重點</div>
+        <ul class="bul">
+          <li>把 <b>[你的任務類型]</b> 換成實際任務，例如「撰寫品牌電子報」「回覆客戶詢問」</li>
+          <li>缺章節就追問：「請補充第 X 章節的細節」</li>
+          <li>規則不夠清楚就追問：「請把第 X 條規則說得更具體，並舉例說明」</li>
+        </ul>
+        <div class="sub-h">輸出品質檢查清單</div>
+        <div class="check">
+          <div class="ck">清楚說明這個技能的使用場景</div>
+          <div class="ck">輸出格式有具體的結構描述（不是模糊的「保持清楚」）</div>
+          <div class="ck">語氣規範有正反兩面的例子</div>
+          <div class="ck">有至少一個完整的輸出範例</div>
+          <div class="ck">有說明「不能做什麼」</div>
+        </div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 3</span><span class="ch-t">把 skill.md 放入 Claude Code 技能資料夾</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>把 NotebookLM 生成的技能文件，安裝進你的 Claude Code 環境。</span></div>
+        <div class="steps">
+          <div class="st">複製 NotebookLM 輸出的完整文字</div>
+          <div class="st">在本機建一個新檔，命名規則：<b>[任務類型].md</b>（英文小寫＋連字號，不要空格）</div>
+          <div class="st">放進 Claude Code 的技能資料夾（自訂技能區）</div>
+          <div class="st">確認檔案已正確放置</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">命名範例 + 資料夾結構建議</div><pre>email-newsletter.md     ← 電子報技能
+faq-generator.md        ← FAQ 生成技能
+customer-reply.md       ← 客服回覆技能
+landing-page.md         ← 落地頁文案技能
+
+skills/
+├── public/          ← 系統內建技能（不要動）
+└── user/            ← 你的自訂技能放這裡
+    ├── email-newsletter.md
+    ├── faq-generator.md
+    ├── customer-reply.md
+    └── landing-page.md</pre></div>
+        <div class="tipline"><b>注意：</b>一個檔案對應一個任務類型，不要把多種任務混在同一個技能裡；技能更新後，下次啟動會自動讀取新版本。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 4</span><span class="ch-t">Claude 讀取技能，照著食譜執行</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>了解 Claude 怎麼使用技能文件，以及如何正確觸發它。</span></div>
+        <p><span class="hl">運作原理：</span>執行任務時，Claude 會掃描技能資料夾、找到與任務相關的技能，先讀完規則再回答。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">觸發方式範例 · Prompt 開頭講明任務類型</div><pre>「請使用電子報技能，幫我撰寫這週的品牌電子報。主題是：AI 工具推薦。」
+「請使用客服回覆技能，回覆以下客戶詢問：[貼上客戶訊息]」
+「請使用 FAQ 技能，根據以下產品說明生成 10 個常見問題：[貼上產品說明]」</pre></div>
+        <div class="sub-h">驗證技能是否正常運作</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第一次用新技能時先問</div><pre>你現在有讀取到哪些技能？請列出來，並簡單說明每個技能的用途。</pre></div>
+        <div class="sub-h">調整技能的時機</div>
+        <p>輸出不符合期望時，<span class="hl">不要一直在對話裡修正——回去更新 skill.md 才是正確做法</span>：</p>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>問題現象</th><th>修正位置</th></tr></thead><tbody>
+          <tr><td>語氣不對</td><td>更新「語氣與風格原則」章節</td></tr>
+          <tr><td>格式跑掉</td><td>更新「輸出格式規範」章節</td></tr>
+          <tr><td>缺少必要資訊</td><td>更新「必填資訊清單」章節</td></tr>
+          <tr><td>輸出過長或過短</td><td>在格式規範裡加字數限制</td></tr>
+        </tbody></table></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">STEP 5</span><span class="ch-t">每種任務建一個技能，重複這個流程</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="goal"><span class="gl">目標</span><span>系統化地建立你的技能庫，讓 AI 真正成為可靠的執行夥伴。</span></div>
+        <p><span class="hl">從「最常重複」的任務開始，不要從「最複雜」的開始。</span></p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">技能庫建立順序建議</div><pre>第一批（高頻率、格式固定）
+├── 電子報撰寫
+├── 社群貼文（Instagram/Threads）
+└── 客服標準回覆
+
+第二批（高價值、需要一致品質）
+├── 銷售頁/落地頁文案
+├── 產品 FAQ
+└── 提案文件
+
+第三批（進階、需要更多上下文）
+├── 課程內容設計
+├── 採訪問答準備
+└── 品牌故事撰寫</pre></div>
+        <div class="sub-h">每週維護習慣（15 分鐘）</div>
+        <div class="steps">
+          <div class="st">檢查這週 Claude 的輸出，哪些地方還要調整</div>
+          <div class="st">更新對應的 skill.md</div>
+          <div class="st">有新任務類型，就用 NotebookLM 建新技能</div>
+        </div>
+        <div class="sub-h">進階技巧：技能疊加</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">組合技能範例</div><pre>single-post.md          ← 單篇貼文技能
+carousel-post.md        ← 輪播貼文技能
+content-calendar.md     ← 內容行事曆技能（整合前兩者的規則）</pre></div>
+        <div class="tipline">組合技能讓 Claude 執行複雜任務時，能同時遵守多個層面的規則。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">技能建好了 然後呢</div>
+      <h3>技能讓輸出穩定<br><span class="g">系統才讓你變現</span></h3>
+      <p>這套工廠幫你把每個重複任務標準化。但要把 AI 接成一套能帶來收入的內容系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 實戰範例 -->
+  <div class="sec fade">
+    <span class="sec-tag">實戰範例 · 直接改就能用</span>
+    <h2>「品牌電子報」<br><span class="g">完整 skill.md 範例</span></h2>
+    <p>一份完整的 skill.md 長這樣。把【】換成你的資訊，直接放進技能資料夾。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">email-newsletter.md · 完整範例</div><pre># 品牌電子報撰寫技能
+
+## 任務概述
+撰寫符合 <span class="ph">[你的品牌名稱]</span> 風格的週報電子報，發送對象為訂閱者，目的是分享本週最有價值的 AI 工具資訊，並維持與訂閱者的連結感。
+
+## 輸出格式規範
+- 主旨行：15 字以內，含數字或具體承諾
+- 開場：1-2 句，直接切入本週主題，不要寒暄
+- 主體：3 個段落，每段不超過 100 字
+- 每段結構：現象/問題 → 具體解法或工具 → 你可以怎麼用
+- 結尾：1 句話，引導讀者採取一個行動（點擊/回覆/試試看）
+- 署名：<span class="ph">[你的名字]</span> + 一句話個人定位
+
+## 語氣與風格原則
+必須：
+- 口語、直接，像在跟朋友說話
+- 有具體的數字或案例
+- 結論放在前面，細節放後面
+禁止：
+- 「希望這封信對你有幫助」類的客套話
+- 超過一個以上的行動呼籲
+- 過度使用感嘆號
+
+## 每次執行前需提供
+1. 本週主題（一句話描述）
+2. 要介紹的工具或方法名稱
+3. 這個工具最具體的一個使用場景
+
+## 輸出範例
+主旨：本週這個 Claude 設定，幫我省了 3 小時
+
+這週我把客服回覆的工作流整個重建了一遍。
+做法很簡單：把過去 50 封最好的回覆丟進 NotebookLM，讓它幫我寫出一份 skill.md，再放進 Claude Code。之後每次回覆詢問，Claude 都照著這份文件走，不用再每次解釋語氣和格式。
+如果你也有重複性的寫作任務，這個方法值得試試。下面是我用的 Prompt 模板。
+
+<span class="ph">[你的名字]</span>
+AI × 自媒體，幫你用更少時間做更多事
+
+## 常見錯誤
+- 輸出太長：主體每段嚴格控制在 100 字以內
+- 語氣太正式：如果感覺像「公告」，重新用口語改寫
+- 行動呼籲超過一個：只保留最重要的那一個</pre></div>
+  </div>
+
+  <!-- FAQ + 快速開始 -->
+  <div class="sec fade">
+    <span class="sec-tag">常見問題 + 快速開始</span>
+    <h2>開始前<br><span class="g">你可能想問</span></h2>
+    <div class="faq">
+      <div class="q">我不用 Claude Code，只用 Claude.ai，適用嗎？</div>
+      <div class="a">Claude.ai 的 Projects 可以達到類似效果——把技能文件貼進 Project 的「自訂指示」。不過 Claude Code 的 skill.md 系統支援多個技能並行，管理更彈性。</div>
+      <div class="q">NotebookLM 生成的 skill.md 品質不好怎麼辦？</div>
+      <div class="a">① 增加更多高品質範例來源（特別是輸出範例）② Prompt 裡更明確指定結構 ③ 分段生成——先寫格式規範、再寫語氣原則、最後寫範例。</div>
+      <div class="q">一份 skill.md 應該多長？</div>
+      <div class="a">通常 500–1500 字最適合。太短規則不夠清楚；太長 Claude 可能無法完整吸收。</div>
+      <div class="q">可以讓多個技能同時生效嗎？</div>
+      <div class="a">可以。Claude Code 會自動判斷哪個技能與當前任務最相關；想明確指定就說「請同時參考 X 技能和 Y 技能」。</div>
+    </div>
+    <div class="sub-h" style="margin-top:26px;">快速開始清單（今天就建第一個技能）</div>
+    <div class="check">
+      <div class="ck">決定要先建立哪個任務的技能</div>
+      <div class="ck">收集 5–10 個該任務的優質範例</div>
+      <div class="ck">開 NotebookLM 建新記事本、上傳範例</div>
+      <div class="ck">用本文的 Prompt 模板生成 skill.md</div>
+      <div class="ck">把 skill.md 放進技能資料夾</div>
+      <div class="ck">執行一次測試任務，確認輸出符合預期</div>
+      <div class="ck">根據結果調整並更新 skill.md</div>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工廠你會蓋了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這套方法讓你的每個重複任務都有標準、有品質。但要把 AI 真正接成一套帶來收入的系統——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造被動收入的人</div>
+        <div class="f">會用工具、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">可以直接套用的 Skill 與 Prompt 範本，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">用更少時間，做出更多成果</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週分享 Claude、ChatGPT、NotebookLM 的實際工作流</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：NotebookLM × Claude 技能工廠教學——對應 IG 輪播，可當留言領取的 DM 承接頁／lead magnet
+· 內容：問題框架 + 5 步驟摺疊（各含目標＋可複製 Prompt/範例）+ 完整 email-newsletter.md 實戰範例 + FAQ + 快速開始清單
+· 微調：原文的 /mnt/skills/ 絕對路徑改為通稱「技能資料夾」＋通用結構圖（不同環境路徑不同，避免讀者照抄出錯）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「NotebookLM_Claude_技能工廠_教學」
+· 狀態：本機已就位（jason-pages/skill-factory.html），尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
