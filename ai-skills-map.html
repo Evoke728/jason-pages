@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 AI 技能地圖｜你不可或缺的 12 個 AI 工具與工作流</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:14px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;width:32px;height:32px;border-radius:9px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.8px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:11.5px;margin-left:6px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.blk{margin:13px 0;}
+.blk .bl{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:5px;}
+.blk .bt{font-size:14px;line-height:1.8;color:var(--text);}
+.blk .bt b{color:var(--gold);}
+.blk .bt .arrow{color:var(--gold);font-weight:600;}
+.tools{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+.tools span{font-family:var(--mono);font-size:11.5px;color:var(--gold);background:rgba(212,144,42,0.09);border:1px solid var(--gold-dim);border-radius:50px;padding:4px 12px;}
+.first{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.8px;line-height:1.74;color:var(--text);}
+.first b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>拿到這張地圖後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">變成你的槓桿</span></h4>
+  <p>看懂地圖只是開始。怎麼用 AI ＋ 自媒體做出收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">2026 · AI SKILLS MAP</div>
+    <h1>2026 AI 技能地圖<br><span class="g">你不可或缺的 12 個領域</span></h1>
+    <div class="hero-sub">AI 工具一年比一年多，多數人卡住的不是「不知道有這些工具」，是「不知道什麼時候該用哪一個」。<br>這份地圖把 12 個技能領域整理成「是什麼 ＋ 什麼時候用 ＋ 代表工具 ＋ 第一步」——不是丟工具清單，是給你能執行的下一步。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">12</div><div class="l">個 · 技能領域</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">12</div><div class="l">個 · 可執行第一步</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">$0</div><div class="l">存起來當字典查</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注於「AI × 自媒體」的個人品牌——用 AI 工具放大一個人的產出效率，把時間與技能轉化成可規模化的收入來源。</div></div>
+  </div>
+
+  <!-- 用法 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份地圖怎麼用</span>
+    <h2>不用一次讀完<br><span class="g">當字典查</span></h2>
+    <p>把這份地圖存進 Notion 或書籤，<span class="hl">遇到對應情境時再回來查</span>。每一塊都附具體可執行的下一步——先看你每週的工作流程，挑 1–2 個最常卡住的環節，從那裡開始套。</p>
+  </div>
+
+  <!-- 1-6 -->
+  <div class="sec fade">
+    <span class="sec-tag">領域 1–6 · 基本盤</span>
+    <h2>從精通 Claude<br><span class="g">到讓 AI 讀你的資料</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">精通 Claude</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">Claude 不是只有一個聊天視窗。底下是一整套工具：<b>Claude AI</b>（對話助手）、<b>Claude Code</b>（程式撰寫代理人）、<b>Claude Skills</b>（自訂指令集）、<b>Claude Cowork</b>（桌面自動化）。多數人只用到第一層，99% 的價值還沒挖出來。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">日常問答、寫作、整理資料 <span class="arrow">→</span> Claude AI｜寫程式、改 bug、自動化腳本 <span class="arrow">→</span> Claude Code｜重複性高的專業任務 <span class="arrow">→</span> Claude Skills｜跨檔案、跨應用程式的桌面工作流 <span class="arrow">→</span> Claude Cowork</div></div>
+        <div class="first"><b>第一步：</b>打開 Claude 建一個 Project，把常用背景資料（品牌語氣、常用格式、慣用詞彙）放進 Project Knowledge——之後每次對話不用重講背景，輸出品質明顯提升。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">上下文工程<span class="en">Context Engineering</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">同樣的模型，給的指令、資料、限制條件不同，輸出品質差非常多。上下文工程就是<b>結構化地餵給 AI 正確的資訊</b>，而不是丟一句模糊的話就期待好結果。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">任何你發現「AI 給的答案不準、不符合需求」的場合——問題通常不在模型，在你提供的上下文不夠。</div></div>
+        <div class="first"><b>第一步：</b>下指令前先問自己三件事——背景資訊 AI 知道嗎？輸出格式講清楚了嗎？有沒有給範例讓 AI 參考？補齊這三點，結果差很多。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">AI 工作流自動化</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">讓 AI 不只回答問題，而是直接串接工具、資料、動作，自己跑完一整套流程。例如：收到 email <span class="arrow">→</span> AI 判斷內容 <span class="arrow">→</span> 自動建任務 <span class="arrow">→</span> 自動通知相關人，全程不用手動。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">當你發現自己每週都在重複同一套「收資料 → 整理 → 分類 → 通知」的流程時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>n8n</span><span>Claude Cowork</span></div></div>
+        <div class="first"><b>第一步：</b>挑一個每週重複 3 次以上的手動流程，用 n8n 畫出第一個自動化流程圖——從最簡單的「觸發 → 動作」兩步驟開始。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">AI 驅動的 SaaS 開發</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">分兩種：<b>Lovable、Antigravity</b> 這類無程式碼 AI 建構工具，不用寫程式就能做出完整應用；<b>Claude Code、Cursor</b> 則是給開發者的 AI 程式助手，加速寫程式。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">你有一個產品想法，想快速做出能用的原型測試市場，而不是花三個月寫完整系統再上線。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>Lovable</span><span>Antigravity</span><span>Claude Code</span><span>Cursor</span></div></div>
+        <div class="first"><b>第一步：</b>不會寫程式的人，先用 Lovable 或 Antigravity 試做一個 MVP——用文字描述你要的功能，看 AI 能幫你生出多少。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">AI 代理人<span class="en">AI Agents</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">能自己規劃、推理、執行多步驟任務的自主系統——你給它一個<b>目標</b>，它自己拆解步驟去完成，不需要你每一步都下指令。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">當任務需要「思考 ＋ 行動」而不只是「回答問題」時。例如：幫你研究一個主題並整理成報告。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>Crew AI</span><span>AutoGen</span><span>Langchain</span><span>LangGraph</span></div><div class="bt" style="margin-top:6px;font-size:12.5px;color:var(--dim);">偏技術向，適合有開發背景的人</div></div>
+        <div class="first"><b>第一步：</b>不是工程師先別急著碰框架——先用 Claude 的多步驟任務功能，體驗「AI 自主完成多步驟工作」的感覺，理解概念再往技術工具深入。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">6</span><span class="ch-t">檢索增強生成<span class="en">RAG</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">讓 AI 基於<b>你自己的真實資料</b>回答問題，而不是憑訓練時的記憶亂猜——先讀你給的文件，再根據文件內容回答。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">需要 AI 處理大量內部資料（公司文件、產品手冊、過往對話），並要求答案準確、有依據時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>Haystack</span><span>LlamaIndex</span></div><div class="bt" style="margin-top:6px;font-size:12.5px;color:var(--dim);">偏技術向</div></div>
+        <div class="first"><b>第一步：</b>不用自己架系統——先善用 Claude 或 ChatGPT 的「上傳文件」功能，把資料餵進去問問題，這就是 RAG 概念最簡單的應用版本。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">地圖看到一半</div>
+      <h3>工具認得再多<br><span class="g">用出收入才算數</span></h3>
+      <p>後面 6 個領域更靠近規模化。想把這些工具真正接成賺錢的系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 7-12 -->
+  <div class="sec fade">
+    <span class="sec-tag">領域 7–12 · 規模化</span>
+    <h2>從多模態<br><span class="g">到 LLM 管理</span></h2>
+    <div class="acc">
+
+      <details class="ch"><summary><span class="ch-n">7</span><span class="ch-t">多模態 AI<span class="en">Multimodal AI</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">能同時理解文字、圖片、程式碼、音訊，把不同形式的資訊當成<b>同一條資料流</b>處理的 AI 模型。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">工作需要同時處理視覺資料（截圖、圖表）、文件與對話內容時——例如分析一張數據圖表並寫成文字報告。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>ChatGPT</span><span>Gemini</span><span>Claude</span><span>Grok</span></div></div>
+        <div class="first"><b>第一步：</b>下次有截圖、圖表要分析，直接上傳給 Claude 或 ChatGPT，搭配文字描述你要的分析角度——不用自己手動轉成文字。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">8</span><span class="ch-t">模型微調與 AI 助手</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">打造一個<b>懂你的領域、語言、工作流程</b>的專屬 AI，而不是用通用型模型硬套。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">通用型 AI 已經有幫助，但回答還是不夠專業、不夠貼近你的產業情境時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>OpenAI GPT Builder</span><span>Hugging Face</span><span>Cohere</span><span>NVIDIA</span></div></div>
+        <div class="first"><b>第一步：</b>入門不用碰微調——先用 GPT Builder 或 Claude 的 Project 功能，建一個有固定知識背景與語氣設定的「客製化助手」，體驗效果。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">9</span><span class="ch-t">語音 AI 與虛擬分身</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">打造 AI 通話代理人、AI 語音克隆，以及大規模影像呈現（虛擬分身）的工具。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">內容需要規模化的聲音或影像呈現——多語言配音、自動化客服通話、不用真人出鏡的影片。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>ElevenLabs</span><span>Vapi</span><span>Synthesia</span><span>Heygen</span></div></div>
+        <div class="first"><b>第一步：</b>用 ElevenLabs 免費額度，把一段你的文字轉成語音，感受語音克隆的真實度——再決定要不要往影片虛擬分身延伸。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">10</span><span class="ch-t">AI 工具堆疊<span class="en">Tool Stacking</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">讓多個 AI 工具<b>像團隊一樣協同運作</b>的生態系統，而不是各自獨立、互不相通。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">你已經在用好幾個工具，但每個工具的資料都是孤立的、得手動在工具之間複製貼上時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>Notion</span><span>ClickUp</span><span>Asana</span><span>Zapier</span></div></div>
+        <div class="first"><b>第一步：</b>列出你正在用的所有工具，標出哪兩個之間最常手動搬資料——用 Zapier 把那個連接點自動化，從一條連結開始。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">11</span><span class="ch-t">AI 影片內容生成</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">用 AI 把策略與訊息<b>直接轉化成可發佈的影片</b>，不需要傳統的拍攝、剪輯團隊。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">想擴大內容產出量與品牌聲量，卻沒辦法、也不想擴編團隊時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>Runway</span><span>Veo 3</span><span>Kling AI</span><span>Seedance</span></div></div>
+        <div class="first"><b>第一步：</b>挑一段已寫好的文字腳本，用 Runway 或 Veo 3 試做一支 15 秒短片——熟悉從文字到影片的流程，再決定要不要放進正式產線。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">12</span><span class="ch-t">LLM 管理<span class="en">LLM Operations</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="blk"><div class="bl">是什麼</div><div class="bt">一套結構化方法，監控你在用的 AI 系統的<b>準確度、成本、延遲與穩定性</b>——當 AI 不再是「偶爾用一下」而是工作流程的核心基礎設施時，這件事就變重要。</div></div>
+        <div class="blk"><div class="bl">什麼時候用</div><div class="bt">開始大量、長期依賴 AI 工具運作業務（客服自動化、內容產線），需要品質穩定、成本可控時。</div></div>
+        <div class="blk"><div class="bl">代表工具</div><div class="tools"><span>PromptLayer</span><span>Helicone</span><span>Phoenix</span><span>Trulens</span></div><div class="bt" style="margin-top:6px;font-size:12.5px;color:var(--dim);">偏技術與團隊管理向</div></div>
+        <div class="first"><b>第一步：</b>還是個人使用的話不用急著導入——先養成習慣：記錄每次用 AI 的目的、用了哪個工具、結果好不好。這就是最簡單版本的 LLM 管理。</div>
+      </div></details>
+
+    </div>
+
+    <div class="insight" style="margin-top:24px;"><div class="il">寫在最後</div><div class="it">這 12 個技能不用全部精通、也不用照順序學。先回頭看你每週的工作流程，挑出 1–2 個最常卡住、最浪費時間的環節，從那裡開始套用對應工具——比硬背完整張地圖更有效。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>地圖你拿到了，<span class="g">接下來換我陪你把它變成槓桿</span></h2>
+      <div class="cta-lead">這張地圖幫你知道「什麼時候該用哪個工具」。但要把工具接成一套放大產出、帶來收入的系統——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具認得不少、卻不知道從哪個環節開始套的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">把 AI 變成自己的槓桿</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">持續分享實測過、真的能用的 AI 工具教學與自動化流程</div>
+  </div>
+
+</div>
+
+<script>
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：2026 AI 技能地圖——對應 IG 輪播，可當留言領取的 DM 承接頁／lead magnet（定位：AI 工具字典，存 Notion 慢慢查）
+· 內容：用法說明 + 12 領域摺疊（1–6 基本盤／7–12 規模化，各含是什麼＋時機＋代表工具膠囊＋第一步）+ 寫在最後
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，6/7 領域之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有 Notion「2026 AI技能地圖」
+· 狀態：本機已就位（jason-pages/ai-skills-map.html），尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
