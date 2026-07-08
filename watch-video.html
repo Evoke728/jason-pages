@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓 Claude 看完任何影片｜完整安裝教學 + 6 組 Prompt 包</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl td:last-child{color:var(--gold);font-weight:600;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.usewhen{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:12px 0;font-size:13.5px;line-height:1.7;color:var(--text);}
+.usewhen b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--dim);line-height:1.8;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝好這個技能後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>想把 AI<br><span class="g">跑成內容產線</span></h4>
+  <p>會拆一支影片只是開始。怎麼用 AI ＋ 自媒體做出收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">WATCH · CLAUDE VIDEO SKILL</div>
+    <h1>讓 Claude<br>看完<span class="g">任何影片</span></h1>
+    <div class="hero-sub">完整安裝教學 ＋ 6 組我自己在用的 Prompt。把任何一支影片，變成 Claude 讀得懂、拆得動的素材。<br>別的工具讓 Claude「讀」影片（只有逐字稿），這個方法讓它「看」影片（畫面＋逐字稿都抓）。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">10</div><div class="l">分鐘 · 安裝</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">6</div><div class="l">組 · 即用 Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30</div><div class="l">分鐘 · 每支省起跳</div></div>
+    </div>
+    <div class="author-card"><div class="a">Jason @jasonxtsai</div><div class="b">做「AI × 自媒體怎麼變現」的個人品牌——每天用 AI 跑內容產線（選題、寫稿、生圖、拆競品）。分享的不是聽來的技巧，是真的在用、真的有結果的東西。</div></div>
+  </div>
+
+  <!-- 這份文件會給你什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件會給你什麼</span>
+    <h2>輪播裡那個技能<br><span class="g">這裡是完整版</span></h2>
+    <ul class="bul">
+      <li><b>觀念：</b>為什麼這個方法比一般影片工具強</li>
+      <li><b>安裝設定：</b>一步一步，含每一行指令</li>
+      <li><b>基礎用法：</b>三種最常用的操作</li>
+      <li><b>真實成本：</b>實際數字，不是行銷話術</li>
+      <li><b>Prompt 包：</b>6 組我自己在用、可直接複製的 Prompt ← 這是重點</li>
+      <li><b>常見問題：</b>卡住時看這裡</li>
+    </ul>
+    <div class="tipline">全部照做大約 <b>10 分鐘</b>，之後每支影片省你半小時起跳。</div>
+  </div>
+
+  <!-- Part 1 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 為什麼有效</span>
+    <h2>影片只有兩種東西<br><span class="g">畫面和文字</span></h2>
+    <p>一支影片拆開來看只有兩層：<span class="hl">畫面（Frames）</span>——螢幕上的圖表、數據、標題、字卡；<span class="hl">聲音（Transcript）</span>——講者說出來的話。</p>
+    <p>大多數「影片摘要工具」只抓第二層逐字稿。問題是，很多影片一半的重點根本不在嘴巴裡，而在<span class="hl">畫面上</span>——一張趨勢圖、一個數字、一句螢幕字卡，逐字稿全部漏掉。</p>
+    <div class="sub-h">這個方法兩層都抓</div>
+    <div class="steps">
+      <div class="st">用 <b>yt-dlp</b> 把影片下載下來</div>
+      <div class="st">用 <b>ffmpeg</b> 每隔幾秒截一張圖（Frames），同時抽出音軌</div>
+      <div class="st">拿到帶時間戳的逐字稿（有字幕就直接用，沒字幕就用 Whisper 轉）</div>
+      <div class="st">把「截圖 ＋ 逐字稿」一起交給 Claude</div>
+    </div>
+    <p>所以 Claude 看到的是<span class="hl">完整的影片</span>——它可以告訴你「第 3 分 20 秒那張圖顯示什麼」「講者在哪個時間點放了哪個數據」。</p>
+    <div class="insight"><div class="il">一句話差別</div><div class="it">別的工具讓 Claude「讀」影片，這個方法讓 Claude「看」影片。</div></div>
+  </div>
+
+  <!-- Part 2 安裝 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · 安裝設定</span>
+    <h2>一步一步<br><span class="g">含每一行指令</span></h2>
+    <p>你需要：<span class="hl">Claude Code</span>（terminal / 桌面版都可）、兩個免費老工具 <b>yt-dlp</b>（下載影片）＋ <b>ffmpeg</b>（處理畫面與音訊），以及<span class="hl">選用</span>的一組 Groq API Key（只有影片完全沒字幕時才用到）。</p>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">步驟一</span><span class="ch-t">先裝好 yt-dlp 和 ffmpeg</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">macOS（用 Homebrew）</div><pre>brew install yt-dlp ffmpeg</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Windows（用 winget）</div><pre>winget install yt-dlp.yt-dlp
+winget install Gyan.FFmpeg</pre></div>
+        <div class="tipline">裝完後在 terminal 輸入 <b>yt-dlp --version</b> 和 <b>ffmpeg -version</b>，有跳版本號就成功。第一次執行時技能通常也會自動補齊缺的東西，但先裝好最省事。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">步驟二</span><span class="ch-t">在 Claude Code 裡安裝技能</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>Claude Code 的技能透過「外掛市集（marketplace）」安裝，兩行指令：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在 Claude Code 執行</div><pre><span class="cm"># 第一行：把市集加進來</span>
+/plugin marketplace add <span class="ph">&lt;作者/儲存庫名稱&gt;</span>
+<span class="cm"># 第二行：安裝技能</span>
+/plugin install <span class="ph">&lt;技能名稱&gt;</span>@<span class="ph">&lt;市集名稱&gt;</span></pre></div>
+        <div class="warn">⚠️ <b>重要：</b>把 <b>&lt;作者/儲存庫名稱&gt;</b> 換成你實際使用的那個 GitHub 儲存庫。安裝前先在該儲存庫的 README 或 Discover 分頁確認它提供的指令名稱，再執行第二行。裝好後 Claude Code 會顯示「Ready to use」。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">步驟三</span><span class="ch-t">（選用）設定 Groq API Key</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>這步<span class="hl">只有處理沒字幕的影片時</span>才需要。</p>
+        <div class="steps">
+          <div class="st">到 <b>console.groq.com</b> 註冊（免費，不用綁信用卡）</div>
+          <div class="st">在 API Keys 頁面產生一組 key</div>
+          <div class="st">把它加到環境變數（見下方）</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">macOS / Linux（加到 ~/.zshrc 或 ~/.bashrc）</div><pre>export GROQ_API_KEY="<span class="ph">你的_key</span>"</pre></div>
+        <div class="tipline">設定好之後重開 Claude Code 就生效。</div>
+      </div></details>
+    </div>
+  </div>
+
+  <!-- Part 3 用法 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 3 · 基礎用法</span>
+    <h2>只有一個動作<br><span class="g">貼上連結，下指令</span></h2>
+    <div class="sub-h">用法 A｜看完整支影片</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">看整支</div><pre>/watch https://www.youtube.com/watch?v=<span class="ph">影片ID</span></pre></div>
+    <p style="font-size:13.5px;">Claude 會下載、截圖、抓逐字稿，然後你就能直接問它影片內容。</p>
+    <div class="sub-h">用法 B｜只看某一段（省時間、省 token）</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">給起訖時間，只看那一小段</div><pre>/watch https://www.youtube.com/watch?v=<span class="ph">影片ID</span> --start 00:35 --end 01:30</pre></div>
+    <p style="font-size:13.5px;">只想分析「開頭鉤子」或某個關鍵段落時超好用，也不浪費 token。</p>
+    <div class="sub-h">用法 C｜看沒有字幕的影片</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">手機原始影片 / Loom / IG Reel 等</div><pre>/watch <span class="ph">&lt;影片連結或本機檔案路徑&gt;</span></pre></div>
+    <p style="font-size:13.5px;">這些通常沒內建字幕，技能會自動改用 Whisper（透過你設定的 Groq key）把聲音轉成文字，你不用多做什麼。</p>
+  </div>
+
+  <!-- Part 4 成本 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 4 · 真實成本</span>
+    <h2>實際數字<br><span class="g">不含糊帶過</span></h2>
+    <p><span class="hl">大多數影片：幾乎免費。</span>多數 YouTube 影片本來就有免費字幕，技能會直接抓，不需要任何轉錄費用，成本趨近於零。</p>
+    <p><span class="hl">沒字幕時：用 Groq 轉，一樣很便宜。</span></p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>費用</th></tr></thead><tbody>
+      <tr><td>Groq Whisper Large v3 Turbo</td><td>每小時音訊約 $0.04</td></tr>
+      <tr><td>OpenAI Whisper（同類對照）</td><td>每小時約 $0.36</td></tr>
+      <tr><td>Groq 免費層</td><td>每天約 2,000 次請求</td></tr>
+    </tbody></table></div>
+    <p style="margin-top:12px;font-size:14px;">換算：<span class="hl">5 小時的影片全部用 Groq 轉，成本大約幾十美分——通常不到半美元。</span>免費額度每天數千次請求一般人用不完，轉錄速度也快到誇張（一小時音訊約十幾秒跑完）。</p>
+    <div class="insight"><div class="il">白話結論</div><div class="it">有字幕免費，沒字幕也便宜到可以忽略。你幾乎不用擔心成本。</div></div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">工具裝好了 重點在這</div>
+      <h3>能拆影片是基本<br><span class="g">拆完怎麼用才是重點</span></h3>
+      <p>下面 6 組 Prompt 是把影片變成你自己內容的關鍵。想把整條產線接起來、真正變現——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 5 Prompt 包 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · Prompt 包（核心）</span>
+    <h2>6 組我自己在用<br><span class="g">處理完影片直接貼</span></h2>
+    <p>以下 6 組是我實際在跑內容時用的。處理完影片後直接貼給 Claude，把 <b>【】</b> 換成你的需求。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">拆解爆款影片的鉤子</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>看到一支數據很好的影片，想搞懂它前 3 秒為什麼抓得住人。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 1 · 拆鉤子</div><pre>你已經看完這支影片。請專注分析「開頭前 5 秒」的鉤子設計，回答以下：
+1. 逐字列出開頭講者說的每一句話（含時間戳）
+2. 畫面上同時出現了什麼（字卡、畫面、動作、表情）
+3. 這個鉤子用了哪些心理機制？請從這幾個角度判斷：
+   - 權威感（他憑什麼讓你聽）
+   - 模式中斷（哪裡打破了你的預期）
+   - 資訊落差（他埋了什麼你想知道的懸念）
+   - 視聽落差（畫面和聲音有沒有製造衝突感）
+4. 如果我要模仿這個鉤子做自己的內容，可以怎麼改寫？給我 3 個變體。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">把長影片濃縮成重點筆記</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>45 分鐘的演講、Podcast、教學影片，你只想要精華。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 2 · 重點筆記</div><pre>你已經看完這支影片。請幫我整理成一份可以收藏的重點筆記：
+1. 用一句話總結整支影片的核心論點
+2. 列出 5-8 個關鍵重點，每個重點：
+   - 一句話標題
+   - 兩到三句說明
+   - 附上出現的時間戳，方便我回去看
+3. 如果影片畫面上有出現重要的圖表或數據，請單獨列出來並說明
+4. 最後給我 3 個「值得深入思考的問題」
+用條列式，繁體中文。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">把影片變成 IG 輪播選題</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>你想把一支好影片的內容，改造成自己的貼文素材。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 3 · 輪播選題</div><pre>你已經看完這支影片。我要把它的內容改造成我自己的 Instagram 輪播貼文。
+請幫我：
+1. 從影片中找出 3 個「可以獨立成篇」的選題角度
+2. 每個角度給我一個「會讓人停下來滑」的封面標題（用數字或具體結果，不要問句）
+3. 選出你覺得最有潛力的那一個，幫我拆成 8 張輪播的大綱：
+   - 每張一句話標題
+   - 標註哪張是痛點、哪張是解法、哪張是 CTA
+4. 提醒我：影片裡有沒有哪個「反直覺的觀點」特別適合當鉤子？
+繁體中文，語氣直接、不說教。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">競品 / 對標帳號影片分析</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>研究別人的內容怎麼做的，找出你可以學的結構。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 4 · 對標拆解</div><pre>你已經看完這支影片，這是我正在研究的對標內容。請幫我做一份拆解：
+1. 內容結構：他把影片分成哪幾個段落？各段的作用是什麼？（附時間戳）
+2. 留人設計：他在哪些時間點做了「防止觀眾離開」的動作？（例如：預告後面、丟問題、換場景）
+3. 記憶點：整支影片最讓人記得住的一句話或一個畫面是什麼？
+4. 可複製的部分：如果我要做同主題內容，有哪 3 個他的做法我可以直接借用？
+5. 他沒做好的地方：有沒有哪裡其實可以更好？
+繁體中文，講重點就好。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">把教學影片轉成 SOP 步驟</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>操作教學、工具示範影片，你想要一份能照著做的文字步驟。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 5 · 轉 SOP</div><pre>你已經看完這支教學影片。請幫我把它整理成一份清楚的操作 SOP：
+1. 這支影片教的是「怎麼做到什麼」？用一句話說明目標
+2. 把操作拆成編號步驟，每一步：
+   - 具體動作
+   - 如果畫面上有出現按鈕、選單、指令，請照抄下來
+   - 附上對應的時間戳
+3. 列出過程中他有提到的「注意事項」或「常見錯誤」
+4. 我照做需要準備什麼工具或前置條件？
+繁體中文，步驟要細到我可以直接照做。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">6</span><span class="ch-t">把長影片改成短影音腳本</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>用在：</b>把一支長影片裡的精華片段，改寫成 30-60 秒的短影音腳本。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Prompt 6 · 短影音腳本</div><pre>你已經看完這支影片。請從裡面挑出「最適合做成短影音」的一個片段，
+幫我改寫成一支 45 秒的短影音腳本：
+1. 先告訴我你選了哪一段、為什麼（哪裡最有梗或最有價值）
+2. 寫出腳本，包含：
+   - 前 3 秒鉤子（一句話，要夠猛）
+   - 中段內容（分鏡＋口播逐字稿）
+   - 結尾 CTA
+3. 標註哪些地方適合放字卡、哪些地方畫面要換
+4. 給我一個適合的貼文標題
+繁體中文，口語、有節奏感。</pre></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- Part 6 FAQ -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 6 · 常見問題</span>
+    <h2>卡住時<br><span class="g">看這裡</span></h2>
+    <div class="faq">
+      <div class="q">一定要會寫程式嗎？</div>
+      <div class="a">不用。安裝時複製貼上指令就好，之後使用只是貼連結。整個過程你不需要看懂任何一行程式碼。</div>
+      <div class="q">影片很長會不會很慢或很貴？</div>
+      <div class="a">有字幕的話幾乎是即時且免費。真的很長又沒字幕時，可以用 --start / --end 只處理你要的那一段，省時間也省錢。</div>
+      <div class="q">Claude 自己不是能看影片嗎？為什麼要這個？</div>
+      <div class="a">Claude 本身沒有原生的影片能力。這個方法聰明的地方，就是把影片拆成「圖片 + 文字」——這兩種格式 Claude 本來就非常擅長處理。</div>
+      <div class="q">只能用 YouTube 嗎？</div>
+      <div class="a">不是。YouTube、Instagram、Loom、本機影片檔都可以。沒字幕的用 Whisper 轉即可。</div>
+      <div class="q">安裝那行指令的儲存庫網址填什麼？</div>
+      <div class="a">填你實際要用的技能儲存庫。安裝前記得先到該儲存庫確認它提供的指令名稱，再執行安裝。</div>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>技能你拿到了，<span class="g">接下來換我陪你把它跑成產線</span></h2>
+      <div class="cta-lead">這個方法讓你把任何影片變成可用素材。但要把它接成一整條「選題 → 生產 → 變現」的內容產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把內容產線跑得更快、更省力的人</div>
+        <div class="f">會用工具、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、有結果才拿出來講的工具與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">下一個能幫你省時間的工具，我會第一時間整理給你</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">@jasonxtsai</div>
+    <div class="fc">AI 工具怎麼用、自媒體怎麼變現、內容工作流怎麼自動化——都是我實際在跑、有結果才拿出來講的<br>※ 工具指令與定價資訊會隨版本更新，使用前建議以官方文件為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：讓 Claude 看完任何影片——輪播「Claude 看影片技能」的 DM 承接頁／lead magnet
+· 內容：文件總覽 + Part1 觀念 + Part2 安裝（3 步驟摺疊，含 brew/winget/plugin/groq 可複製指令）+ Part3 用法（A/B/C 可複製）+ Part4 成本表 + Part5 6 組 Prompt（摺疊、可複製）+ Part6 FAQ
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，Part4/Part5 之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：Jason 自有「watch-lead-magnet」文件
+· 狀態：本機已就位（jason-pages/watch-video.html），尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
