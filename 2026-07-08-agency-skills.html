@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我整間公司，都跑在 Claude Code 上｜220 個 Skill 完整清單</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.22em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:35px;line-height:1.4;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+
+.how{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+.how .hstep{display:flex;gap:13px;align-items:flex-start;}
+.how .hn{flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.how .ht{font-size:14px;line-height:1.75;color:var(--text);}
+.how .ht b{color:var(--gold);}
+.how .ht .m{font-family:var(--mono);font-size:12px;color:var(--gold);background:rgba(212,144,42,0.09);border:1px solid var(--gold-dim);border-radius:5px;padding:1px 6px;}
+
+.dir{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.dcard{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:15px 18px;cursor:pointer;transition:border-color .2s ease,transform .2s ease;}
+.dcard:hover{border-color:var(--gold-dim);transform:translateX(3px);}
+.dcard .di{font-size:22px;flex-shrink:0;}
+.dcard .dm{flex:1;}
+.dcard .dt{font-weight:700;font-size:15px;color:var(--text);}
+.dcard .dd{font-size:12.5px;color:var(--dim);margin-top:2px;line-height:1.55;}
+.dcard .dc{font-family:"Inter";font-weight:800;font-size:20px;color:var(--gold);flex-shrink:0;}
+.dcard .dc span{font-size:11px;color:var(--dim);font-weight:500;display:block;text-align:center;margin-top:1px;}
+
+details.team{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;position:relative;z-index:1;scroll-margin-top:60px;}
+details.team[open]{border-color:var(--gold-dim);box-shadow:0 4px 20px rgba(120,90,30,0.08);}
+details.team>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:20px 22px;user-select:none;}
+details.team>summary::-webkit-details-marker{display:none;}
+.tm-ico{font-size:22px;flex-shrink:0;}
+.tm-name{flex:1;font-family:var(--serif);font-weight:900;font-size:19px;color:var(--text);line-height:1.35;}
+.tm-name .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;margin-left:5px;}
+.tm-cnt{font-family:"Inter";font-weight:800;color:var(--gold);font-size:16px;flex-shrink:0;}
+.tm-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.tm-mk::before,.tm-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.tm-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.tm-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.team[open] .tm-mk::after{transform:rotate(90deg);opacity:0;}
+.tm-body{padding:2px 22px 20px;border-top:1px solid var(--line);}
+.tm-desc{font-size:13.5px;color:var(--dim);margin:15px 0 6px;line-height:1.72;border-left:2px solid var(--gold-dim);padding-left:13px;}
+
+.subh{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--gold);margin:22px 0 4px;padding-top:6px;border-top:1px dashed var(--line);}
+.subh:first-of-type{border-top:none;padding-top:0;}
+
+.srow{padding:13px 0;border-bottom:1px solid var(--line);}
+.srow:last-child{border-bottom:none;}
+.shead{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;}
+.sk{font-family:var(--mono);font-size:12.5px;color:var(--gold);font-weight:500;background:rgba(212,144,42,0.09);border:1px solid var(--gold-dim);border-radius:6px;padding:2px 9px;white-space:nowrap;}
+.ro{font-weight:700;font-size:13.5px;color:var(--text);}
+.ds{font-size:13px;color:var(--dim);line-height:1.72;margin-top:6px;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:27px;}
+  .sec h2{font-size:21px;}
+  .tm-name{font-size:17px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>拿到這份編制表後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>把一個人<br><span class="g">變成一整間公司</span></h4>
+  <p>看懂編制表只是開始。怎麼把 Claude Code ＋ Skill 接成能賺錢的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">AI AGENCY · 220 SKILLS</div>
+    <h1>我整間公司，<br><span class="g">都跑在 Claude Code 上</span></h1>
+    <div class="hero-sub">這是一份「AI 公司」的完整編制表。<br>把 Claude Code 當成大腦（<b>CLAUDE.md</b> 是對所有人下指令的 context），底下掛 6 支團隊、220 個 skill——每一個 skill 就是一位專職員工，負責一件很具體的事。<br>你只要喊它的名字、丟給它素材，它就照同一套流程把事情做完。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">6</div><div class="l">支 · 團隊</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">220</div><div class="l">個 · Skill</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">1</div><div class="l">個 · 你</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注於「AI × 自媒體」的個人品牌——用 AI 工具放大一個人的產出效率，把時間與技能轉化成可規模化的收入來源。</div></div>
+  </div>
+
+  <!-- 一個 skill 長怎樣 -->
+  <div class="sec fade">
+    <span class="sec-tag">先搞懂一件事</span>
+    <h2>一個 skill 的長相<br><span class="g">很單純</span></h2>
+    <p>一個名字、一個職責、一份標準做法。名字用 <span class="hl">kebab-case</span>（<span class="hl">viral-hooks</span> 這種），方便你直接在 Claude Code 裡呼叫，也方便你自己整理成資料庫。做得越窄，產出越穩定——<span class="hl">一個 skill 只做一件事</span>。</p>
+    <div class="how">
+      <div class="hstep"><span class="hn">1</span><span class="ht">先看你<b>缺哪一隊</b>：社群、SEO、內容、廣告、工程、業務。</span></div>
+      <div class="hstep"><span class="hn">2</span><span class="ht">在那一隊裡挑出你<b>每天都在重做的事</b>，那就是你第一個該建的 skill。</span></div>
+      <div class="hstep"><span class="hn">3</span><span class="ht">一個 skill <b>只做一件事</b>。做得越窄，產出越穩定。</span></div>
+      <div class="hstep"><span class="hn">4</span><span class="ht">需要跨隊協作時，讓一個 skill 的產出變成下一個的輸入：<span class="m">viral-hooks</span> → <span class="m">carousel-writer</span> → <span class="m">publish-social-media</span>。</span></div>
+    </div>
+  </div>
+
+  <!-- 目錄 -->
+  <div class="sec fade">
+    <span class="sec-tag">目錄 · 6 支團隊</span>
+    <h2>點一隊<br><span class="g">直接展開它的名單</span></h2>
+    <div class="dir">
+      <div class="dcard" data-t="t1"><span class="di">🧑‍🤝‍🧑</span><div class="dm"><div class="dt">社群 Social</div><div class="dd">在所有平台寫好、做好、發好</div></div><div class="dc">17<span>skill</span></div></div>
+      <div class="dcard" data-t="t2"><span class="di">🔍</span><div class="dm"><div class="dt">SEO</div><div class="dd">找出該排名的關鍵字、做出會贏的頁面</div></div><div class="dc">17<span>skill</span></div></div>
+      <div class="dcard" data-t="t3"><span class="di">📝</span><div class="dm"><div class="dt">內容 Content</div><div class="dd">全自動產出所有內容：腳本、影片、輪播</div></div><div class="dc">107<span>skill</span></div></div>
+      <div class="dcard" data-t="t4"><span class="di">📣</span><div class="dm"><div class="dt">廣告 Ads</div><div class="dd">研究、製作、優化廣告</div></div><div class="dc">5<span>skill</span></div></div>
+      <div class="dcard" data-t="t5"><span class="di">🧩</span><div class="dm"><div class="dt">工程 Engineering</div><div class="dd">串接 app、架好 CRM、把缺的補上</div></div><div class="dc">47<span>skill</span></div></div>
+      <div class="dcard" data-t="t6"><span class="di">💼</span><div class="dm"><div class="dt">業務 Business</div><div class="dd">開發、提案、回報、優化，負責成交</div></div><div class="dc">27<span>skill</span></div></div>
+    </div>
+  </div>
+
+  <!-- 團隊清單 -->
+  <div class="sec fade" style="padding-bottom:8px;">
+    <span class="sec-tag">完整名單</span>
+    <h2>220 位員工<br><span class="g">照團隊分好</span></h2>
+
+    <!-- T1 社群 -->
+    <details class="team" id="t1" open>
+      <summary><span class="tm-ico">🧑‍🤝‍🧑</span><span class="tm-name">社群 Social</span><span class="tm-cnt">17</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">幫你在所有平台寫好、做好、發好。你完全不用碰。</div>
+        <div class="srow"><div class="shead"><span class="sk">viral-hooks</span><span class="ro">鉤子手</span></div><div class="ds">寫出讓人停下滑動的開場。輸入主題與受眾，產出 15–20 組不同框架的 hook（痛點式、數字式、反直覺式、懸念式），可套到 Reels 首 3 秒、輪播封面或貼文首行。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">instagram-reels</span><span class="ro">Reels 擔當</span></div><div class="ds">產出可直接發 IG 的 Reels。輸入題目，吐出腳本、分鏡、字幕點位、封面文字與建議 BGM，含 hook／內容／CTA 三段結構。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">social-captions</span><span class="ro">文案手</span></div><div class="ds">幫每篇貼文寫好說明文。依平台調整長度與語氣，含首行鉤子、段落斷行、結尾 CTA 與留言引導。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">stories-weekly-planner</span><span class="ro">限動排程</span></div><div class="ds">規劃整週的限時動態。依你的檔期排出每天的限動主題（幕後、投票、問答、導購），標好互動貼圖用法。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">publish-social-media</span><span class="ro">自動發文</span></div><div class="ds">一鍵發佈到所有平台。把一份內容依 IG／Threads／X／LinkedIn／TikTok 各自的格式改寫並排程送出。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">manychat-flow-duplicate</span><span class="ro">自動私訊</span></div><div class="ds">用自動 DM 把資源送出去。設定關鍵字觸發（例：留言「CLAUDE」），自動私訊連結、抓名單、加標籤。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">threads-post</span><span class="ro">Threads 擔當</span></div><div class="ds">產出偏口語、碎唸感的 Threads 短文，含劇透遮蔽（mark spoiler）鉤子用法與互動收尾。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">linkedin-post</span><span class="ro">LinkedIn 擔當</span></div><div class="ds">產出專業感的 LinkedIn 貼文，觀點 ＋ 個人故事 ＋ 條列價值，適合 B2B 與個人品牌。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">x-thread-writer</span><span class="ro">推文串手</span></div><div class="ds">把一個觀點拆成 5–15 則連貫的 X 推文串，首則抓眼、每則獨立成立、結尾導流。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">tiktok-script</span><span class="ro">TikTok 腳本手</span></div><div class="ds">針對 TikTok 演算法寫短影音腳本，強開場、快節奏、留言鉤子，附拍攝運鏡提示。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">youtube-shorts</span><span class="ro">Shorts 擔當</span></div><div class="ds">把長內容或單一觀點做成 YouTube Shorts 腳本與封面文字，60 秒內講完一個重點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">comment-responder</span><span class="ro">留言管家</span></div><div class="ds">產出符合品牌語氣的留言回覆草稿，分正評、負評、提問三種模板，維持互動熱度。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">dm-auto-reply</span><span class="ro">私訊客服</span></div><div class="ds">建立常見問題的私訊自動回覆腳本（價格、購買、合作、售後），把重複問題自動化。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">hashtag-strategist</span><span class="ro">標籤策略</span></div><div class="ds">依貼文主題產出大中小三層 hashtag 組合，避開過度競爭與被限流的標籤。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">profile-optimizer</span><span class="ro">個人檔案優化</span></div><div class="ds">重寫 IG／Threads／LinkedIn 的名稱、簡介、精選重點與導流連結，讓陌生人 3 秒看懂你在做什麼。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">community-engagement</span><span class="ro">互動經營</span></div><div class="ds">規劃每日主動互動清單（該留言的帳號、該回的 DM、該轉發的內容），把觸及養起來。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ugc-collector</span><span class="ro">UGC 收集</span></div><div class="ds">整理粉絲自發內容與見證，產出轉發文案與授權詢問訊息，把口碑變成素材。</div></div>
+      </div>
+    </details>
+
+    <!-- T2 SEO -->
+    <details class="team" id="t2">
+      <summary><span class="tm-ico">🔍</span><span class="tm-name">SEO</span><span class="tm-cnt">17</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">找出該排名的關鍵字、做出會贏的頁面。你完全不用碰。</div>
+        <div class="srow"><div class="shead"><span class="sk">seo-audit</span><span class="ro">網站醫生</span></div><div class="ds">診斷並修好你的 SEO。掃描標題、描述、H 標籤、內鏈、載入速度、行動裝置友善度，列出問題與修法優先序。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">claude-seo</span><span class="ro">AI 優化師</span></div><div class="ds">讓你在 ChatGPT、Claude、Perplexity 被搜到。針對 AI 引用邏輯優化內容結構、可引用段落與實體標記（GEO／AEO）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">programmatic-seo</span><span class="ro">量產機</span></div><div class="ds">大量生成 SEO 頁面。用模板 ＋ 資料集批次產出數十到數百個長尾關鍵字著陸頁。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">seo-competitor-pages</span><span class="ro">間諜</span></div><div class="ds">分析對手哪些頁面有效。抓出競品排名最好的頁面、關鍵字與內容結構，找出你能贏的切角。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">faq-generator</span><span class="ro">解答者</span></div><div class="ds">寫出會被 AI 引用的答案。從關鍵字延伸出真實用戶提問，產出精準、可直接被搜尋引擎與 AI 摘錄的 FAQ。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">guide-generator</span><span class="ro">教授</span></div><div class="ds">產出可直接發佈的完整攻略。針對一個主題寫出長篇、結構完整、含目錄與內鏈的權威指南。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">keyword-research</span><span class="ro">關鍵字探勘</span></div><div class="ds">依主題與市場產出關鍵字清單，標註搜尋意圖、難度與商業價值，排出優先攻擊順序。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-brief</span><span class="ro">大綱手</span></div><div class="ds">為每個目標關鍵字產出寫作大綱：標題選項、H2／H3 結構、必答問題、字數建議與內外連建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">internal-linking</span><span class="ro">內鏈規劃</span></div><div class="ds">掃描站內文章，建議該互相連結的頁面與錨點文字，把權重集中到主力頁。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">meta-tags-writer</span><span class="ro">標題描述手</span></div><div class="ds">批次撰寫 title 與 meta description，控制字數、放入關鍵字、提高點閱率。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">schema-markup</span><span class="ro">結構化標記</span></div><div class="ds">產出 FAQ、How-to、Product、Article 等 JSON-LD 結構化資料，爭取複合式搜尋結果。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">backlink-outreach</span><span class="ro">外連開發</span></div><div class="ds">找出可爭取外連的網站與聯絡人，產出客製化的邀約信與客座文章提案。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-refresh</span><span class="ro">舊文翻新</span></div><div class="ds">找出流量下滑的舊文，補上新資料、更新關鍵字、優化結構，重新推上排名。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">serp-analyzer</span><span class="ro">排名分析</span></div><div class="ds">拆解某關鍵字的搜尋結果頁：誰在排名、用什麼內容型態、有哪些精選摘要機會。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">local-seo</span><span class="ro">在地 SEO</span></div><div class="ds">優化 Google 商家檔案、在地關鍵字與評論回覆，搶下「附近的 XX」搜尋。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">topic-cluster</span><span class="ro">主題叢集</span></div><div class="ds">圍繞一個核心主題規劃支柱頁 ＋ 群集文章的內鏈架構，建立主題權威。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sitemap-generator</span><span class="ro">網站地圖</span></div><div class="ds">產出並維護 XML sitemap，確保重要頁面都被搜尋引擎正確索引。</div></div>
+      </div>
+    </details>
+
+    <!-- T3 內容 -->
+    <details class="team" id="t3">
+      <summary><span class="tm-ico">📝</span><span class="tm-name">內容 Content</span><span class="tm-cnt">107</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">107 個 skill，全自動產出所有內容：腳本、影片、輪播。最大的一隊。</div>
+
+        <div class="subh">影片與短影音（26）</div>
+        <div class="srow"><div class="shead"><span class="sk">carousel-cloner</span><span class="ro">複製師</span></div><div class="ds">把任何輪播複製成你的品牌風格。保留原資訊結構，套上你的配色、字體與版型重製。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">clone-video</span><span class="ro">影片複製</span></div><div class="ds">用你的分身重現爆款 Reels。拆解爆片結構，換成你的腳本與人像產出新片。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">heygen-avatar</span><span class="ro">你的分身</span></div><div class="ds">用 AI 生成你的口播人像，把文字稿直接變成你在鏡頭前說話的影片。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">react-to-post</span><span class="ro">反應擔當</span></div><div class="ds">針對爆紅貼文做出回應內容，蹭上熱度並帶入你的觀點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-calendar</span><span class="ro">排程規劃</span></div><div class="ds">排好整個月的內容行事曆，分配主題、平台、格式與發佈時間。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">viral-music-bgm</span><span class="ro">配樂手</span></div><div class="ds">配上抓住注意力的音樂，依內容情緒推薦當紅音檔與進場點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">reels-script</span><span class="ro">Reels 腳本手</span></div><div class="ds">產出 15–60 秒 Reels 的逐字腳本，含 hook、內容節奏與 CTA。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">tiktok-hook-video</span><span class="ro">TikTok 開場手</span></div><div class="ds">專攻前 3 秒，產出多組 TikTok 開場鉤子與畫面提示。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">youtube-long-form-script</span><span class="ro">長片腳本手</span></div><div class="ds">產出 8–20 分鐘 YouTube 長片腳本，含開場、章節、留存鉤子與結尾導流。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">youtube-title-thumbnail</span><span class="ro">標題縮圖手</span></div><div class="ds">產出高點閱的 YouTube 標題與縮圖文字／構圖建議，附 A/B 版本。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">shorts-repurpose</span><span class="ro">長轉短</span></div><div class="ds">從一支長片切出多支短影音，標出金句片段與最佳切點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">talking-head-script</span><span class="ro">口播稿手</span></div><div class="ds">把觀點寫成適合對鏡頭講的口播稿，口語、有停頓、好記。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">b-roll-planner</span><span class="ro">空鏡規劃</span></div><div class="ds">依腳本標出每一句該搭什麼畫面或空鏡，列出拍攝與素材清單。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-storyboard</span><span class="ro">分鏡師</span></div><div class="ds">把腳本轉成分鏡表：每格畫面、運鏡、字幕與時間軸。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-hook-tester</span><span class="ro">開場測試</span></div><div class="ds">產出同一支影片的 5 種開場版本，供你 A/B 測哪個留存最好。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-caption-burner</span><span class="ro">燒字幕</span></div><div class="ds">產出可直接燒進畫面的字幕檔與樣式（斷句、強調字、位置）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">auto-subtitle</span><span class="ro">自動字幕</span></div><div class="ds">把影片語音轉成逐字字幕（SRT／VTT），自動斷行斷句。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">subtitle-translate</span><span class="ro">字幕翻譯</span></div><div class="ds">把字幕翻成多語版本，保留語氣與時間軸，做跨市場發佈。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-cut-editor</span><span class="ro">剪輯手</span></div><div class="ds">依逐字稿標出剪輯點，產出粗剪清單（保留、刪除、順序調整）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">silence-remover</span><span class="ro">去廢話</span></div><div class="ds">標出影片中的停頓、贅字與重複段落，讓節奏更緊湊。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">jump-cut-maker</span><span class="ro">跳剪手</span></div><div class="ds">規劃跳剪節奏與畫面切換點，做出高留存的短影音感。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">broll-stock-finder</span><span class="ro">素材搜尋</span></div><div class="ds">依腳本關鍵字建議免費／付費空鏡與圖庫素材來源與搜尋詞。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-thumbnail-ab</span><span class="ro">縮圖 A/B 測</span></div><div class="ds">產出多組縮圖概念與文字，規劃測試方式與判讀指標。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-description-writer</span><span class="ro">影片說明手</span></div><div class="ds">撰寫 YouTube／IG 影片說明欄：摘要、章節時間戳、關鍵字與連結。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-chapter-marker</span><span class="ro">章節標記</span></div><div class="ds">從逐字稿自動切出章節與時間戳，提升觀看體驗與 SEO。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-repurpose-quotes</span><span class="ro">金句擷取</span></div><div class="ds">從影片抓出最有力的金句，做成引言卡或短影音字卡。</div></div>
+
+        <div class="subh">輪播與圖文（12）</div>
+        <div class="srow"><div class="shead"><span class="sk">carousel-writer</span><span class="ro">輪播文案手</span></div><div class="ds">產出整組輪播的每張標題與正文，控制資訊節奏與翻頁動機。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">carousel-hook-cover</span><span class="ro">輪播封面手</span></div><div class="ds">專攻第一張封面，產出多組能停滑的封面主標與副標。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">carousel-outline</span><span class="ro">輪播結構師</span></div><div class="ds">規劃整組輪播的張數與各張角色（鉤子→問題→解法→CTA）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">quote-card-maker</span><span class="ro">金句卡</span></div><div class="ds">把一句話做成有設計感的金句圖卡，附版面與配色建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">infographic-planner</span><span class="ro">資訊圖規劃</span></div><div class="ds">把複雜資訊拆成可視化資訊圖的結構與圖示建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">before-after-post</span><span class="ro">對比圖手</span></div><div class="ds">產出「之前 vs. 之後」對比型貼文，突顯轉變與成效。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">listicle-carousel</span><span class="ro">清單輪播</span></div><div class="ds">把一個主題做成「X 個方法／工具／重點」的清單型輪播。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">tutorial-carousel</span><span class="ro">教學輪播</span></div><div class="ds">把一套操作步驟做成一步一張的教學輪播，含截圖建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">myth-buster-carousel</span><span class="ro">迷思破解</span></div><div class="ds">用「常見誤解 vs. 真相」的結構做出反直覺輪播。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">data-viz-post</span><span class="ro">數據圖手</span></div><div class="ds">把數據轉成一眼看懂的圖表貼文，標出重點數字與結論。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">checklist-post</span><span class="ro">清單貼文</span></div><div class="ds">產出可存檔的檢查清單型貼文，提高收藏率。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">faq-carousel</span><span class="ro">問答輪播</span></div><div class="ds">把常見問題做成一問一答的輪播，順便處理購買疑慮。</div></div>
+
+        <div class="subh">文案與貼文（8）</div>
+        <div class="srow"><div class="shead"><span class="sk">post-copy-writer</span><span class="ro">貼文文案手</span></div><div class="ds">產出各平台貼文本體，含鉤子、價值、CTA 三段結構。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">story-caption</span><span class="ro">故事文案</span></div><div class="ds">用個人故事包裝觀點，寫出有畫面、有情緒的敘事型貼文。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">cta-writer</span><span class="ro">行動呼籲手</span></div><div class="ds">針對留言、收藏、分享、導購四種目標產出對應 CTA 句型。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">emoji-formatter</span><span class="ro">排版美化</span></div><div class="ds">幫長文案做斷行、分段與適度 emoji，提升行動裝置可讀性。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">first-line-hook</span><span class="ro">首行鉤子</span></div><div class="ds">專門優化貼文第一行，產出多組讓人點「更多」的開場。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">caption-repurpose</span><span class="ro">文案改寫</span></div><div class="ds">把一篇文案改寫成不同語氣、長度與平台的多個版本。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">tone-adapter</span><span class="ro">語氣轉換</span></div><div class="ds">把同一段內容在專業、口語、幽默、溫暖之間自由切換。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">brand-voice-guide</span><span class="ro">品牌語氣手冊</span></div><div class="ds">分析你過去的貼文，萃取出可複用的語氣規則與禁用句型。</div></div>
+
+        <div class="subh">腳本與口播（7）</div>
+        <div class="srow"><div class="shead"><span class="sk">podcast-script</span><span class="ro">Podcast 腳本</span></div><div class="ds">產出單集 Podcast 的開場、段落大綱、訪綱與結尾。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">webinar-script</span><span class="ro">線上講座腳本</span></div><div class="ds">規劃講座流程：破題、教學、案例、Q&A 與成交環節。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">live-stream-rundown</span><span class="ro">直播流程</span></div><div class="ds">產出直播的分段流程表、話題卡與互動與導購節點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sales-video-script</span><span class="ro">銷售影片腳本</span></div><div class="ds">用問題→放大→解法→證明→行動的結構寫銷售型影片。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">explainer-script</span><span class="ro">解說影片腳本</span></div><div class="ds">把一個產品或概念寫成 60–90 秒的清楚解說腳本。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">testimonial-script</span><span class="ro">見證腳本</span></div><div class="ds">引導客戶說出有說服力的見證，產出訪談提問與剪輯重點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">faq-video-script</span><span class="ro">問答影片腳本</span></div><div class="ds">把高頻問題做成一問一答的短影音腳本系列。</div></div>
+
+        <div class="subh">AI 生成素材（15）</div>
+        <div class="srow"><div class="shead"><span class="sk">ai-image-prompt</span><span class="ro">生圖提示手</span></div><div class="ds">依需求產出完整的 GPT Image／生圖英文提示詞，含風格、構圖、光線。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">midjourney-prompt</span><span class="ro">MJ 提示手</span></div><div class="ds">產出 Midjourney 專用提示詞，含參數（–ar、–style、–v）與變體建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">product-photo-ai</span><span class="ro">商品圖手</span></div><div class="ds">用 AI 生成情境商品照，附場景、光線與品牌調性提示。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-headshot</span><span class="ro">大頭照手</span></div><div class="ds">產出專業形象照的生圖提示與風格建議，用於個人品牌。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-voiceover</span><span class="ro">配音手</span></div><div class="ds">把腳本轉成 AI 配音（語速、情緒、停頓標記），適合旁白與短影音。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">voice-clone</span><span class="ro">聲音複製</span></div><div class="ds">用你的聲音樣本建立語音模型，把文字稿變成你的聲音口播。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-avatar-video</span><span class="ro">虛擬人影片</span></div><div class="ds">用虛擬主播把文字稿變成口播影片，適合量產內容。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-music-generator</span><span class="ro">AI 配樂</span></div><div class="ds">依情緒與長度生成原創背景音樂，避開版權問題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sound-effect-picker</span><span class="ro">音效手</span></div><div class="ds">依腳本標出該加音效的點位並建議音效類型。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-background-remover</span><span class="ro">去背手</span></div><div class="ds">批次去背並替換背景，產出乾淨的商品或人像素材。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-upscaler</span><span class="ro">畫質放大</span></div><div class="ds">把低解析度圖片／影片放大到可用畫質，救回舊素材。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-video-generator</span><span class="ro">AI 生影</span></div><div class="ds">用文字或圖片生成短影音片段，做空鏡、轉場或概念畫面。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">lip-sync</span><span class="ro">對嘴手</span></div><div class="ds">讓人像影片對上任意配音，做多語或換稿版本。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ai-comic-strip</span><span class="ro">四格漫畫</span></div><div class="ds">把一個觀點或故事變成四格漫畫的分鏡與生圖提示。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sticker-pack-maker</span><span class="ro">貼圖手</span></div><div class="ds">依品牌角色產出一組貼圖／表情包的設計提示。</div></div>
+
+        <div class="subh">內容再利用（8）</div>
+        <div class="srow"><div class="shead"><span class="sk">content-repurpose-engine</span><span class="ro">內容再利用引擎</span></div><div class="ds">一份原始內容自動裂變成貼文、輪播、短影音、電子報等多種格式。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">blog-to-carousel</span><span class="ro">文章轉輪播</span></div><div class="ds">把一篇部落格濃縮成一組 IG 輪播，保留核心論點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">video-to-blog</span><span class="ro">影片轉文章</span></div><div class="ds">把影片逐字稿改寫成結構完整、可 SEO 的部落格文章。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">podcast-to-clips</span><span class="ro">Podcast 切片</span></div><div class="ds">從一集 Podcast 切出多支社群短影音與金句卡。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">thread-to-carousel</span><span class="ro">推文轉輪播</span></div><div class="ds">把一串爆紅推文重製成 IG 輪播。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">webinar-to-content</span><span class="ro">講座轉內容</span></div><div class="ds">把一場講座拆成部落格、短影音、金句與電子報。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">transcript-cleaner</span><span class="ro">逐字稿整理</span></div><div class="ds">把口語逐字稿清成通順書面稿，去贅字、補標點、分段落。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">long-to-atomic</span><span class="ro">長文拆解</span></div><div class="ds">把一篇長文拆成多則可獨立發佈的原子內容。</div></div>
+
+        <div class="subh">部落格與文章（8）</div>
+        <div class="srow"><div class="shead"><span class="sk">blog-post-writer</span><span class="ro">部落格寫手</span></div><div class="ds">依大綱產出完整部落格文章，兼顧可讀性與 SEO。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">seo-blog-outline</span><span class="ro">文章大綱手</span></div><div class="ds">針對關鍵字產出符合搜尋意圖的文章結構。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">how-to-article</span><span class="ro">教學文章手</span></div><div class="ds">產出步驟清楚、含前置需求與常見錯誤的教學文。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">case-study-writer</span><span class="ro">案例文章手</span></div><div class="ds">用「背景→挑戰→做法→成效」寫出有說服力的案例文。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">listicle-writer</span><span class="ro">清單文章手</span></div><div class="ds">產出「X 個最佳 XX」型清單文章，附各項優缺點。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">comparison-article</span><span class="ro">比較文章手</span></div><div class="ds">產出工具／方案比較文，含比較表與適用情境建議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">glossary-writer</span><span class="ro">名詞解釋手</span></div><div class="ds">把專有名詞寫成清楚、可被 AI 引用的定義段落。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">blog-intro-hook</span><span class="ro">文章開場手</span></div><div class="ds">專門優化文章前兩段，降低跳出率、拉高閱讀完成率。</div></div>
+
+        <div class="subh">電子報（6）</div>
+        <div class="srow"><div class="shead"><span class="sk">newsletter-writer</span><span class="ro">電子報寫手</span></div><div class="ds">產出單期電子報，含主旨、開場、主要內容與 CTA。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">welcome-email-sequence</span><span class="ro">歡迎信序列</span></div><div class="ds">為新訂閱者設計 3–5 封自動化歡迎信，建立信任並導向轉換。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">email-subject-lines</span><span class="ro">信件主旨手</span></div><div class="ds">產出高開信率的主旨與前導文，附 A/B 版本。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">weekly-digest</span><span class="ro">週報手</span></div><div class="ds">把一週的內容或產業動態整理成可讀的週報格式。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">re-engagement-email</span><span class="ro">喚醒信手</span></div><div class="ds">針對沉睡訂閱者設計重新互動的信件。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">broadcast-email</span><span class="ro">群發信手</span></div><div class="ds">快速產出活動、上新、限時優惠的群發信文案。</div></div>
+
+        <div class="subh">Podcast 與音頻（5）</div>
+        <div class="srow"><div class="shead"><span class="sk">podcast-show-notes</span><span class="ro">節目摘要</span></div><div class="ds">把單集內容整理成含時間戳、重點與連結的節目摘要。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">podcast-guest-outreach</span><span class="ro">來賓邀約</span></div><div class="ds">產出來賓邀約信與訪前準備資料。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">audiogram-maker</span><span class="ro">聲音圖卡</span></div><div class="ds">把音頻片段做成可發社群的聲波動態圖卡（規劃字幕與畫面）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">podcast-topic-ideas</span><span class="ro">選題手</span></div><div class="ds">依受眾與定位產出一整季的 Podcast 選題與角度。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">interview-questions</span><span class="ro">訪綱手</span></div><div class="ds">依來賓背景產出有深度、不流於客套的訪談問題。</div></div>
+
+        <div class="subh">策略、行事曆與分析（12）</div>
+        <div class="srow"><div class="shead"><span class="sk">content-strategy</span><span class="ro">內容策略師</span></div><div class="ds">依目標與受眾規劃整體內容方向、平台配置與節奏。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-pillars</span><span class="ro">內容支柱規劃</span></div><div class="ds">定義 3–5 個內容支柱主題，讓帳號定位清楚不發散。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-repurpose-calendar</span><span class="ro">再利用行事曆</span></div><div class="ds">規劃一份內容在各平台的再利用與發佈時程。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">trend-scanner</span><span class="ro">趨勢雷達</span></div><div class="ds">掃描你領域的當紅話題與音檔，建議可蹭的切角。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">viral-post-analyzer</span><span class="ro">爆文拆解</span></div><div class="ds">拆解一則爆紅貼文的鉤子、結構與傳播原因，變成可複用公式。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-audit</span><span class="ro">內容盤點</span></div><div class="ds">盤點現有內容的成效，找出該保留、翻新、下架的項目。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">competitor-content-tracker</span><span class="ro">對手追蹤</span></div><div class="ds">監控競品的內容產出與表現，找出你的機會缺口。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">best-time-to-post</span><span class="ro">發文時機</span></div><div class="ds">依你的受眾活躍數據建議各平台最佳發文時段。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-idea-generator</span><span class="ro">選題發想機</span></div><div class="ds">依定位一次產出 30–50 個可執行的內容選題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">swipe-file-builder</span><span class="ro">靈感庫</span></div><div class="ds">收集並分類優秀貼文、標題、廣告，建立可隨時取用的靈感庫。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">hook-swipe-library</span><span class="ro">鉤子庫</span></div><div class="ds">累積各類高效鉤子模板，依情境快速調用。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-performance-report</span><span class="ro">成效報告</span></div><div class="ds">彙整各平台數據，產出可讀的內容成效月報與下一步建議。</div></div>
+      </div>
+    </details>
+
+    <!-- 中段 CTA -->
+    <div class="mid-cta fade">
+      <div class="mid-card">
+        <div class="mk">名單看到一半</div>
+        <h3>員工你都認得了<br><span class="g">但老闆得會調度</span></h3>
+        <p>skill 建再多，接不成流水線就只是散工。怎麼把這 220 個接成一條會賺錢的產線——我在 Skool 帶你做、每週更新。</p>
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+      </div>
+    </div>
+
+    <!-- T4 廣告 -->
+    <details class="team" id="t4">
+      <summary><span class="tm-ico">📣</span><span class="tm-name">廣告 Ads</span><span class="tm-cnt">5</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">研究、製作、優化廣告。不用代理商。</div>
+        <div class="srow"><div class="shead"><span class="sk">meta-ads</span><span class="ro">Meta 擔當</span></div><div class="ds">建立並優化 Meta（FB／IG）廣告。規劃受眾、版位、預算與素材，產出多組廣告文案與投放結構。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">google-ads-manager</span><span class="ro">Google 擔當</span></div><div class="ds">管理 Google 廣告。規劃關鍵字廣告與 PMax 活動，撰寫廣告標題與說明，設定否定關鍵字。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ad-library-research</span><span class="ro">間諜</span></div><div class="ds">分析對手的廣告。從 Meta 廣告資料庫抓出競品正在跑的素材與文案，找出有效角度。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">clone-ad</span><span class="ro">複製師</span></div><div class="ds">把得獎廣告改成你的品牌版。拆解爆量廣告的結構與鉤子，換成你的產品重製。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">meta-ads-analyzer</span><span class="ro">分析師</span></div><div class="ds">診斷哪個活動有成效。讀取投放數據，找出該加碼、該關掉的組合與素材疲乏訊號。</div></div>
+      </div>
+    </details>
+
+    <!-- T5 工程 -->
+    <details class="team" id="t5">
+      <summary><span class="tm-ico">🧩</span><span class="tm-name">工程 Engineering</span><span class="tm-cnt">47</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">串接 app、架好 CRM、把缺的補上。全自動。</div>
+        <div class="srow"><div class="shead"><span class="sk">twenty-crm</span><span class="ro">CRM 擔當</span></div><div class="ds">建立並管理你的 CRM（Twenty），設定商機階段、欄位與自動化。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">adloop-supabase</span><span class="ro">資料擔當</span></div><div class="ds">串接並查詢 Supabase 資料庫，把廣告與營運數據集中管理。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">connect-whatsapp-cloud-api</span><span class="ro">WhatsApp 擔當</span></div><div class="ds">接上 WhatsApp Cloud API 機器人，做自動回覆與名單經營。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">framer-motion-animator</span><span class="ro">動效師</span></div><div class="ds">幫 landing page 加上 Framer Motion 動畫，讓頁面有質感的進場與互動。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">client-onboarding</span><span class="ro">客戶導入</span></div><div class="ds">自動完成新客戶上線：建帳號、寄歡迎信、開資料夾、排啟動會議。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">web-development</span><span class="ro">工程師</span></div><div class="ds">缺什麼就寫什麼，處理各種前後端開發需求。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">landing-page-builder</span><span class="ro">落地頁手</span></div><div class="ds">產出高轉換 landing page（結構、文案、CTA、行動裝置版）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">nextjs-scaffold</span><span class="ro">Next.js 起手式</span></div><div class="ds">快速建立 Next.js 專案骨架，含路由、元件與部署設定。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">tailwind-styler</span><span class="ro">樣式手</span></div><div class="ds">用 Tailwind 快速做出乾淨一致的介面樣式與 RWD。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">api-integrator</span><span class="ro">API 串接手</span></div><div class="ds">串接第三方 API（金流、寄信、AI、社群），處理驗證與錯誤。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">zapier-automation</span><span class="ro">Zapier 自動化</span></div><div class="ds">用 Zapier 把跨 app 流程自動化，省下重複手動操作。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">make-scenario-builder</span><span class="ro">Make 流程手</span></div><div class="ds">在 Make（Integromat）建立多步驟自動化情境。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">n8n-workflow</span><span class="ro">n8n 工作流</span></div><div class="ds">用 n8n 架自架式自動化工作流，串接 API 與資料庫。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">webhook-handler</span><span class="ro">Webhook 處理</span></div><div class="ds">接收與處理各服務的 webhook 事件，觸發後續動作。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">database-schema-designer</span><span class="ro">資料表設計</span></div><div class="ds">設計乾淨、可擴充的資料庫結構與關聯。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">supabase-auth</span><span class="ro">登入驗證</span></div><div class="ds">建立會員註冊、登入與權限控管（Supabase Auth）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">stripe-payment</span><span class="ro">金流串接</span></div><div class="ds">接上 Stripe 收款、訂閱與發票，處理成功／失敗回呼。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">email-automation</span><span class="ro">信件自動化</span></div><div class="ds">串接寄信服務做觸發式信件（註冊、購買、提醒）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">slack-bot</span><span class="ro">Slack 機器人</span></div><div class="ds">建立 Slack 通知與指令機器人，把團隊流程搬進 Slack。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">telegram-bot</span><span class="ro">Telegram 機器人</span></div><div class="ds">建立 Telegram 通知／客服／自動化機器人。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">discord-bot</span><span class="ro">Discord 機器人</span></div><div class="ds">建立社群 Discord 機器人（歡迎、驗證、通知）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">line-oa-connector</span><span class="ro">LINE OA 串接</span></div><div class="ds">串接 LINE 官方帳號的訊息 API 與自動回覆。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">google-sheets-automation</span><span class="ro">表單自動化</span></div><div class="ds">把 Google Sheets 當輕量資料庫，自動讀寫與計算。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">notion-api-sync</span><span class="ro">Notion 同步</span></div><div class="ds">用 Notion API 把資料自動寫入／讀出 Notion 資料庫。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">airtable-connector</span><span class="ro">Airtable 串接</span></div><div class="ds">串接 Airtable 做資料管理與自動化。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">calendar-booking</span><span class="ro">預約系統</span></div><div class="ds">架設預約／排程系統並串接行事曆與提醒。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">form-builder</span><span class="ro">表單建置</span></div><div class="ds">建立表單並把回覆自動導入資料庫或通知。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">chatbot-builder</span><span class="ro">聊天機器人</span></div><div class="ds">建立網站／社群的對話機器人，處理常見問題與導購。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">rag-knowledge-base</span><span class="ro">知識庫問答</span></div><div class="ds">用你的文件建 RAG 知識庫，讓 AI 依你的資料回答。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">vector-search</span><span class="ro">向量搜尋</span></div><div class="ds">建立向量資料庫與語意搜尋，支撐知識庫與推薦。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">openai-api-wrapper</span><span class="ro">AI API 封裝</span></div><div class="ds">把 AI 模型 API 封裝成穩定可重用的內部服務。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">cron-scheduler</span><span class="ro">定時任務</span></div><div class="ds">設定排程任務（定時抓資料、發報、備份）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">data-scraper</span><span class="ro">爬蟲手</span></div><div class="ds">依需求抓取公開網頁資料並整理成結構化表格。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">csv-etl-pipeline</span><span class="ro">資料清洗</span></div><div class="ds">把雜亂的 CSV／資料清洗、轉換、合併成可用格式。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">dashboard-builder</span><span class="ro">儀表板手</span></div><div class="ds">把數據做成即時儀表板（營運、廣告、內容成效）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">analytics-tracking</span><span class="ro">追蹤碼安裝</span></div><div class="ds">安裝與設定 GA4、Pixel、轉換事件與 UTM。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">ab-test-setup</span><span class="ro">A/B 測試</span></div><div class="ds">建立網站／頁面的 A/B 測試與結果判讀。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">seo-tech-fixer</span><span class="ro">技術 SEO 修復</span></div><div class="ds">修正索引、robots、canonical、結構化資料等技術問題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">site-speed-optimizer</span><span class="ro">網站加速</span></div><div class="ds">優化載入速度（圖片、快取、程式碼），改善 Core Web Vitals。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">deploy-vercel</span><span class="ro">部署手</span></div><div class="ds">把專案部署到 Vercel／Netlify，設定環境變數與網域。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">domain-dns-setup</span><span class="ro">網域設定</span></div><div class="ds">設定網域、DNS 與 SSL，串好子網域與信箱記錄。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">error-monitoring</span><span class="ro">錯誤監控</span></div><div class="ds">接上錯誤與效能監控（如 Sentry），即時抓出線上問題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">backup-automation</span><span class="ro">備份自動化</span></div><div class="ds">設定資料庫與檔案的自動定期備份與還原流程。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">pdf-generator</span><span class="ro">PDF 產生器</span></div><div class="ds">用資料自動生成報價單、報告、憑證等 PDF。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">qr-code-generator</span><span class="ro">QR 產生器</span></div><div class="ds">批次生成含追蹤的 QR code 用於線下導流。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">image-optimizer</span><span class="ro">圖片優化</span></div><div class="ds">批次壓縮與轉檔圖片（WebP），兼顧畫質與載入。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">cms-setup</span><span class="ro">CMS 建置</span></div><div class="ds">架設 headless CMS，讓非工程人員也能自己更新內容。</div></div>
+      </div>
+    </details>
+
+    <!-- T6 業務 -->
+    <details class="team" id="t6">
+      <summary><span class="tm-ico">💼</span><span class="tm-name">業務 Business</span><span class="tm-cnt">27</span><span class="tm-mk"></span></summary>
+      <div class="tm-body">
+        <div class="tm-desc">開發、提案、回報、優化。負責成交。</div>
+        <div class="srow"><div class="shead"><span class="sk">commercial-proposal</span><span class="ro">業務員</span></div><div class="ds">寫好商業提案。依客戶需求產出含問題、方案、成效、報價的完整提案。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">lead-prospecting</span><span class="ro">獵人</span></div><div class="ds">找到並篩選名單。依理想客戶輪廓（ICP）產出潛在客戶清單與聯絡切角。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">content-autopsy</span><span class="ro">鑑識官</span></div><div class="ds">分析哪些內容有效。解剖成效好的內容，找出可複製的成功要素。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">web-traffic-report</span><span class="ro">記者</span></div><div class="ds">產出流量數據報告。彙整來源、行為與轉換，寫成客戶看得懂的報告。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">page-cro</span><span class="ro">優化師</span></div><div class="ds">優化 landing page 轉換率。找出流失點並提出文案、版面、CTA 的改法。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">figma-generate-design</span><span class="ro">設計師</span></div><div class="ds">在 Figma 產出設計素材，把需求變成可用的版面與元件。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">cold-email-writer</span><span class="ro">開發信手</span></div><div class="ds">產出高回覆率的陌生開發信，個人化開場 ＋ 清楚價值 ＋ 低門檻 CTA。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sales-follow-up</span><span class="ro">追單手</span></div><div class="ds">設計成交前的追蹤序列，在不惹人厭的前提下持續推進。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">proposal-deck</span><span class="ro">提案簡報手</span></div><div class="ds">把提案做成有說服力的簡報，含痛點、方案、案例與報價頁。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">quote-generator</span><span class="ro">報價單手</span></div><div class="ds">依服務項目自動產出格式清楚的報價單。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">contract-drafter</span><span class="ro">合約草稿手</span></div><div class="ds">產出服務合約／報價確認的草稿（提醒仍需法務確認）。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">invoice-generator</span><span class="ro">請款單手</span></div><div class="ds">自動產出請款單與付款說明，追蹤未收款。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">crm-pipeline-manager</span><span class="ro">商機管理</span></div><div class="ds">維護銷售漏斗，更新商機階段並提醒該推進的案子。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">lead-scoring</span><span class="ro">名單評分</span></div><div class="ds">依互動與輪廓為名單評分，讓業務先打最可能成交的。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sales-call-prep</span><span class="ro">銷售前準備</span></div><div class="ds">產出開會前的客戶背景、痛點假設與提問清單。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">objection-handler</span><span class="ro">異議處理手</span></div><div class="ds">針對常見拒絕（太貴、再想想、已有廠商）準備回應話術。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">discovery-questions</span><span class="ro">需求探詢手</span></div><div class="ds">產出能問出真實需求與預算的探詢問題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sales-script</span><span class="ro">銷售話術手</span></div><div class="ds">產出從破冰到成交的銷售對話腳本，含分支應對。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">case-study-collector</span><span class="ro">案例收集手</span></div><div class="ds">引導客戶提供成果數據，整理成可對外的案例。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">testimonial-request</span><span class="ro">見證邀請手</span></div><div class="ds">產出邀請客戶留下見證的訊息與引導問題。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">referral-program</span><span class="ro">轉介方案手</span></div><div class="ds">設計轉介獎勵機制與邀請話術，把老客戶變業務。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">pricing-strategy</span><span class="ro">定價策略手</span></div><div class="ds">依價值與市場設計方案分級與定價，提高客單價。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">sales-report</span><span class="ro">業績報告手</span></div><div class="ds">彙整成交、漏斗與預測，產出定期業績報告。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">meeting-notes</span><span class="ro">會議記錄手</span></div><div class="ds">把會議轉成重點結論與待辦清單，指派負責人與期限。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">client-report</span><span class="ro">客戶月報手</span></div><div class="ds">產出給客戶的月度成效報告，含數據、成果與下月計畫。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">upsell-recommender</span><span class="ro">加購推薦手</span></div><div class="ds">依客戶使用情況建議加購／升級方案與提案時機。</div></div>
+        <div class="srow"><div class="shead"><span class="sk">churn-predictor</span><span class="ro">流失預警手</span></div><div class="ds">找出即將流失的客戶徵兆，提出挽回動作。</div></div>
+      </div>
+    </details>
+
+    <div class="insight" style="margin-top:8px;"><div class="il">寫在最後</div><div class="it">整包 220 個 skill 是骨架，不是要你一次建完。先挑你每天都在重做的那一件事，把它寫成第一個 skill——做得越窄，產出越穩定。剩下 219 個，等你真的卡到那個環節再長出來。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>名單你拿到了，<span class="g">接下來換我陪你把它接成系統</span></h2>
+      <div class="cta-lead">這份編制表幫你看懂「一個人可以拆成一整間公司」。但要把 Claude Code ＋ 220 個 skill 真的接成一條會賺錢的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">skill 概念看懂了、卻不知道從哪個環節開始建的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的 skill 建法與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">把一個人變成一整間公司</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">持續分享實測過、真的能用的 AI 工具教學與自動化流程</div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.dcard').forEach(function(c){
+  c.addEventListener('click',function(){
+    var id=c.getAttribute('data-t');
+    var t=document.getElementById(id);
+    if(t){ t.open=true; t.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：220 個 Skill 完整清單——對應 IG 貼文／輪播，可當留言領取的 DM 承接頁／lead magnet（定位：AI 公司編制表，存起來當索引查）
+· 內容：一個 skill 長怎樣 + 怎麼用（4 步）+ 目錄（6 團隊，點卡展開）+ 6 團隊摺疊名單（Social 17／SEO 17／Content 107／Ads 5／Engineering 47／Business 27）+ 寫在最後
+· 互動：目錄卡 data-t 對應各 team details id，點擊自動 open + 捲動
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，Content 與 Ads 之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「220-skills-完整清單」文件
+· 命名：日期前綴（2026-07-08-agency-skills.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
