@@ -246,12 +246,14 @@ winget install Gyan.FFmpeg</pre></div>
       </div></details>
       <details class="ch"><summary><span class="ch-n">步驟二</span><span class="ch-t">在 Claude Code 裡安裝技能</span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <p>Claude Code 的技能透過「外掛市集（marketplace）」安裝，兩行指令：</p>
+        <p>這個技能叫 <b>claude-video</b>（開源，作者 bradautomates），透過「外掛市集（marketplace）」安裝，兩行指令：</p>
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在 Claude Code 執行</div><pre><span class="cm"># 第一行：把市集加進來</span>
-/plugin marketplace add <span class="ph">&lt;作者/儲存庫名稱&gt;</span>
+/plugin marketplace add bradautomates/claude-video
 <span class="cm"># 第二行：安裝技能</span>
-/plugin install <span class="ph">&lt;技能名稱&gt;</span>@<span class="ph">&lt;市集名稱&gt;</span></pre></div>
-        <div class="warn">⚠️ <b>重要：</b>把 <b>&lt;作者/儲存庫名稱&gt;</b> 換成你實際使用的那個 GitHub 儲存庫。安裝前先在該儲存庫的 README 或 Discover 分頁確認它提供的指令名稱，再執行第二行。裝好後 Claude Code 會顯示「Ready to use」。</div>
+/plugin install watch@claude-video</pre></div>
+        <p style="font-size:13.5px;">裝好後 Claude Code 會顯示「Ready to use」，接著就能用 <b>/watch</b> 了。</p>
+        <div class="tipline">用 <b>Codex / Cursor / Copilot</b> 的話，改用這行裝：<br><b>npx skills add bradautomates/claude-video -g</b></div>
+        <div class="warn">⚠️ <b>提醒：</b>這是第三方開源工具，不是 Claude 官方內建。指令與用法以 <b>github.com/bradautomates/claude-video</b> 的 README 為準——工具偶爾改版，裝之前掃一眼最新說明最保險。</div>
       </div></details>
       <details class="ch"><summary><span class="ch-n">步驟三</span><span class="ch-t">（選用）設定 Groq API Key</span><span class="ch-mk"></span></summary>
       <div class="ch-body">
@@ -285,16 +287,24 @@ winget install Gyan.FFmpeg</pre></div>
   <!-- Part 4 成本 -->
   <div class="sec fade">
     <span class="sec-tag">Part 4 · 真實成本</span>
-    <h2>實際數字<br><span class="g">不含糊帶過</span></h2>
-    <p><span class="hl">大多數影片：幾乎免費。</span>多數 YouTube 影片本來就有免費字幕，技能會直接抓，不需要任何轉錄費用，成本趨近於零。</p>
-    <p><span class="hl">沒字幕時：用 Groq 轉，一樣很便宜。</span></p>
+    <h2>成本分兩塊<br><span class="g">轉錄 ＋ 看畫面</span></h2>
+    <div class="sub-h">第一塊｜轉錄：有字幕免費，沒字幕也很便宜</div>
+    <p>多數 YouTube 影片本來就有免費字幕，技能直接抓，<span class="hl">轉錄成本趨近於零</span>。真的沒字幕才用 Groq 轉：</p>
     <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>費用</th></tr></thead><tbody>
       <tr><td>Groq Whisper Large v3 Turbo</td><td>每小時音訊約 $0.04</td></tr>
       <tr><td>OpenAI Whisper（同類對照）</td><td>每小時約 $0.36</td></tr>
-      <tr><td>Groq 免費層</td><td>每天約 2,000 次請求</td></tr>
+      <tr><td>Groq 免費層</td><td>一般人用不完</td></tr>
     </tbody></table></div>
-    <p style="margin-top:12px;font-size:14px;">換算：<span class="hl">5 小時的影片全部用 Groq 轉，成本大約幾十美分——通常不到半美元。</span>免費額度每天數千次請求一般人用不完，轉錄速度也快到誇張（一小時音訊約十幾秒跑完）。</p>
-    <div class="insight"><div class="il">白話結論</div><div class="it">有字幕免費，沒字幕也便宜到可以忽略。你幾乎不用擔心成本。</div></div>
+    <div class="sub-h">第二塊｜看畫面：這才是長影片的主要成本</div>
+    <p>真正會花的不是轉錄，是<span class="hl">截圖餵給 Claude 時吃掉的 token</span>——影片越長、抓越多張，Claude 讀圖就越花。好在技能會<span class="hl">依影片長度自動控制張數</span>，不會真的每幾秒截一張塞爆：</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>影片長度</th><th>自動抓幾張</th></tr></thead><tbody>
+      <tr><td>30 秒以內</td><td>約 30 張</td></tr>
+      <tr><td>1–3 分鐘</td><td>約 60 張</td></tr>
+      <tr><td>3–10 分鐘</td><td>約 80 張</td></tr>
+      <tr><td>10 分鐘以上</td><td>封頂約 100 張</td></tr>
+    </tbody></table></div>
+    <div class="tipline">超過 10 分鐘的長片，封頂 100 張畫面會變得比較稀疏。想省就用 <b>--start / --end</b> 只看關鍵段落（見 Part 3 用法 B）；真要看全片每個畫面，才需要開更花 token 的完整模式。</div>
+    <div class="insight"><div class="il">白話結論</div><div class="it">短影片幾乎免費，長影片主要花在「Claude 讀畫面」而不是轉錄——只看你要的那一段，成本就壓得很低。</div></div>
   </div>
 
   <!-- 中段 CTA -->
@@ -413,8 +423,10 @@ winget install Gyan.FFmpeg</pre></div>
       <div class="a">Claude 本身沒有原生的影片能力。這個方法聰明的地方，就是把影片拆成「圖片 + 文字」——這兩種格式 Claude 本來就非常擅長處理。</div>
       <div class="q">只能用 YouTube 嗎？</div>
       <div class="a">不是。YouTube、Instagram、Loom、本機影片檔都可以。沒字幕的用 Whisper 轉即可。</div>
-      <div class="q">安裝那行指令的儲存庫網址填什麼？</div>
-      <div class="a">填你實際要用的技能儲存庫。安裝前記得先到該儲存庫確認它提供的指令名稱，再執行安裝。</div>
+      <div class="q">下載失敗、或它叫我「登入確認不是機器人」怎麼辦？</div>
+      <div class="a">YouTube 有時會擋自動下載。兩招通常能解：① 先更新 yt-dlp——Mac 打 brew upgrade yt-dlp，其他系統打 yt-dlp -U，版本太舊是最常見原因；② 還被擋就帶上瀏覽器的登入狀態，在下載指令加 --cookies-from-browser chrome（chrome 換成你的瀏覽器）。這是 yt-dlp 本身的限制，跟這個技能無關。</div>
+      <div class="q">要裝的是哪一個技能？</div>
+      <div class="a">bradautomates/claude-video（開源、MIT）。在 Claude Code 執行 /plugin marketplace add bradautomates/claude-video，再 /plugin install watch@claude-video 就好。它是第三方工具，用法以 GitHub repo 的 README 為準。</div>
     </div>
   </div>
 
