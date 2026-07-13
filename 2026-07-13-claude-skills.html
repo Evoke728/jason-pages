@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>這 5 個 Claude Skills，自動化了我的生活｜完整原始碼直接複製</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl td:last-child{color:var(--gold);font-weight:600;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.usewhen{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:12px 0;font-size:13.5px;line-height:1.7;color:var(--text);}
+.usewhen b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--dim);line-height:1.8;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝好這 5 個 Skill 後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>把 AI<br><span class="g">變成你的作業系統</span></h4>
+  <p>裝好這 5 個只是開始。怎麼把整條工作流接成系統、真正變現——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">5 CLAUDE SKILLS · 完整原始碼</div>
+    <h1>這 5 個 Claude Skills<br><span class="g">自動化了我的生活</span></h1>
+    <div class="hero-sub">五個 Claude Skill 的完整原始碼，全部可以直接複製使用。<br>寫貼文用你的口吻、幫你先看過信箱、排出今天的優先順序、把會議逐字稿變待辦、在你醒來前把一天排好——設定一次，之後每天自動跑。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · Skill 原始碼</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">100%</div><div class="l">可直接複製</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">10+</div><div class="l">小時 · 每週省起跳</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">一個用 AI ＋ 自媒體變現的商業帳號。分享 AI 工具怎麼真的用在工作上、怎麼把工作流變成系統、怎麼讓一個人做出一整個團隊的產出——不講理論，只給可以直接複製貼上的東西。</div></div>
+  </div>
+
+  <!-- 這份檔案裡有什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份檔案裡有什麼</span>
+    <h2>五個 Skill<br><span class="g">各省你多少時間</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Skill</th><th>它幫你做什麼</th><th>一週省下</th></tr></thead><tbody>
+      <tr><td>voice</td><td>用你的口吻寫貼文、信件、腳本</td><td>3–5 小時</td></tr>
+      <tr><td>filter</td><td>先看過信箱，分類、草擬、標記</td><td>2–4 小時</td></tr>
+      <tr><td>signal</td><td>排出今天的優先順序</td><td>30 分 × 5 天</td></tr>
+      <tr><td>debrief</td><td>把會議逐字稿變成待辦清單</td><td>1–3 小時</td></tr>
+      <tr><td>blueprint</td><td>在你醒來前把一天排好</td><td>20 分 × 5 天</td></tr>
+    </tbody></table></div>
+    <div class="tipline">下面每一個 Skill 都是完整內容，<b>直接複製就能跑</b>。</div>
+  </div>
+
+  <!-- Skill 是什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前</span>
+    <h2>Skill<br><span class="g">到底是什麼</span></h2>
+    <p>Claude Skill 就是一個資料夾，裡面放一個叫 <span class="hl">SKILL.md</span> 的檔案。這個檔案有兩個部分：</p>
+    <ul class="bul">
+      <li><b>YAML frontmatter</b>（最上面被 <span class="hl">---</span> 包住的部分）：寫 name 和 description。Claude 開機時只先讀這兩行，判斷什麼時候該用這個 skill。</li>
+      <li><b>Markdown 內容</b>：真正的指令。Claude 決定要用的時候，才會整份讀進去。</li>
+    </ul>
+    <p>這個設計叫 <span class="hl">progressive disclosure</span>。你可以裝 50 個 skill，平常幾乎不佔 context，用到才載入。所以下面五個檔案，每一個都是一個 SKILL.md，各自放在自己的資料夾裡：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">資料夾結構</div><pre>skills/
+├── voice/
+│   └── SKILL.md
+├── filter/
+│   └── SKILL.md
+├── signal/
+│   └── SKILL.md
+├── debrief/
+│   └── SKILL.md
+└── blueprint/
+    └── SKILL.md</pre></div>
+  </div>
+
+  <!-- 怎麼安裝 -->
+  <div class="sec fade">
+    <span class="sec-tag">怎麼安裝</span>
+    <h2>兩種裝法<br><span class="g">挑你順手的</span></h2>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">方法一</span><span class="ch-t">Claude.ai（網頁 / App）</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p style="font-size:13.5px;">適合大多數人。需要 Pro / Max / Team / Enterprise 方案，並開啟 code execution。</p>
+        <div class="steps">
+          <div class="st">建一個資料夾，例如 <b>voice</b></div>
+          <div class="st">把下面的內容存成 <b>SKILL.md</b> 放進去</div>
+          <div class="st">把整個資料夾壓成 <b>.zip</b></div>
+          <div class="st">進 Claude.ai → Settings → Capabilities → 上傳 zip</div>
+          <div class="st">五個 skill 各做一次</div>
+        </div>
+        <div class="tipline">之後你在對話裡講到相關的事，Claude 會自己判斷要不要用。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">方法二</span><span class="ch-t">Claude Code（終端機 / 桌面版）</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p style="font-size:13.5px;">適合工程師或已經在用 Claude Code 的人。不用打包，直接丟資料夾。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">終端機執行</div><pre><span class="cm"># 個人用（所有專案都吃得到）</span>
+mkdir -p ~/.claude/skills/voice
+<span class="cm"># 把 SKILL.md 放進去，完成</span>
+
+<span class="cm"># 專案用（跟著 git repo 走，團隊共用）</span>
+mkdir -p .claude/skills/voice</pre></div>
+        <div class="tipline">放好之後重開一次 Claude Code，<b>/skills</b> 就會看到。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">文件</span><span class="ch-t">官方參考連結</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="bul">
+          <li>Skills 總覽：<a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview" target="_blank" rel="noopener">platform.claude.com/docs</a></li>
+          <li>Claude Code 用法：<a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">code.claude.com/docs/en/skills</a></li>
+          <li>官方 Skill 範例庫：<a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">github.com/anthropics/skills</a></li>
+        </ul>
+      </div></details>
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">原始碼在下面 重點在這</div>
+      <h3>複製五個檔案是基本<br><span class="g">接成系統才是重點</span></h3>
+      <p>單獨一個 skill 幫你省時間，五個串起來才是「一個人做出團隊產出」。想把整條工作流接起來、真正變現——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 五個 SKILL -->
+  <div class="sec fade">
+    <span class="sec-tag">五個 SKILL.md · 完整原始碼</span>
+    <h2>展開任一個<br><span class="g">按複製直接拿走</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">voice<span class="en"> · 用你自己的口吻寫</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>它做什麼：</b>貼文、信件、腳本，都用你自己的口吻。AI 寫出來一看就知道是 AI——問題出在你每次都要重新解釋「我的語氣是什麼」。這個 skill 把你的語氣寫死在檔案裡，設定一次，之後每一篇都自動帶。</div>
+        <div class="warn">⚠️ <b>使用前必做：</b>把 SKILL.md 裡的「我的語氣樣本」區塊，換成你自己的東西。這一步不做，這個 skill 等於沒裝。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 SKILL.md</button><div class="pl">voice/SKILL.md</div><pre>---
+name: voice
+description: 用使用者本人的語氣撰寫任何對外文字，包含社群貼文、電子郵件、影片腳本、私訊回覆。當使用者要求「幫我寫貼文」「幫我回這封信」「寫個腳本」「用我的口氣寫」時使用。任何需要以使用者身分對外發聲的文字，都套用這個 skill。
+---
+# Voice
+以使用者本人的語氣產出對外文字。
+
+## 核心規則
+寫任何東西之前，先讀完下面「我的語氣樣本」與「禁用清單」。
+寫完之後，逐條對照「輸出前檢查」再交出去。
+
+## 我的語氣樣本
+（把這一段換成你自己的。以下為範例格式）
+
+**我是誰：** 一個做 AI × 自媒體的個人品牌經營者，面對的讀者是想用 AI 提升產出的上班族與創作者。
+
+**我的三個語氣特徵：**
+1. 短句多，長句少。一句話講一件事。
+2. 給具體數字和具體步驟，不給抽象鼓勵。
+3. 偶爾帶一點乾話感，但不裝熟、不喊口號。
+
+**我實際寫過的三段文字：**
+&gt; 我每天早上打開電腦，該做什麼已經寫好了。不是我勤勞，是那五個檔案在跑。
+&gt; 工具沒有好壞。用錯場景，再強也沒用。
+&gt; 同樣的任務，設定一次，下週你只需要 10 分鐘。
+
+**我的口頭禪 / 慣用詞：**
+- 「直接講結論」
+- 「這個省下的時間是複利」
+- 「先做再說」
+
+## 禁用清單
+以下句型一律不准出現：
+- 「不是……而是……」「不只是……更是……」
+- 「真正的 X，是……」「這才是 X 的本質」
+- 「現在就開始……」「是時候……了」
+- 「這讓我想到……」「值得注意的是……」
+- 「你是否曾經……」「如果你也有過這種感覺……」
+- 任何形式的勵志收尾
+- Emoji（除非使用者明說要）
+- 破折號連接的補充子句
+
+遇到對比或轉折，改用兩句短句並排。
+範例：
+- 錯：不是工具不好用，而是你用錯了場景。
+- 對：工具沒有好壞。用錯場景，再強也沒用。
+
+## 各通路格式
+**IG 貼文（100–180 字）**
+1. 開頭一句有畫面感的陳述句（不用問句）
+2. 中間 2–3 行說明或觀點
+3. 結尾一句留白或互動引導
+4. 最後一行：追蹤號召
+
+**Threads（50–120 字）**
+更碎、更口語。一句鉤子 → 一到兩句補充 → 一句收尾。
+
+**Email**
+第一句直接講目的。中間給具體資訊。結尾給明確的下一步動作。不寒暄。
+
+**短影音腳本**
+前 3 秒是鉤子，必須有衝擊。之後每 5 秒一個資訊點。結尾給 CTA。
+
+## 輸出前檢查
+逐條確認，任一條沒過就重寫：
+- [ ] 語氣對照過「語氣樣本」，讀起來像同一個人
+- [ ] 禁用清單全部沒有出現
+- [ ] 有鉤子、有正文、有 CTA
+- [ ] 沒有 AI 腔（沒有過度平衡的句子、沒有空洞的形容詞）
+- [ ] 長度符合該通路規範
+
+## 使用者要求改寫時
+不要問「你想要什麼語氣」。直接依照本檔案的語氣樣本改寫。
+如果原文有事實或數字，全部保留，只改語氣。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">filter<span class="en"> · 先看過信箱，你就不用看</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>它做什麼：</b>信箱最花時間的不是回信，是判斷哪些要回。這個 skill 把判斷這一步接走——分級、草擬、標記金流信。</div>
+        <div class="warn">⚠️ <b>注意：</b>這個 skill 需要 Claude 讀得到你的信箱。你需要在 Claude 開啟 Gmail / Outlook 連接器（Connectors），或手動把信件內容貼給它。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 SKILL.md</button><div class="pl">filter/SKILL.md</div><pre>---
+name: filter
+description: 分類與處理電子郵件收件匣。當使用者說「幫我看信箱」「今天有什麼信要回」「幫我整理 email」「這封信怎麼回」時使用。會把信件依急迫性分級、草擬回覆、標記金流相關信件。
+---
+# Filter
+處理收件匣，讓使用者只需要處理真正該他處理的信。
+
+## 執行流程
+1. 讀取指定時間範圍內的未讀信件（預設：過去 24 小時）
+2. 依「分級規則」把每封信歸入四類
+3. 對「今天必回」的信，各草擬一份回覆
+4. 依「輸出格式」回報
+
+## 分級規則
+**🔴 今天必回**
+- 寄件人是客戶、合作方、主管
+- 信中有明確的截止時間，且在 48 小時內
+- 有具體的問題在等你回答
+- 對方已經催過一次以上
+
+**🟡 這週回**
+- 需要你的回覆，但沒有時間壓力
+- 需要你決策，但不緊急
+- 值得回但可以排隊的合作邀約
+
+**⚪️ 不用回**
+- 通知信、電子報、系統信
+- 純粹告知，不需要動作
+- 已讀即可
+
+**💰 金流標記（獨立標記，會與上面三類重疊）**
+任何提到以下內容的信，一律額外標記：
+- 報價、發票、付款、匯款、對帳
+- 合約、金額、費率、佣金
+- 退款、爭議、延遲付款
+金流信一律歸到「今天必回」，即使對方沒有催。
+
+## 草擬回覆的規則
+- 如果有裝 voice skill，套用它的語氣規範
+- 沒有的話：短句、直接、第一句就講結論
+- 回覆長度不超過原信的一半
+- 需要對方做動作的，明確寫出來，放在最後一行
+- 任何涉及金額、承諾、法律責任的內容，留空白讓使用者自己填，並在該處寫 [需要你確認：____]
+
+## 輸出格式
+    ## 🔴 今天必回（N 封）
+    ### 1. [寄件人] — [主旨]
+    **摘要：** 一到兩句
+    **他要什麼：** 一句話
+    **建議動作：** 回覆 / 拒絕 / 轉寄 / 排會議
+    **草稿：**
+    &gt; （回覆內容）
+    ---
+    ## 💰 金流相關（N 封）
+    （同上格式）
+    ## 🟡 這週回（N 封）
+    只列 寄件人 — 主旨 — 一句摘要，不草擬
+    ## ⚪️ 不用回（N 封）
+    只給數字與大致類別，不逐封列
+
+## 邊界
+- 不要主動寄出任何信。只草擬，交給使用者決定。
+- 不確定分級的，放進「今天必回」並註明「不確定，請你判斷」。
+- 看不懂的信不要猜，直接說看不懂。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">signal<span class="en"> · 現在該做哪一件</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>它做什麼：</b>待辦清單最大的問題是它照你輸入的順序排，不照重要性排。這個 skill 只做一件事：告訴你現在該做哪一件。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 SKILL.md</button><div class="pl">signal/SKILL.md</div><pre>---
+name: signal
+description: 把一堆待辦事項排出真正的優先順序，並指出「現在該做哪一件」。當使用者說「我今天要做什麼」「幫我排優先順序」「事情太多不知道從哪開始」「這些事怎麼排」時使用。
+---
+# Signal
+從一堆任務中，指出唯一該先做的那一件。
+
+## 執行流程
+1. 收集任務（使用者貼上、或從行事曆 / 任務工具讀取）
+2. 對每個任務跑一次「影響力評估」
+3. 排序
+4. 輸出：一句話講「先做哪一件」，然後才是完整清單
+
+## 影響力評估
+對每個任務問四個問題：
+
+**Q1 — 不做會怎樣？**
+- 有人損失金錢或錯過機會 → 高
+- 有人要等你 → 中
+- 沒有人會發現 → 低
+
+**Q2 — 有時效嗎？**
+- 今天過了就作廢 → 高
+- 這週要交 → 中
+- 沒有明確期限 → 低
+
+**Q3 — 卡住別人嗎？**
+- 有人在等這個才能開工 → 高
+- 只影響你自己 → 低
+
+**Q4 — 是複利型任務嗎？**
+（做一次會讓未來所有同類任務變快的事，例如建系統、寫模板、錄 SOP）
+- 是 → 加權
+- 不是 → 不加權
+
+## 排序邏輯
+1. **Q2 高 + Q1 高** → 最優先。今天不做就出事。
+2. **Q3 高** → 次優先。你不動，別人也不能動。
+3. **Q4 是** → 第三。今天做，未來每天賺。
+4. 其餘依 Q1 排序。
+5. Q1 Q2 Q3 全低 → 直接放進「可以等」，不用排序。
+
+## 輸出格式
+    ## 先做這個
+    **[任務名稱]**
+    [一句話說為什麼是它。要具體，不要「因為它最重要」這種廢話]
+    ---
+    ## 今天的順序
+    1. [任務] — [為什麼排這裡，一行]
+    2. [任務] — [為什麼排這裡，一行]
+    3. [任務] — [為什麼排這裡，一行]
+    ## 可以等
+    - [任務]（原因：一句）
+    - [任務]（原因：一句）
+    ## 建議刪掉
+    - [任務]（原因：一句）
+
+## 語氣規則
+- 直接下判斷。不要說「你可以考慮」「或許可以」。
+- 不要為了讓使用者開心而把每件事都說成重要。
+- 「可以等」和「建議刪掉」這兩區一定要有東西。如果真的沒有，明講：「今天沒有可以砍的。」
+- 全部講完不超過 200 字。
+
+## 範例輸出
+&gt; **先做這個**
+&gt;
+&gt; **回覆客戶合約條款**
+&gt; 三件事等你，只有合約有時效。對方今天下班前要回覆，其他兩件明天做一樣。從這裡開始。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">debrief<span class="en"> · 會議逐字稿變待辦</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>它做什麼：</b>開完會那 30 分鐘最貴——要回想決定了什麼、誰做什麼、什麼時候交。這個 skill 吃逐字稿，吐出待辦。輸入來源：Otter、Notta、Zoom / Google Meet 的自動字幕、或你自己打的筆記都可以。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 SKILL.md</button><div class="pl">debrief/SKILL.md</div><pre>---
+name: debrief
+description: 把會議逐字稿或會議筆記轉成決議清單與待辦事項。當使用者貼上逐字稿、會議記錄、通話紀錄，或說「幫我整理這場會議」「這場會決定了什麼」「幫我抓待辦」時使用。也會草擬會後追蹤信。
+---
+# Debrief
+從逐字稿中抓出「決定了什麼」和「誰要做什麼」。
+
+## 執行流程
+1. 通讀全部逐字稿
+2. 抓出決議（Decisions）
+3. 抓出待辦（Action Items），每一項都要有負責人與期限
+4. 抓出懸而未決的事（Open Questions）
+5. 草擬會後追蹤信
+
+## 抓決議的標準
+只有符合以下條件的才算決議：
+✅ 算：
+- 有人明確說「那就這樣」「我們決定 X」「就用 A 方案」
+- 討論之後沒有人反對，且有人開始講執行細節
+- 明確排除了某個選項（「B 方案不做了」也是決議）
+❌ 不算：
+- 「我覺得應該可以」「或許可以考慮」
+- 只有一個人講，其他人沒回應
+- 講到一半跳走的話題
+抓不確定的，放進 Open Questions，不要當成決議。
+
+## 抓待辦的標準
+每一項待辦都必須有三個欄位。缺任何一個，不要自己編，標記為「未指定」。
+
+| 欄位 | 缺的時候怎麼寫 |
+|------|--------------|
+| 做什麼 | （必有，否則不算待辦） |
+| 誰負責 | ⚠️ 未指定負責人 |
+| 什麼時候 | ⚠️ 未指定期限 |
+
+會議裡出現 ⚠️ 的項目，通常就是兩週後會出事的項目。全部列出來，放在最前面提醒。
+
+## 輸出格式
+    # [會議名稱]｜[日期]
+    ## ⚠️ 需要補的資訊
+    （所有負責人或期限未指定的項目，列在這裡）
+    ## 決議
+    1. [決議內容]
+    2. [決議內容]
+    ## 待辦
+    | 做什麼 | 誰 | 期限 |
+    |--------|-----|------|
+    | | | |
+    ## 懸而未決
+    - [問題]（誰要跟進：____）
+    ## 會後追蹤信草稿
+    &gt; 主旨：[會議名稱] 會後整理
+    &gt;
+    &gt; （信件內容）
+
+## 追蹤信的規則
+- 開頭一句話講這封信是什麼，不寒暄
+- 決議用條列
+- 待辦用表格，把負責人的名字放在最前面（他們掃一眼就找得到自己）
+- 結尾：請大家在 X 時間前確認，有錯的話回信更正
+- 全信不超過 250 字
+
+## 邊界
+- 逐字稿講的話就是全部的事實。不要補充你認為「應該也決定了」的東西。
+- 逐字稿有辨識錯誤（人名、專有名詞）的時候，照抄，並在旁邊標 [?]。
+- 不要主動寄信。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">blueprint<span class="en"> · 你還沒醒，今天已排好</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="usewhen"><b>它做什麼：</b>前面四個是被動的，要你開口叫它。這一個是主動的——它把前面串起來，在你打開電腦之前，一天已經排好。<b>建議搭配 signal 一起裝</b>，它會呼叫 signal 的排序邏輯。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 SKILL.md</button><div class="pl">blueprint/SKILL.md</div><pre>---
+name: blueprint
+description: 為使用者規劃一整天的時間表。抓取行事曆、任務清單、截止日，排出時段安排，並指出哪些事今天可以跳過。當使用者說「幫我排今天」「今天怎麼安排」「幫我做每日計畫」「我的一天」時使用。
+---
+# Blueprint
+把一天排好，包含要做什麼、什麼時候做、哪些不做。
+
+## 執行流程
+1. **抓資料**
+   - 行事曆：今天所有已排定的會議與行程
+   - 任務：待辦清單、專案期限
+   - 昨天沒做完的事
+2. **排序**
+   - 套用 signal skill 的影響力評估邏輯
+   - 沒裝 signal 的話：依「今天不做會出事」的程度排
+3. **排時段**（依下方原則）
+4. **輸出**
+
+## 排時段的原則
+**深度工作優先**
+最重要的那一件事，安排在使用者精神最好的時段。
+預設是早上 9:00–11:00。使用者說過自己的高峰時段就照他的。
+這個時段不排會議、不排回信、不排任何雜事。
+
+**會議集中**
+能移的會議，往下午挪，集中在同一個時段。
+連續會議之間至少留 15 分鐘緩衝。
+
+**雜事打包**
+回信、行政、小事，全部集中在一到兩個時段，通常是下午 4 點之後。
+不要讓雜事散落在一整天，那會把深度時段切碎。
+
+**留白**
+每天至少留 60 分鐘不排任何事。
+突發狀況一定會來。沒留白的計畫第一天就會爆掉。
+
+**明確標出「今天不做」**
+每天列出 2–5 件今天不會碰的事。寫出來，才不會一直在腦子裡佔位。
+
+## 輸出格式
+    # [日期]｜今天
+    ## 今天的一件事
+    **[最重要的那件]**
+    [一句話：為什麼是它]
+    ---
+    ## 時間表
+    | 時間 | 做什麼 | 類型 |
+    |------|--------|------|
+    | 09:00–11:00 | [深度工作] | 🎯 深度 |
+    | 11:00–12:00 | [ ] | |
+    | 13:00–15:00 | [會議] | 💬 會議 |
+    | 16:00–17:00 | [雜事打包] | 📥 雜事 |
+    | 17:00–18:00 | 留白 | ⬜️ 緩衝 |
+    ## 今天不做
+    - [事項]（原因）
+    - [事項]（原因）
+    ## 提醒
+    - [截止日在 3 天內的事]
+    - [需要別人回覆才能動的事，記得去催]
+
+## 語氣規則
+- 不要問使用者偏好，直接排。使用者會自己改。
+- 排不進去的事，明講排不進去，不要硬塞。
+- 如果今天的會議已經超過 5 小時，第一句話就要說：「今天會議太多，深度工作只剩 X 分鐘。」
+- 全部不超過一個螢幕的長度。
+
+## 邊界
+- 不要自己動使用者的行事曆。只提建議。
+- 抓不到行事曆的時候，直接問使用者今天有什麼會，不要假設。</pre></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 怎麼開始用 -->
+  <div class="sec fade">
+    <span class="sec-tag">怎麼開始用</span>
+    <h2>第一天<br><span class="g">不要五個一起裝</span></h2>
+    <div class="steps">
+      <div class="st">先裝 <b>signal</b>。它不需要接任何工具，把待辦貼給它就能跑。三天內你就會知道有沒有效。</div>
+      <div class="st">再裝 <b>voice</b>。唯一需要你花時間客製的（要填語氣樣本）。花 30 分鐘填好，之後每一篇貼文都在賺。</div>
+      <div class="st">然後 <b>debrief</b>。下一場會議結束，把逐字稿貼進去。</div>
+      <div class="st"><b>filter</b> 和 <b>blueprint</b> 最後裝。這兩個要接信箱和行事曆，設定成本較高，但省下的時間也最多。</div>
+    </div>
+    <div class="insight"><div class="il">五個都上線之後</div><div class="it">每天早上打開電腦，blueprint 已經排好了，filter 已經分好信了，signal 告訴你先做哪一件。你只要做事就好。</div></div>
+  </div>
+
+  <!-- 客製化建議 -->
+  <div class="sec fade">
+    <span class="sec-tag">客製化建議</span>
+    <h2>直接用可以<br><span class="g">改成你的更好用</span></h2>
+    <p>這五個檔案是我的版本。最值得改的三個地方：</p>
+    <ul class="bul">
+      <li><b>voice 的「我的語氣樣本」</b>——這個一定要改，不改等於沒用</li>
+      <li><b>signal 的排序邏輯</b>——你的行業如果有特殊優先順序（接案、電商、醫療），寫進去</li>
+      <li><b>blueprint 的深度工作時段</b>——如果你是晚上型的人，把 09:00–11:00 改成 21:00–23:00</li>
+    </ul>
+    <div class="tipline">改法很簡單：把 SKILL.md 貼給 Claude，跟它說你想改什麼，它會幫你改。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>五個檔案你拿到了，<span class="g">接下來換我陪你接成系統</span></h2>
+      <div class="cta-lead">這五個檔案的價值不在檔案本身，在於你設定一次之後，每天省下的時間是複利。但要把它接成一整套「一個人做出團隊產出」的系統——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把工作流跑成系統、省下重複勞動的人</div>
+        <div class="f">會複製檔案、卻不知道怎麼接成一條產線的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、有結果才拿出來講的 skill 與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">第一週你會覺得麻煩，第一個月你會忘記以前怎麼過的</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具怎麼用、工作流怎麼變成系統、一個人怎麼做出團隊產出——都是我實際在跑、有結果才拿出來講的<br>※ 本文件歡迎自用與修改，轉載請註明出處；工具方案與介面會隨版本更新，使用前建議以官方文件為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：這 5 個 Claude Skills 自動化生活——輪播／貼文的 DM 承接頁／lead magnet（定位：5 份 SKILL.md 完整原始碼，可直接複製）
+· 內容：檔案總覽表 + Skill 是什麼（progressive disclosure）+ 資料夾結構 + 安裝兩法（Claude.ai zip / Claude Code）+ 官方文件 + 5 個 SKILL.md（摺疊、每個可一鍵複製）+ 怎麼開始用（順序）+ 客製化建議
+· 可複製區塊：資料夾結構 1、Claude Code 指令 1、5 份 SKILL.md，共 7 個 .cp
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，安裝與 SKILL 原始碼之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about，換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「5個Claude Skills自動化生活」文件
+· 命名：日期前綴（2026-07-13-claude-skills.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
