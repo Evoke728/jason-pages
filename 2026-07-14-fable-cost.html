@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fable 5 省錢術｜把最貴的模型用在刀口上（完整操作手冊）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:420px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .g{color:var(--gold);font-weight:700;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;margin:10px 0;color:var(--text);}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.usewhen{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:12px 0;font-size:13.5px;line-height:1.7;color:var(--text);}
+.usewhen b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>把這套省錢術跑起來後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>把 AI<br><span class="g">跑成一人產線</span></h4>
+  <p>會省錢只是開始。怎麼用 AI ＋ 自媒體把產能撐開、真正變現——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">FABLE 5 · 成本操作手冊</div>
+    <h1>Fable 5 省錢術<br><span class="g">把最貴的模型用在刀口上</span></h1>
+    <div class="hero-sub">一份可以直接照著做的操作手冊。把最強模型的錢，只花在只有它做得到的地方，其他全部交出去。<br>五個招式、三個官方成本槓桿、一套完整工作流——每個數字都來自官方定價，你自己就能驗算。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · 省錢招式</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">80%</div><div class="l">起 · 帳單可砍</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">個 · 官方成本槓桿</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">把 AI 工具真正拆開來用，然後把能複製的方法交給你。我靠「AI × 自媒體」養活自己——一個人，沒有團隊，靠工具把產能撐開。分享的東西沒有理論、沒有願景稿，只有我真的在用、真的有效、你今天就能照抄的流程。</div></div>
+  </div>
+
+  <!-- 1 先搞清楚 -->
+  <div class="sec fade">
+    <span class="sec-tag">01 · 先搞清楚發生了什麼事</span>
+    <h2>Fable 5 上線後<br><span class="g">時間軸很亂，先理一次</span></h2>
+    <p>Claude Fable 5 是 Anthropic 目前對外開放的最強模型，2026 年 6 月 9 日上線。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>日期</th><th>發生什麼</th></tr></thead><tbody>
+      <tr><td>6/9</td><td>Fable 5 上線，Pro / Max / Team / 部分 Enterprise 免費包含在方案內</td></tr>
+      <tr><td>6/12</td><td>因美國出口管制命令，全球暫停存取</td></tr>
+      <tr><td>7/1</td><td>恢復存取。訂閱用戶可用到每週額度的 50%</td></tr>
+      <tr><td>7/7</td><td>原定截止日，當天延長至 7/12</td></tr>
+      <tr><td>7/13</td><td>再次延長至 7/19</td></tr>
+      <tr><td>7/20 起</td><td>Fable 5 離開訂閱額度，改為 usage credits 按量計價</td></tr>
+    </tbody></table></div>
+    <ul class="bul">
+      <li><b>7/19 之前</b>，Fable 5 對訂閱用戶是「已經付過錢」的東西，用力用。</li>
+      <li><b>7/20 之後</b>，你每呼叫一次 Fable 5，都是真金白銀。</li>
+    </ul>
+    <p>Anthropic 有公開表示，等產能跟上會把 Fable 5 放回訂閱方案。但在那之前，你要有一套「便宜地用最強模型」的方法——這份文件就是那套方法。</p>
+    <div class="warn">⚠️ 這個日期 Anthropic 已經延後兩次了。開始執行前，建議去 Claude 官方說明中心確認一次當前狀態。</div>
+  </div>
+
+  <!-- 2 定價表 -->
+  <div class="sec fade">
+    <span class="sec-tag">02 · 官方定價表</span>
+    <h2>所有數字的來源<br><span class="g">沒有一個是猜的</span></h2>
+    <p>每一個數字都來自 Anthropic 官方定價頁，或工具作者本人公布的測試結果。</p>
+    <div class="sub-h">Claude API 官方定價（每百萬 token）</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模型</th><th>輸入</th><th>輸出</th><th>相對 Fable 5</th></tr></thead><tbody>
+      <tr><td>Claude Fable 5</td><td>$10</td><td>$50</td><td class="g">基準</td></tr>
+      <tr><td>Claude Opus 4.8</td><td>$5</td><td>$25</td><td>1/2 價</td></tr>
+      <tr><td>Claude Sonnet 5</td><td>$3</td><td>$15</td><td>標準價</td></tr>
+      <tr><td>Sonnet 5（優惠 · 8/31 前）</td><td>$2</td><td>$10</td><td class="g">1/5 價</td></tr>
+      <tr><td>Claude Haiku 4.5</td><td>$1</td><td>$5</td><td class="g">1/10 價</td></tr>
+    </tbody></table></div>
+    <div class="sub-h">「省 80%」怎麼算出來的</div>
+    <p>Fable 5 輸出 $50，Sonnet 5 優惠價輸出 $10。<span class="hl">$10 ÷ $50 = 0.2 → 你只付 20% → 省 80%</span>。一個除法，你自己就能驗算。</p>
+    <p>同一份工作，執行的部分從 Fable 5 移到 Sonnet 5，帳單直接砍掉八成。就算 9/1 之後 Sonnet 5 回到標準價，仍然省 70%。換成 Haiku 4.5 做真的很簡單的活，省 90%。這就是這五招的全部數學基礎。</p>
+  </div>
+
+  <!-- 3 核心心法 -->
+  <div class="sec fade">
+    <span class="sec-tag">03 · 核心心法</span>
+    <h2>Fable 貴在「想」<br><span class="g">不貴在「寫」</span></h2>
+    <p>如果你只記得這份文件的一句話，記這句：</p>
+    <div class="insight"><div class="il">核心</div><div class="it">Fable 5 的價值在「想」，不在「寫」。把「想」留給 Fable，把「做」交出去。</div></div>
+    <p>Anthropic 官方的說法是：Fable 是「見過幾乎沒人見過的問題的專家」。它的價值在長鏈條、多步驟、複雜的判斷——那種你卡了三天、換了三個方法都不行的問題。</p>
+    <p>而你 <span class="hl">90% 的時間</span>，其實是在做這些事：讀檔案、改變數名稱、跑測試、寫 boilerplate、查文件、把 A 格式轉成 B 格式。這些事 Sonnet 5 做得跟 Fable 5 一樣好，價格是五分之一。用 Fable 5 做這些，等於用兩倍的錢買 Sonnet 做得到的事。</p>
+  </div>
+
+  <!-- 4 五招 -->
+  <div class="sec fade">
+    <span class="sec-tag">04 · 五個招式</span>
+    <h2>把工作<br><span class="g">分給對的模型</span></h2>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">招 01</span><span class="ch-t">把 effort 調下來</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><span class="hl">/effort</span> 是 Claude Code 的官方指令，控制模型回應前要花多少 token 去「想」。它同時決定模型會讀多少檔案、跑多少指令、驗證幾次、回應多長。五個檔位由少到多：low → medium → high → xhigh → max。Fable 5 的預設是 high。</p>
+        <div class="usewhen"><b>官方說：</b>Fable 5 在較低的 effort 設定下表現依然很好，經常還超過前代模型在 xhigh 的表現。翻成人話——你把它降到 medium，可能還是比開到最大的舊模型強，那你為什麼要付 high 的錢。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在 Claude Code 裡</div><pre><span class="cm"># 開啟互動式選單</span>
+/effort
+
+<span class="cm"># 或直接設定</span>
+/effort medium
+/effort low
+/effort high
+
+<span class="cm"># 回到模型預設值</span>
+/effort auto</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">啟動時指定</div><pre>claude --effort medium</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">環境變數（優先權最高）</div><pre>export CLAUDE_CODE_EFFORT_LEVEL=medium</pre></div>
+        <div class="sub-h">什麼時候用哪一檔</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>檔位</th><th>適合的任務</th></tr></thead><tbody>
+          <tr><td>low</td><td>改變數名稱、修 typo、產 boilerplate、「這個函式回傳什麼」、跑輕量 subagent</td></tr>
+          <tr><td>medium</td><td>範圍明確的修改、單檔案的功能新增、一般日常開發</td></tr>
+          <tr><td>high</td><td>真正的開發工作、跨檔案的邏輯</td></tr>
+          <tr><td>xhigh</td><td>難的多步驟問題、大型重構</td></tr>
+          <tr><td>max</td><td>high / xhigh 已經失敗過的問題、架構決策、安全審查</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>兩個坑：</b>① low 不適合需要「看全局」的任務——有人用 low 跑重構，Claude 直接把函式改名沒查誰在呼叫，三個 import 壞掉。② 中途換檔會讓 prompt cache 失效，下一輪用全價重讀整段對話。要換，在開新 session 時換。</div>
+        <div class="tipline">持久性：low / medium / high / xhigh 會跨 session 保留；<b>max 只在當前 session 有效</b>，結束就重置。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">招 02</span><span class="ch-t">讓它當架構師，不當工人</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>Claude Code 的 <span class="hl">plan mode</span>：讓模型先把整件事想清楚、寫成計畫，但不動手。流程變成——Fable 5（plan mode）產出一份規格書 → Sonnet 5 / Opus 4.8 照著執行。Fable 5 的 token 只花在「想架構」，剩下讀檔、寫檔、跑測試、debug 全由便宜的模型完成。</p>
+        <div class="usewhen"><b>為什麼有效：</b>一個開發任務的 token，規劃架構約 5%、讀檔寫碼跑測試修 bug 約 95%。全程用 Fable 5，那 95% 都是用兩倍價買 Sonnet 做得到的事。把 95% 移走，成本從 $10/$50 降到 $2/$10。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 Prompt 1</button><div class="pl">第一步 · 讓 Fable 5 產出規格書</div><pre>你現在是架構師，不是工程師。
+
+進入 plan mode。
+
+任務：[在這裡描述你要做的事]
+
+我要你做的：
+1. 讀完相關的程式碼，理解現有結構
+2. 設計完整的實作方案
+3. 把方案寫成一份 markdown 規格書，存成 SPEC.md
+
+規格書必須包含：
+- 要改動哪些檔案，每個檔案改什麼
+- 新增的函式 / 元件的簽名與職責
+- 資料流：輸入 → 處理 → 輸出
+- 邊界情況與錯誤處理
+- 測試要驗證哪些行為
+- 執行順序（哪一步必須在哪一步之前）
+
+規格書要寫到「一個不熟悉這個 codebase 的工程師，
+照著做就能完成」的程度。
+
+你不要寫任何實作程式碼。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製 Prompt 2</button><div class="pl">第二步 · 換模型，交給便宜的執行</div><pre>/model sonnet
+
+讀 SPEC.md，照著執行。
+
+規則：
+- 完全按照規格書執行，不要自己加功能
+- 遇到規格書沒寫到的情況，先停下來問我，不要自己決定
+- 每完成一個檔案，跑一次相關測試
+- 完成後回報：改了哪些檔案、測試結果</pre></div>
+        <div class="tipline"><b>什麼時候用：</b>跨多檔案的功能開發、重構、從零開始的新模組、任何你自己都還沒想清楚怎麼做的任務。<b>什麼時候別用：</b>單行修改、改文字、修 typo——直接用 Sonnet 或 Haiku，連 plan 都不用。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">招 03</span><span class="ch-t">讓它少寫一點</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>輸出 token 比輸入 token 貴 5 倍（所有 Claude 模型都是 1:5）。所以砍成本最有效的地方，是砍掉模型「寫出來」的東西。有兩個 open source 的 skill 專門在做這件事。</p>
+        <div class="sub-h">Ponytail｜把「懶惰的資深工程師」裝進 AI</div>
+        <p>作者 DietrichGebert。它讓 AI 寫任何程式碼之前，先爬一個決策階梯，停在第一個成立的那一階：</p>
+        <ul class="bul">
+          <li>這東西有必要存在嗎？→ 沒有，跳過（YAGNI）</li>
+          <li>codebase 裡已經有了嗎？→ 有，直接用，別重寫</li>
+          <li>標準函式庫做得到嗎？→ 用標準函式庫</li>
+          <li>平台原生功能做得到嗎？→ 用原生功能</li>
+          <li>已安裝的套件做得到嗎？→ 用它</li>
+          <li>一行寫得完嗎？→ 一行</li>
+          <li>以上都不行 → 才寫，而且只寫最小可行版本</li>
+        </ul>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>指標</th><th>作者實測結果</th></tr></thead><tbody>
+          <tr><td>程式碼行數</td><td>少約 54%（過度設計情境最高到 94%）</td></tr>
+          <tr><td>成本</td><td>降約 20%</td></tr>
+          <tr><td>速度</td><td>快約 27%</td></tr>
+          <tr><td>安全性</td><td>100% 通過對抗測試（path traversal、SQLi、token 偽造等）</td></tr>
+        </tbody></table></div>
+        <p>最經典的例子：叫 AI 做一個倒數計時器，沒裝的版本蓋了 190 行、附帶沒人要求的動畫「儀表板」。Ponytail 版本：13 行。它明確保留了信任邊界驗證、資料遺失處理、安全性、無障礙——是「懶，但不失職」。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝 Ponytail（強度分級 lite / full / ultra）</div><pre>claude plugin marketplace add DietrichGebert/ponytail
+claude plugin install ponytail@ponytail</pre></div>
+        <div class="sub-h">Caveman｜砍掉所有客套跟廢話</div>
+        <p>作者 JuliusBrussee。讓 AI 用「原始人語法」講話，砍掉所有廢話。程式碼、指令、錯誤訊息完全不動。「我已經成功完成了認證模組的重構，Token 驗證現在能處理邊界情況…」→「Auth 模組重構完成。Token 驗證處理邊界情況。加了錯誤處理。向後相容。」</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝 Caveman（/caveman lite / full / ultra）</div><pre>claude plugin marketplace add JuliusBrussee/caveman
+claude plugin install caveman@caveman</pre></div>
+        <div class="warn">⚠️ <b>誠實的期待值管理：</b>網路上說「Caveman 省 65%」——那只適用於「說明文字」那一小塊。一場 100,000 token 的 session，說明文字大概只佔 6,000。壓縮 65% 省下約 4,000，<b>整場實際只省 4–5%</b>，不是 65%。還是推薦裝（免費、終端機乾淨、能壓縮 CLAUDE.md），但別指望它救帳單。真正砍成本的是招 02、04、05 的「換模型」；Ponytail 的 20% 才是實打實，因為它砍的是貴 5 倍的輸出程式碼。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">招 04</span><span class="ch-t">查資料交給便宜的模型</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><span class="hl">/deep-research</span> 是 Claude Code 內建的第一方 workflow（不是第三方外掛）。你丟一個問題，它會：先問你 2–3 個釐清問題 → 在背景撒出大量 subagent 平行搜尋、抓取來源 → 讓不同 agent 互相對抗性驗證 → 合成一份帶引用的報告。</p>
+        <div class="usewhen"><b>關鍵：</b>整個過程在背景跑，你的 session 保持可用。中間所有搜尋、抓取、驗證的 token 都留在 workflow 腳本裡，不塞進主對話——Claude 的 context 只拿到最後那份報告。</div>
+        <p>查資料是體力活不是腦力活，Sonnet 5 做得完全夠；而 deep research 會大量燒 token，這正是你最不想用 $10/$50 的地方。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第一步 · 切到便宜的模型</div><pre>/model sonnet</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第二步 · 跑 deep research</div><pre>/deep-research
+
+我要研究 [主題]。
+
+範圍：
+- 時間範圍：[例如：2026 年之後的資料]
+- 來源類型：[例如：官方文件、原始論文、公司部落格，
+  排除內容農場]
+- 我要回答的核心問題：[列 2-3 個]
+
+輸出：
+- 一份 markdown 報告，存成 RESEARCH.md
+- 每個主張都要有來源連結
+- 明確標出哪些地方各家說法互相衝突
+- 明確標出哪些地方資料不足</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第三步 · 報告交給 Fable 5，只讓它做判斷</div><pre>/model fable
+
+讀 RESEARCH.md。
+
+不要重新查資料，不要驗證來源，那些已經做完了。
+
+我只要你做一件事：根據這份報告，做出架構判斷。
+
+回答：
+1. 這幾個方案，你建議選哪一個？為什麼？
+2. 這個選擇最大的風險是什麼？
+3. 報告裡有哪個地方你認為結論下錯了？</pre></div>
+        <div class="insight"><div class="il">這一招的精髓</div><div class="it">用便宜的模型建立 context，用貴的模型做決策。Context 建立是 token 密集、智力不密集；決策是 token 稀疏、智力密集。分開，錢就省下來了。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">招 05</span><span class="ch-t">讓 Fable 5 只當顧問</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><span class="hl">/advisor</span> 讓你把「主模型」跟「顧問模型」拆開。主模型（執行者）是便宜的模型，每一輪都在跑，負責讀檔、寫檔、跑指令；顧問模型是貴的模型，只在關鍵時刻被叫進來。顧問會拿到完整對話歷史（含每次工具呼叫與結果），回傳一段指引。顧問什麼都不能碰——不能讀檔、跑 shell、上網，只能讀對話給建議，這是硬性的架構邊界。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">設定：Sonnet 執行 + Fable 顧問</div><pre><span class="cm"># 設定主模型為 Sonnet</span>
+/model sonnet
+
+<span class="cm"># 設定 Fable 5 為顧問</span>
+/advisor fable
+
+<span class="cm"># 或用選單</span>
+/advisor</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">寫進設定檔 settings.json</div><pre>{
+  "model": "sonnet",
+  "advisorModel": "claude-fable-5"
+}</pre></div>
+        <div class="warn">⚠️ <b>很多人踩到的官方限制：</b>顧問模型必須比主模型更強，否則不會啟用。Sonnet+Fable ✅、Haiku+Fable ✅、Opus+Fable ✅；但 Fable+Opus ❌（顧問比主模型弱）、Sonnet+Sonnet ❌。想省錢就是 <b>Sonnet 執行 + Fable 顧問</b>。</div>
+        <p><b>你不能手動叫顧問。</b>顧問是主模型自己決定要不要叫的。Claude 通常在這些時候叫：準備鎖定一個做法之前、同一個錯誤重複卡住、準備宣告任務完成之前。想讓它叫對時機，把規則寫進 CLAUDE.md：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進 CLAUDE.md</div><pre>## Advisor 使用規則
+
+- 開始實作之前，先諮詢 advisor 確認策略與設計
+- 跨多個檔案的改動，動手前一定要問 advisor
+- 同一個錯誤出現兩次以上，去問 advisor，不要自己一直試
+- 宣告任務完成之前，問一次 advisor
+- 長任務至少呼叫兩次：鎖定做法前一次，宣告完成前一次</pre></div>
+        <div class="tipline"><b>計費：</b>每次顧問呼叫都把對話送給顧問模型，按顧問費率計費，疊加在主模型用量之上——所以次數要控制，這也是為什麼要在 CLAUDE.md 寫清楚「什麼時候該叫」。</div>
+        <div class="warn">⚠️ <b>已知問題：</b>/advisor 目前標記為實驗性，需要 Claude Code v2.1.98 以上；用 Fable 5 當顧問需要 v2.1.170 以上。不支援 Amazon Bedrock、Google Cloud Agent Platform、Microsoft Foundry。遇到怪錯誤先升級 Claude Code。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">五招你會了 重點在這</div>
+      <h3>會省成本是基本<br><span class="g">把產能撐開才是重點</span></h3>
+      <p>省下的錢跟時間，要接到「一個人做出團隊產出」才有意義。怎麼把整條工作流接成能變現的系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 5 三個官方槓桿 -->
+  <div class="sec fade">
+    <span class="sec-tag">05 · 三個官方成本槓桿</span>
+    <h2>大部分人<br><span class="g">沒開的三個開關</span></h2>
+    <p>上面五招是「怎麼分配工作」。這三個是「怎麼付更少錢做同一件事」——都是 Anthropic 官方功能，不是外掛。</p>
+    <div class="sub-h">槓桿 1｜Prompt Caching（省最多，最少人開）</div>
+    <p>快取命中的輸入 token，只要付原價的 <span class="hl">10%</span>。省 90%。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模型</th><th>標準輸入</th><th>快取命中</th></tr></thead><tbody>
+      <tr><td>Fable 5</td><td>$10</td><td class="g">$1</td></tr>
+      <tr><td>Opus 4.8</td><td>$5</td><td class="g">$0.50</td></tr>
+      <tr><td>Sonnet 5（優惠）</td><td>$2</td><td class="g">$0.20</td></tr>
+    </tbody></table></div>
+    <p>把重複使用的內容（system prompt、工具定義、文件、CLAUDE.md）標記起來。第一次寫入快取成本是標準輸入的 1.25 倍（5 分鐘 TTL）或 2 倍（1 小時 TTL），之後每次讀取只要 10%——<span class="hl">第一次重用之後就開始賺錢</span>。你能做得更好的：CLAUDE.md 保持精簡、任務之間 /clear、別在 session 中途換模型或 effort（會讓 cache key 失效全價重讀）。</p>
+    <div class="sub-h">槓桿 2｜Batch API（非即時工作，直接對折）</div>
+    <p>輸入輸出全部 <span class="hl">5 折</span>，24 小時內非同步處理完。適合夜間自動化、大量文件處理、評測、內容批次生成。<span class="hl">可以跟 prompt caching 疊加</span>——「有快取 + 走 batch」的請求，成本可以低到標準價的 5%。</p>
+    <div class="sub-h">槓桿 3｜模型路由（最直接的一招）</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模型</th><th>價格（輸入/輸出）</th><th>拿來做</th></tr></thead><tbody>
+      <tr><td>Haiku 4.5</td><td>$1 / $5</td><td>分類、抽取、路由、摘要</td></tr>
+      <tr><td>Sonnet 5</td><td>$2 / $10</td><td>生產環境預設值</td></tr>
+      <tr><td>Opus 4.8</td><td>$5 / $25</td><td>複雜推理、agentic 開發</td></tr>
+      <tr><td>Fable 5</td><td>$10 / $50</td><td>長鏈條、卡死你的問題</td></tr>
+    </tbody></table></div>
+    <p>Fable 5 的輸出 token 是 Haiku 4.5 的 10 倍價。<span class="hl">原則：從最便宜的開始，有證據才往上升級。</span>不要因為「反正 Fable 最強」就一路 Fable——你付的是 10 倍價，換來的可能是同一個答案。</p>
+  </div>
+
+  <!-- 6 完整工作流 -->
+  <div class="sec fade">
+    <span class="sec-tag">06 · 完整工作流</span>
+    <h2>把五招<br><span class="g">疊成一套</span></h2>
+    <p>五招不是各自獨立，可以疊起來。這是我實際在跑的流程：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">階段 0 · 開場設定（一次設定，跨 session 保留）</div><pre>/effort medium
+/advisor fable
+/model sonnet</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">階段 1 · 查資料（Sonnet）→ 產出 RESEARCH.md</div><pre>/model sonnet
+/deep-research [你的研究問題]</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">階段 2 · 想架構（Fable 5，plan mode）→ 產出 SPEC.md</div><pre>/model fable
+/effort high
+
+<span class="cm"># 進入 plan mode，讀 RESEARCH.md，產出 SPEC.md</span>
+<span class="cm"># 這是整個流程裡唯一該花 Fable 錢的地方</span></pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">階段 3 · 執行（Sonnet + Fable 顧問）</div><pre>/model sonnet
+/effort medium
+/advisor fable
+
+<span class="cm"># Sonnet 讀 SPEC.md 開始寫，卡住時自己會叫 Fable 顧問</span></pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">階段 4 · 收尾（Haiku）寫測試、文件、lint、typo</div><pre>/model haiku
+/effort low</pre></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>階段</th><th>模型</th><th>佔總 token</th><th>佔總成本</th></tr></thead><tbody>
+      <tr><td>查資料</td><td>Sonnet 5</td><td>高</td><td>低</td></tr>
+      <tr><td>想架構</td><td>Fable 5</td><td>低</td><td>中</td></tr>
+      <tr><td>執行</td><td>Sonnet + 少量 Fable 顧問</td><td>最高</td><td>中</td></tr>
+      <tr><td>收尾</td><td>Haiku 4.5</td><td>中</td><td>極低</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">結論</div><div class="it">Fable 5 只出現在「想」跟「卡住」的時候。那正是它值那個價的地方。</div></div>
+  </div>
+
+  <!-- 7 五個錯誤 -->
+  <div class="sec fade">
+    <span class="sec-tag">07 · 五個常見錯誤</span>
+    <h2>別踩<br><span class="g">這五個雷</span></h2>
+    <ul class="bul">
+      <li><b>錯誤 1｜整場 session 都掛在 Fable 5 上</b>——90% 的 token 花在 Fable 做 Sonnet 做得到的事。最貴、也最容易犯。</li>
+      <li><b>錯誤 2｜在 session 中途換模型或換 effort</b>——cache key 失效，下一輪全價重讀整段對話。要換，開新 session。</li>
+      <li><b>錯誤 3｜把 effort 設在 low 去跑重構</b>——低 effort 只做「最少的事」，會直接改名，然後三個 import 壞掉。</li>
+      <li><b>錯誤 4｜以為 Caveman 能省 65%</b>——它只壓縮那 6% 的說明文字，整場實際省 4–5%。裝它，但別靠它。</li>
+      <li><b>錯誤 5｜CLAUDE.md 寫成一部小說</b>——它每一輪都在 context 裡，臃腫的 CLAUDE.md 就是一筆每輪都在付的稅。</li>
+    </ul>
+  </div>
+
+  <!-- 8 檢查清單 -->
+  <div class="sec fade">
+    <span class="sec-tag">08 · 執行檢查清單</span>
+    <h2>照這個<br><span class="g">今天就開始</span></h2>
+    <div class="sub-h">今天就做（10 分鐘）</div>
+    <ul class="bul">
+      <li>開一次 /effort，看你現在在哪一檔</li>
+      <li>把預設 effort 從 high 降到 medium</li>
+      <li>跑 /advisor，把顧問設成 fable</li>
+      <li>把主模型 /model 設成 sonnet</li>
+      <li>打開 CLAUDE.md，把沒用的段落砍掉</li>
+    </ul>
+    <div class="sub-h">這週做（1 小時）</div>
+    <ul class="bul">
+      <li>安裝 Ponytail、Caveman</li>
+      <li>在 CLAUDE.md 加上 Advisor 使用規則（招 05 有現成的）</li>
+      <li>拿一個做過的任務，跑一次「Fable 規劃 → Sonnet 執行」，比對成本</li>
+      <li>建立 /clear 的習慣：不相關的任務之間，清</li>
+    </ul>
+    <div class="sub-h">7/19 之前做（把握免費額度）</div>
+    <ul class="bul">
+      <li>用 Fable 5 把那個拖很久的架構問題想清楚，產出 SPEC.md 存起來</li>
+      <li>用 Fable 5 幫你寫一份好的 CLAUDE.md</li>
+      <li>用 Fable 5 建立你的 skill 跟 workflow</li>
+    </ul>
+    <div class="insight"><div class="il">重點</div><div class="it">把 Fable 5 用來產出「你留得下來的資產」——SPEC.md、CLAUDE.md、skill、workflow。這些東西在額度結束之後，還會繼續幫你省錢。</div></div>
+  </div>
+
+  <!-- 9 名詞速查 -->
+  <div class="sec fade">
+    <span class="sec-tag">09 · 名詞速查表</span>
+    <h2>看到不懂的<br><span class="g">回這裡查</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名詞</th><th>意思</th></tr></thead><tbody>
+      <tr><td>token</td><td>模型處理文字的最小單位。輸入輸出分開計價，輸出通常是輸入的 5 倍價</td></tr>
+      <tr><td>MTok</td><td>每百萬 token。所有定價的單位</td></tr>
+      <tr><td>usage credits</td><td>預付點數。7/20 之後 Fable 5 改用這個計費</td></tr>
+      <tr><td>effort</td><td>模型花多少工在一個回合上。影響思考深度、工具呼叫次數、回應長度</td></tr>
+      <tr><td>plan mode</td><td>Claude Code 模式：只規劃，不執行</td></tr>
+      <tr><td>subagent</td><td>主模型派出去的子代理，有自己獨立的 context</td></tr>
+      <tr><td>workflow</td><td>Claude Code 用腳本協調大量 subagent 的機制，在背景跑</td></tr>
+      <tr><td>advisor</td><td>顧問模型。比主模型強，只在關鍵時刻被呼叫</td></tr>
+      <tr><td>prompt caching</td><td>快取重複的輸入內容，命中時只付 10%</td></tr>
+      <tr><td>Batch API</td><td>非同步批次處理，全部 5 折，24 小時內完成</td></tr>
+      <tr><td>CLAUDE.md</td><td>專案的記憶檔。每一輪都會被讀進 context</td></tr>
+      <tr><td>skill</td><td>一個 markdown 檔案，教 AI 用特定方式做事。Ponytail、Caveman 都是 skill</td></tr>
+      <tr><td>YAGNI</td><td>You Aren't Gonna Need It。少寫程式碼的核心原則</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 10 資料來源 -->
+  <div class="sec fade">
+    <span class="sec-tag">10 · 資料來源</span>
+    <h2>每個數字<br><span class="g">都有出處</span></h2>
+    <div class="sub-h">Anthropic 官方</div>
+    <ul class="bul">
+      <li>Claude 定價：<a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">platform.claude.com/docs/…/pricing</a></li>
+      <li>Effort 參數：<a href="https://platform.claude.com/docs/en/build-with-claude/effort" target="_blank" rel="noopener">…/build-with-claude/effort</a></li>
+      <li>Advisor 工具：<a href="https://code.claude.com/docs/en/advisor" target="_blank" rel="noopener">code.claude.com/docs/en/advisor</a></li>
+      <li>Dynamic Workflows：<a href="https://code.claude.com/docs/en/workflows" target="_blank" rel="noopener">code.claude.com/docs/en/workflows</a></li>
+      <li>如何選模型與 effort：<a href="https://claude.com/blog/claude-model-and-effort-level-in-claude-code" target="_blank" rel="noopener">claude.com/blog/…</a></li>
+      <li>Claude Code 文件：<a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">docs.claude.com/…/claude-code/overview</a></li>
+      <li>Claude 說明中心（確認最新日期）：<a href="https://support.claude.com" target="_blank" rel="noopener">support.claude.com</a></li>
+    </ul>
+    <div class="sub-h">第三方 Skill（open source）</div>
+    <ul class="bul">
+      <li>Ponytail：<a href="https://github.com/DietrichGebert/ponytail" target="_blank" rel="noopener">github.com/DietrichGebert/ponytail</a></li>
+      <li>Caveman：<a href="https://github.com/JuliusBrussee/caveman" target="_blank" rel="noopener">github.com/JuliusBrussee/caveman</a></li>
+    </ul>
+    <div class="warn">所有定價數字取自 Anthropic 官方定價頁。Ponytail / Caveman 的效能數字為工具作者本人公布的測試結果，非官方數據，也非我的實測。7/19 這個日期 Anthropic 已延後兩次，執行前請自行確認當前狀態。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">最後</div>
+      <h2>把最貴的模型，<span class="g">用在只有它做得到的地方</span></h2>
+      <div class="cta-lead">這五招的核心，說到底只有一句話：把最貴的模型用在刀口上，其他所有的事交出去。省下的錢跟時間，接到「一個人做出團隊產出」才是真正的槓桿——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把產能撐開、靠自媒體養活自己的人</div>
+        <div class="f">會用工具、卻不知道怎麼接成一套變現系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、有結果才拿出來講的工具與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">我不做願景，我做流程</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具的實戰用法、內容自動化的工作流、個人品牌怎麼從零長出來——都是我真的在用、真的有效的東西<br>※ 本文件可自由分享，請保留出處｜工具定價與功能會隨版本更新，使用前以官方文件為準｜最後更新：2026 年 7 月</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Fable 5 省錢術操作手冊——IG 留言「FABLE」領取的 DM 承接頁／lead magnet
+· 內容：時間軸 + 官方定價表 + 核心心法 + 五招摺疊（effort/plan/少寫/deep-research/advisor，各含可複製指令與 prompt）+ 三個官方成本槓桿（caching/batch/routing）+ 完整工作流（階段0-4 可複製）+ 五個錯誤 + 執行清單 + 名詞速查 + 資料來源
+· 可複製區塊：約 18 個 .cp（指令、prompt、工作流階段、安裝、設定檔、CLAUDE.md 規則）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，五招與三槓桿之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref），換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），沿用 .cp + copyCp 可複製版型
+· 來源：傑森所長自有「Fable 5 省錢術完整版」文件（內容含時效性日期與第三方數據，均附作者原始免責聲明）
+· 命名：日期前綴（2026-07-14-fable-cost.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
