@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 四模組完整手冊｜檔案・指令・記憶・工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:14px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--gold);margin-bottom:16px;line-height:1.6;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.gold-last td:last-child{color:var(--gold);font-weight:600;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.usewhen{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:12px 0;font-size:13.5px;line-height:1.7;color:var(--text);}
+.usewhen b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.5;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.vs{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin:11px 0;}
+.vs .vl{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px;letter-spacing:0.04em;}
+.vs .vt{font-size:13.5px;line-height:1.75;color:var(--text);}
+.vs .vt .u{color:var(--dim);}
+
+.err{margin:6px 0;}
+.err .eq{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.err .eq::before{content:"\2717";color:#b1431f;font-weight:800;margin-right:8px;}
+.err .ea{font-size:13.8px;color:var(--dim);line-height:1.8;}
+.err .ea b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>讀完這份手冊後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>把 Claude Code<br><span class="g">跑成你的產線</span></h4>
+  <p>會用四個模組只是開始。怎麼把它接成能省時間、能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 四模組完整手冊</div>
+    <h1>Claude Code<br><span class="g">四模組完整手冊</span></h1>
+    <div class="h-sub">檔案・指令・記憶・工具<br>從聊天機器人到代理人的完整操作指南</div>
+    <div class="hero-sub">輪播只能放結論，這份放的是完整操作內容：每個模組怎麼運作、實際指令長什麼樣、非工程師怎麼用、常見錯誤在哪、三十天怎麼從零到會用。<br>不談概念，只談你今天下午就能打開來用的東西。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">4</div><div class="l">個 · 模組</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">8</div><div class="l">個 · 職能範本</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30</div><div class="l">天 · 上手路徑</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">經營「傑森所長」——專講 AI × 自媒體變現。我把 AI 工具實際跑過一輪，篩掉看起來厲害但沒用的，留下真的能省時間、能產出、能變現的工作流，拆成你可以直接複製的步驟。</div></div>
+  </div>
+
+  <!-- 怎麼使用這份文件 -->
+  <div class="sec fade">
+    <span class="sec-tag">怎麼使用這份文件</span>
+    <h2>五個步驟<br><span class="g">照著走就好</span></h2>
+    <div class="steps">
+      <div class="st">先讀「<b>心智模型</b>」那一節，五分鐘，建立正確的理解</div>
+      <div class="st">照「<b>安裝</b>」那一節裝好，十分鐘</div>
+      <div class="st">四個模組挑一個最痛的先做（<b>多數人是「記憶」</b>）</div>
+      <div class="st"><b>職能範本</b>那一節，找到跟你工作最接近的，整段複製貼上</div>
+      <div class="st">卡住的時候回來翻「<b>常見錯誤</b>」</div>
+    </div>
+    <div class="tipline">閱讀時間約 <b>25 分鐘</b>。實作時間：第一週每天 <b>20 分鐘</b>。</div>
+  </div>
+
+  <!-- 1 心智模型 -->
+  <div class="sec fade">
+    <span class="sec-tag">1 · 心智模型</span>
+    <h2>你到底<br><span class="g">在操作什麼</span></h2>
+    <p>多數人打開 Claude Code，做的第一件事是打字聊天。問一個問題，得到一段回答，複製，貼到自己的檔案裡。<span class="hl">這是把一台代理人當成聊天視窗在用。</span></p>
+    <p>Claude Code 的設計是<span class="hl">代理人（Agent）</span>。你給它一個目標，它自己讀檔案、自己執行指令、自己看錯誤訊息、自己修好、自己交件。過程中你不需要複製貼上任何東西。</p>
+    <div class="insight"><div class="il">差別在一句話</div><div class="it">聊天機器人給你答案，代理人給你結果。</div></div>
+
+    <div class="sub-h">四個模組</div>
+    <p style="font-size:14px;">代理人之所以能做到這件事，是因為它有四個模組。這四個模組<span class="hl">每一次都在</span>，你用不用是另一回事。</p>
+    <div class="cp"><div class="pl">四模組架構</div><pre class="art">                    ┌─────────────┐
+                    │    Agent    │
+                    └──────┬──────┘
+              ┌────────────┼────────────┐
+              │            │            │
+        ┌─────┴────┐ ┌─────┴────┐ ┌────┴─────┐ ┌──────────┐
+        │   檔案   │ │   指令   │ │   記憶   │ │   工具   │
+        │  Files   │ │ Commands │ │  Memory  │ │  Tools   │
+        └──────────┘ └──────────┘ └──────────┘ └──────────┘
+             眼睛          手         連續性        延伸</pre></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模組</th><th>它是什麼</th><th>沒有它會怎樣</th></tr></thead><tbody>
+      <tr><td>檔案 Files</td><td>Claude 能直接讀寫你電腦上的資料夾</td><td>你得手動上傳，每次都上傳</td></tr>
+      <tr><td>指令 Commands</td><td>Claude 能執行終端機指令並讀取結果</td><td>它只能「告訴你怎麼做」，不能「做」</td></tr>
+      <tr><td>記憶 Memory</td><td>Claude 跨對話記得你的專案與偏好</td><td>每一次對話都從零開始講背景</td></tr>
+      <tr><td>工具 Tools</td><td>Claude 能連上 Gmail、Notion、Jira、資料庫</td><td>它被關在一個盒子裡</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">一個具體的對照</div>
+    <div class="vs">
+      <div class="vl">聊天機器人的做法</div>
+      <div class="vt"><b>你：</b>幫我把這三十篇文章的重點整理成表格<br><span class="u"><b>它：</b>好的，請把文章內容貼給我<br><b>你：</b>（開始複製第一篇……第二篇……第三篇……）</span></div>
+    </div>
+    <div class="vs" style="border-left:3px solid var(--gold);">
+      <div class="vl">代理人的做法</div>
+      <div class="vt"><b>你：</b>讀 ./articles/ 資料夾裡的三十個 md 檔，抓出每篇的核心論點、目標讀者、可複用的鉤子，整理成一張表格，輸出成 summary.md<br><span class="u"><b>它：</b>（自己讀完三十個檔案，自己寫檔，自己存好）完成，三十篇都在 summary.md 裡</span></div>
+    </div>
+    <div class="tipline">第二種做法，你打字的時間是 <b>十五秒</b>。</div>
+  </div>
+
+  <!-- 2 安裝 -->
+  <div class="sec fade">
+    <span class="sec-tag">2 · 開始之前</span>
+    <h2>安裝<br><span class="g">與五種介面</span></h2>
+    <p><b>你需要：</b>一個付費的 Claude 訂閱（Pro 或 Max）或 Anthropic Console 帳號，以及一台電腦（macOS、Windows、Linux 都可以）。</p>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">安裝</span><span class="ch-t">四種裝法，挑一個</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">macOS / Linux / WSL</div><pre>curl -fsSL https://claude.ai/install.sh | bash</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Windows（PowerShell）</div><pre>irm https://claude.ai/install.ps1 | iex</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Homebrew（macOS）</div><pre>brew install --cask claude-code</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">WinGet（Windows）</div><pre>winget install Anthropic.ClaudeCode</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">裝完之後，進到任何一個資料夾</div><pre>cd 你的專案資料夾
+claude</pre></div>
+        <div class="tipline">第一次會要你登入。登入完就可以開始。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">介面</span><span class="ch-t">五種介面，同一個引擎</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p style="font-size:13.5px;">很多人以為 Claude Code 只能在終端機用。它有五種介面，<b>共用同一套設定、同一份 CLAUDE.md、同一組 MCP 連接</b>。</p>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>介面</th><th>適合誰</th><th>特點</th></tr></thead><tbody>
+          <tr><td>終端機 CLI</td><td>想要完整功能的人</td><td>功能最全，可串接、可寫進腳本</td></tr>
+          <tr><td>VS Code 外掛</td><td>已經在用 VS Code 的人</td><td>有視覺化的修改對照</td></tr>
+          <tr><td>JetBrains 外掛</td><td>IntelliJ、PyCharm 使用者</td><td>需另外裝 CLI</td></tr>
+          <tr><td>桌面應用程式</td><td>不想碰終端機的人</td><td>視覺化介面，可同時跑多任務、可排程</td></tr>
+          <tr><td>網頁版</td><td>想在瀏覽器或手機上跑的人</td><td>不用安裝，可跑長任務</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>給非工程師的建議：</b>直接用<b>桌面應用程式</b>。介面友善，不用碰指令列，四個模組一樣都有。等你熟了再考慮終端機。</div>
+      </div></details>
+    </div>
+  </div>
+
+  <!-- 3 模組一 檔案 -->
+  <div class="sec fade">
+    <span class="sec-tag">3 · 模組一｜檔案</span>
+    <h2>你的檔案系統<br><span class="g">就是它的工作區</span></h2>
+    <p>你打開 Claude Code 的那個資料夾，就是它的視野範圍。它看得到裡面每一個檔案，讀得到、改得到、也能新建。</p>
+    <div class="insight"><div class="il">方向搞反了</div><div class="it">還在手動上傳檔案？檔案已經在你電腦裡，它住在裡面。</div></div>
+    <ul class="bul">
+      <li>一百份 PDF 放在一個資料夾，你可以叫它全部讀完再摘要</li>
+      <li>一團亂的下載資料夾，你可以叫它照規則重新分類命名</li>
+      <li>三十篇部落格草稿，你可以叫它統一語氣、統一格式</li>
+      <li>一份 CSV，你可以叫它清資料、算數字、畫圖、輸出報表</li>
+    </ul>
+
+    <div class="sub-h">建立你的工作資料夾</div>
+    <p style="font-size:14px;">不要在桌面亂丟。開一個乾淨的專案資料夾：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">建議結構</div><pre class="art">my-content/
+├── CLAUDE.md          ← 記憶檔（下一節會講）
+├── drafts/            ← 草稿
+├── published/         ← 已發布
+├── research/          ← 素材與參考資料
+└── output/            ← Claude 產出的東西</pre></div>
+
+    <div class="sub-h">四個立刻可用的指令</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 1 · 讀完 PDF 出表格</div><pre>讀 research/ 資料夾裡所有的 pdf，每份抓出三個核心論點，
+整理成一張表格，欄位是：檔名 / 論點一 / 論點二 / 論點三 / 我可以用的角度，
+輸出成 output/research-summary.md</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 2 · 找出重複主題</div><pre>把 drafts/ 裡的所有檔案讀過一遍，找出重複講過的主題，
+列出哪些可以合併，哪些可以拆成系列。不要動原檔。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 3 · 整理下載資料夾</div><pre>整理 ~/Downloads 資料夾。依照檔案類型與日期分類到子資料夾，
+重新命名成「YYYY-MM-DD_原始檔名」的格式。
+執行前先列出你打算怎麼做，等我確認。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 4 · 分析你的寫作習慣</div><pre>讀 published/ 裡所有已發布的文章，分析我的寫作習慣：
+常用句型、平均段落長度、開頭的模式、收尾的模式。
+輸出成 output/writing-style.md</pre></div>
+
+    <div class="warn">⚠️ <b>一個重要的安全習慣：</b>在指令最後加一句「<b>執行前先列出計畫，等我確認</b>」。這一句會讓它先講清楚要做什麼，你點頭它才動手。批次改檔名、批次刪檔、大規模重構之前，這一句是必要的。</div>
+  </div>
+
+  <!-- 4 模組二 指令 -->
+  <div class="sec fade">
+    <span class="sec-tag">4 · 模組二｜指令</span>
+    <h2>你的終端機<br><span class="g">是它的手</span></h2>
+    <p>它能執行指令，讀取結果，看到錯誤訊息，然後自己修好，再跑一次。這個<span class="hl">「執行 → 失敗 → 讀錯誤 → 修正 → 再執行」</span>的迴圈，全程不需要你介入。</p>
+    <div class="insight"><div class="il">你不需要會寫程式</div><div class="it">你描述，它執行。你只需要描述你要的結果——要用什麼工具、裝什麼套件、指令怎麼下、跑錯怎麼修，那些是它的工作。</div></div>
+
+    <div class="sub-h">非工程師也能跑的四個任務</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">批次處理圖片</div><pre>把 images/ 資料夾裡所有的 png 轉成 jpg，
+寬度統一縮到 1080，品質 85，
+輸出到 images-web/ 資料夾，原檔保留。
+需要什麼工具自己裝。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">影片轉逐字稿</div><pre>把 videos/ 裡的所有 mp4 抽出音軌，
+用 whisper 轉成逐字稿，輸出成同名的 txt 檔。
+跑完之後告訴我每支影片的長度和字數。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">資料清理</div><pre>讀 data/sales.csv。
+清掉重複列，把日期格式統一成 YYYY-MM-DD，
+金額欄位的逗號和貨幣符號拿掉轉成數字，
+空值填 0。
+輸出成 data/sales-clean.csv，另外告訴我清掉了幾筆、改了幾筆。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">把重複工作變成腳本</div><pre>每次我寫完一篇文章，我都要做這四件事：
+1. 檢查錯字
+2. 把標題改成 60 字以內
+3. 生三個 IG 版本的鉤子
+4. 存到 published/ 並加上日期
+幫我把這個流程寫成一個腳本，之後我只要給你檔名就能跑完。</pre></div>
+
+    <div class="sub-h">無介面模式（進階但很有用）</div>
+    <p style="font-size:14px;">Claude Code 可以完全不進入對話介面，直接在指令列跑完一件事：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">直接跑完一件事</div><pre>claude -p "讀 sales.csv，告訴我這個月營收比上個月成長幾 %"</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">把其他工具的輸出餵給它</div><pre>tail -200 app.log | claude -p "看一下這些 log 有沒有異常"</pre></div>
+    <div class="tipline">這個用法的價值在於：<b>你可以把它寫進自動化腳本裡</b>，變成每天早上自動跑的東西。</div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">前兩個模組講完了</div>
+      <h3>會用四個模組是基本<br><span class="g">接成產線才是重點</span></h3>
+      <p>下面「記憶」跟「工具」是多數人沒開過、但投報率最高的兩個。想把整條工作流接起來、真正變現——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 5 模組三 記憶 -->
+  <div class="sec fade">
+    <span class="sec-tag">5 · 模組三｜記憶</span>
+    <h2>CLAUDE.md<br><span class="g">完整指南</span></h2>
+    <p>沒有記憶，就沒有連續性。沒有連續性，你每一次對話都要重講一遍背景——你是誰、你在做什麼、你的偏好是什麼、上次的決定是什麼。</p>
+    <div class="insight"><div class="il">投報率最高的一個模組</div><div class="it">每次從零開始，一半的時間都在重講背景。這是四個模組裡最多人沒開過的一個，也是投報率最高的一個。</div></div>
+
+    <div class="sub-h">CLAUDE.md 是什麼</div>
+    <p style="font-size:14px;">在你的專案資料夾根目錄放一個叫 <span class="hl">CLAUDE.md</span> 的檔案。Claude Code 每次啟動都會<span class="hl">自動讀完它</span>，然後才開始工作。<br>它不是文件，是<b>設定檔</b>。你在裡面寫的每一條規則，都會變成它的預設行為。</p>
+
+    <div class="sub-h">三分鐘建立</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">自動生成草稿</div><pre>/init</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">編輯記憶檔</div><pre>/memory</pre></div>
+
+    <div class="sub-h">記憶的四個層級</div>
+    <p style="font-size:14px;">越具體的層級，優先權越高。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>層級</th><th>位置</th><th>用途</th></tr></thead><tbody>
+      <tr><td>組織政策</td><td>系統管理員設定</td><td>公司層級的規範</td></tr>
+      <tr><td>個人偏好</td><td>~/.claude/CLAUDE.md</td><td>跨所有專案都適用的偏好</td></tr>
+      <tr><td>專案記憶</td><td>專案資料夾/CLAUDE.md</td><td>這個專案專屬的規則（可進版控、可分享）</td></tr>
+      <tr><td>本機記憶</td><td>CLAUDE.local.md</td><td>只有你自己看得到，不會進 git</td></tr>
+    </tbody></table></div>
+
+    <div class="acc" style="margin-top:18px;">
+      <details class="ch"><summary><span class="ch-n">範本</span><span class="ch-t">個人偏好檔<span class="en"> · ~/.claude/CLAUDE.md</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製範本</button><div class="pl">~/.claude/CLAUDE.md</div><pre># 個人偏好
+
+## 關於我
+- 我是內容創作者，不是工程師。
+- 我的主力平台是 Instagram 與 Threads，內容主題是 AI 工具與自媒體。
+- 我用繁體中文（台灣用語）。
+
+## 回答方式
+- 直接給結論，不要鋪陳。
+- 需要我做決定的時候，給我 2–3 個選項和各自的取捨，不要只給一個。
+- 技術名詞第一次出現時用一句話解釋，之後直接用。
+- 不確定的事情直接說不確定，不要猜。
+
+## 執行規則
+- 動到檔案之前，先列出你要做什麼，等我確認。
+- 批次操作（改名、刪除、覆寫）一律先確認。
+- 產出的檔案放到 output/ 資料夾。
+
+## 語氣
+- 中性、清楚、可以直接套用。
+- 不要用「不是 A 而是 B」這種對比句型。
+- 不要勵志收尾。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">範本</span><span class="ch-t">專案記憶檔<span class="en"> · 專案/CLAUDE.md</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製範本</button><div class="pl">專案資料夾/CLAUDE.md</div><pre># 專案：IG 內容工廠
+
+## 這個專案在做什麼
+生產 Instagram 輪播貼文與 Threads 短文。
+每一則貼文包含：輪播文案、生圖 prompt、IG 說明文案、Threads 文案。
+
+## 資料夾結構
+- research/ — 素材、參考貼文、對標帳號的內容
+- drafts/ — 草稿
+- output/ — 完成品，可直接使用
+- published/ — 已發布，供分析用
+
+## 品牌設定
+- 帳號：@jasonxtsai
+- 定位：AI 工具 × 自媒體變現
+- 受眾：想用 AI 提高產出效率的個人創作者
+- 語氣：直接、清楚、中性教學。不煽情、不說教。
+
+## 輪播規格
+- 每則 7–10 張
+- 第一張是鉤子，最後一張是 CTA
+- CTA 一律是「留言關鍵字換資源」
+- 每一張都要有 @jasonxtsai
+
+## 文案規則
+- 禁止句型：「不是 A 而是 B」「真正的 X 是」「現在就開始」「你是否曾經」
+- 遇到對比，用兩個短句並排，不要用轉折詞
+- IG 說明文案 100–180 字
+- Threads 文案 50–120 字
+
+## 產出格式
+- 所有產出寫成 md 檔，放進 output/
+- 檔名格式：YYYY-MM-DD_主題.md</pre></div>
+      </div></details>
+    </div>
+
+    <div class="sub-h">自動記憶</div>
+    <p style="font-size:14px;">除了你寫的 CLAUDE.md，Claude 在工作過程中也會<span class="hl">自己記東西</span>——它發現的模式、你糾正過的地方、專案的慣例。這部分它自己維護，你不用寫。想看它記了什麼、或想刪掉錯的，用 <b>/memory</b>。</p>
+
+    <div class="sub-h">三個重要的注意事項</div>
+    <ul class="bul">
+      <li><b>控制在 200 行以內。</b>CLAUDE.md 每次都會被讀進去。寫太長會佔掉上下文空間，反而讓它記不住重點。</li>
+      <li><b>具體的規則才會被遵守。</b>「寫得好一點」會被忽略；「IG 說明文案控制在 100–180 字」會被執行。</li>
+      <li><b>用 @ 引入其他檔案。</b>規則多的時候，不要全部塞在一個檔案。</li>
+    </ul>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">引入語法</div><pre># 專案規則
+@docs/brand-guidelines.md
+@docs/writing-rules.md</pre></div>
+  </div>
+
+  <!-- 6 模組四 工具 -->
+  <div class="sec fade">
+    <span class="sec-tag">6 · 模組四｜工具</span>
+    <h2>MCP、Skills<br><span class="g">Hooks</span></h2>
+    <p>前三個模組讓它在你的電腦裡工作，這一個讓它<span class="hl">走出你的電腦</span>。這是四個模組裡最容易被低估的一個。</p>
+
+    <div class="sub-h">MCP：把外部服務接進來</div>
+    <p style="font-size:14px;">MCP（Model Context Protocol）是一個開放標準，用來把 AI 工具連上外部資料來源。接上之後，Claude Code 可以讀你 Google Drive 的文件、更新 Jira 任務、從 Slack 抓對話、查資料庫、讀寫 Notion。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">一句話跨三件事</div><pre>去我 Notion 的「內容行事曆」資料庫，
+把這週狀態是「草稿」的項目全部列出來，
+每一個都幫我補上鉤子跟大綱，寫回 Notion。</pre></div>
+    <div class="tipline">這一句跨了三件事：讀 Notion、生成內容、寫回 Notion。<b>全程你沒有離開對話框。</b></div>
+
+    <div class="sub-h">Skills：把工作流存起來</div>
+    <p style="font-size:14px;">Skill 是一個<span class="hl">可重複使用的工作流</span>。你把一套做事的方法寫下來，之後用一個指令就能叫出來。<br><b>舉例：</b>你每次做輪播，流程都固定——分析素材、決定張數、寫文案、生 prompt、寫說明文案。把這套做成 Skill，之後你只要說「用輪播流程處理這篇文章」，它就照著跑完整套。</p>
+    <div class="tipline"><b>Skill 跟一般 prompt 的差別：</b>prompt 是一次性的，Skill 是存起來的。你不用每次都重打。</div>
+
+    <div class="sub-h">Hooks：自動觸發</div>
+    <p style="font-size:14px;">Hook 讓你在 Claude Code 做某件事的<span class="hl">之前或之後</span>，自動跑一個指令。例如：改完檔案自動格式化、寫完文章自動備份、要刪檔案先跳確認。</p>
+    <div class="insight"><div class="il">層級差在哪</div><div class="it">CLAUDE.md 是規則，Hook 是強制執行。這是「把規矩變成機制」的層級。</div></div>
+
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>層級</th><th>你做什麼</th><th>它幫你做什麼</th></tr></thead><tbody>
+      <tr><td>MCP</td><td>接上服務</td><td>讀寫外部資料</td></tr>
+      <tr><td>Skills</td><td>存下流程</td><td>重複執行同一套方法</td></tr>
+      <tr><td>Hooks</td><td>設定觸發條件</td><td>自動執行前置／後置動作</td></tr>
+      <tr><td>子代理</td><td>給它一個大任務</td><td>拆成好幾個代理人平行跑</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 7 八個職能範本 -->
+  <div class="sec fade">
+    <span class="sec-tag">7 · 八個職能的實戰範本</span>
+    <h2>找到你的職能<br><span class="g">整段複製貼上</span></h2>
+    <p>Claude Code 不是工程師專用。這八組範本，直接複製到 Claude Code 裡就能用。每一組都包含<span class="hl">要放進 CLAUDE.md 的設定</span> ＋ <span class="hl">可直接下的指令</span>。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">內容創作</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">CLAUDE.md 設定</div><pre>## 內容規則
+- 平台：Instagram、Threads
+- 語氣：直接、清楚、口語
+- 每篇產出都要包含：鉤子 × 3、正文、CTA
+- 產出寫成 md 檔放進 output/</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 從素材挑選題</div><pre>讀 research/ 裡這五篇文章，找出重複出現的觀點。
+從裡面挑三個最適合做輪播的主題，每個給我：
+- 一句話的核心主張
+- 三個可能的鉤子
+- 預估張數
+輸出成 output/選題清單.md</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 找沒碰過的方向</div><pre>讀 published/ 裡所有的貼文，分析哪些主題的鉤子最常用。
+列出我可能講膩的主題，以及三個我還沒碰過但符合我定位的方向。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">行銷</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">CLAUDE.md 設定</div><pre>## 行銷分析規則
+- 競品分析要包含：定位、內容頻率、主要鉤子類型、變現方式
+- 所有數字要標明來源
+- 不要給主觀評價，只列出可觀察的事實</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 競品分析</div><pre>用網路搜尋，分析這三個帳號的內容策略：[帳號A]、[帳號B]、[帳號C]
+每一個都整理出：
+- 主要內容主題（前五名）
+- 貼文形式的比例（輪播 / 單圖 / 影片）
+- CTA 的模式
+- 可觀察到的變現方式
+輸出成一張比較表，放進 output/競品分析.md</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">文案</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">CLAUDE.md 設定</div><pre>## 文案規則
+- 禁用句型：「不是 A 而是 B」、「真正的 X 是」、「現在就開始」
+- 對比用兩個短句並排，不用轉折詞
+- 每個版本要標明它在追求什麼（清楚 / 情緒 / 好奇）</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 三版本改寫</div><pre>讀 output/writing-style.md（我的寫作風格分析）。
+用這個風格，把 drafts/新文章.md 改寫成三個版本：
+版本 A：追求清楚，最短
+版本 B：追求好奇心，鉤子最強
+版本 C：追求說服力，論證最完整
+每個版本後面標註它犧牲了什麼。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">研究</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">CLAUDE.md 設定</div><pre>## 研究規則
+- 每個論點都要標明出處
+- 分不清事實和推論的時候，明講哪個是哪個
+- 找不到證據的時候直接說找不到，不要補</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 文獻整理</div><pre>讀 research/papers/ 裡的十五份 PDF。
+每一份抓出：核心主張、方法、樣本數、主要發現、限制。
+整理成表格，另外標出哪幾份的結論互相矛盾。
+輸出成 output/文獻整理.md</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">設計維運</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 批次改名分類</div><pre>掃描 assets/ 資料夾。
+所有檔案重新命名成「專案名_用途_版本.副檔名」的格式，
+依專案分類到子資料夾。
+執行前先給我一份改名對照表，等我確認。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 三種尺寸輸出</div><pre>把 assets/raw/ 裡的圖片全部處理成三種尺寸：
+- IG 貼文：1080x1350
+- IG 限動：1080x1920
+- 縮圖：400x500
+分別放進三個子資料夾，檔名保持一致。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">專案管理</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 會議筆記抓任務</div><pre>讀 notes/ 裡這週的所有會議筆記。
+抓出所有「有人要做某件事」的句子，整理成任務清單：
+負責人 / 任務 / 截止日 / 來源（哪份筆記哪一段）
+沒講截止日的標成「未定」。
+輸出成 output/本週任務.md</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">財務</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · 發票整理</div><pre>讀 invoices/ 裡所有的 PDF 發票。
+抽出：日期、廠商、金額、稅額、品項類別。
+整理成一張 CSV，依日期排序。
+另外算出每個類別的總金額和佔比。
+金額有讀不出來的，標成「需人工確認」，不要猜。</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">08</span><span class="ch-t">數據</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">指令 · IG 後台數據分析</div><pre>讀 data/ig-insights.csv（我的 IG 後台匯出資料）。
+分析：
+1. 哪個時段發文的觸及最好
+2. 輪播 vs 單圖 vs 影片，哪種留存最高
+3. 標題有數字的貼文，表現有沒有比較好
+4. 我的追蹤成長跟哪個變數的相關性最高
+每個結論都要附上實際數字。樣本數不足以下結論的，直接說不足。
+輸出成 output/數據報告.md，另外把三張圖表存成 png。</pre></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 8 vs Vibe Coding -->
+  <div class="sec fade">
+    <span class="sec-tag">8 · 常被搞混</span>
+    <h2>Claude Code<br><span class="g">與 Vibe Coding 的差別</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th></th><th>Vibe Coding</th><th>Claude Code</th></tr></thead><tbody>
+      <tr><td>在做什麼</td><td>用 prompt 生出一個 app</td><td>跑完你整條工作流</td></tr>
+      <tr><td>住在哪裡</td><td>瀏覽器裡</td><td>你的電腦裡</td></tr>
+      <tr><td>記憶</td><td>每個專案重新開始</td><td>跨對話記得你</td></tr>
+      <tr><td>能力範圍</td><td>只會寫程式</td><td>讀寫整理檔案、執行指令、連外部工具</td></tr>
+      <tr><td>產出</td><td>一個網頁或應用</td><td>檔案、報表、自動化流程、程式碼</td></tr>
+      <tr><td>適合誰</td><td>想快速做出一個 demo</td><td>想把重複工作交出去的人</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">一句話</div><div class="it">Vibe Coding 在做東西。Claude Code 在做事情。想把每週固定花掉的三小時變成三分鐘，你要的是後者。</div></div>
+  </div>
+
+  <!-- 9 三十天 -->
+  <div class="sec fade">
+    <span class="sec-tag">9 · 三十天上手路徑</span>
+    <h2>不要一次全開<br><span class="g">照順序來</span></h2>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">W1</span><span class="ch-t">第一週｜檔案<span class="en"> · 讓它讀得到你的東西</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="bul">
+          <li><b>Day 1：</b>安裝，開一個乾淨的專案資料夾</li>
+          <li><b>Day 2：</b>把你的素材、草稿、參考資料丟進去，分類好</li>
+          <li><b>Day 3：</b>叫它讀完整個資料夾，給你一份摘要</li>
+          <li><b>Day 4：</b>叫它整理你最亂的一個資料夾</li>
+          <li><b>Day 5：</b>叫它分析你已發布的內容，找出你的寫作模式</li>
+        </ul>
+        <div class="tipline"><b>這週結束時你會理解：</b>它看得到你的東西，你不用上傳。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">W2</span><span class="ch-t">第二週｜記憶<span class="en"> · 停止重講背景</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="bul">
+          <li><b>Day 8：</b>用 /init 生成第一份 CLAUDE.md</li>
+          <li><b>Day 9：</b>手動改寫，寫進你的品牌設定、語氣規則、禁用句型</li>
+          <li><b>Day 10：</b>建立 ~/.claude/CLAUDE.md，寫進你的個人偏好</li>
+          <li><b>Day 11：</b>實測——開一個全新對話，看它記不記得你的規則</li>
+          <li><b>Day 12：</b>把不管用的規則改得更具體</li>
+        </ul>
+        <div class="tipline"><b>這週結束時你會理解：</b>好的 CLAUDE.md 值一小時，能省你幾十小時。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">W3</span><span class="ch-t">第三週｜指令<span class="en"> · 讓它動手，不只動嘴</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="bul">
+          <li><b>Day 15：</b>叫它幫你批次處理一次圖片</li>
+          <li><b>Day 16：</b>叫它清一份 CSV</li>
+          <li><b>Day 17：</b>叫它把你每週的重複工作寫成一個腳本</li>
+          <li><b>Day 18：</b>跑那個腳本，看能不能省時間</li>
+          <li><b>Day 19：</b>改進那個腳本</li>
+        </ul>
+        <div class="tipline"><b>這週結束時你會有：</b>至少一個能自動跑的流程。</div>
+      </div></details>
+      <details class="ch"><summary><span class="ch-n">W4</span><span class="ch-t">第四週｜工具<span class="en"> · 走出你的電腦</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="bul">
+          <li><b>Day 22：</b>接一個 MCP（建議從 Notion 或 Google Drive 開始）</li>
+          <li><b>Day 23：</b>做一個「讀外部資料 → 生成 → 寫回去」的完整循環</li>
+          <li><b>Day 24：</b>把你最常做的流程做成一個 Skill</li>
+          <li><b>Day 25：</b>用那個 Skill 跑一次真實任務</li>
+          <li><b>Day 26：</b>回頭改進 CLAUDE.md，把這個月學到的規則寫進去</li>
+        </ul>
+        <div class="tipline"><b>週末：</b>檢視這一個月省下多少時間。</div>
+      </div></details>
+    </div>
+  </div>
+
+  <!-- 10 九個錯誤 -->
+  <div class="sec fade">
+    <span class="sec-tag">10 · 九個最常見的錯誤</span>
+    <h2>卡住的時候<br><span class="g">回來翻這裡</span></h2>
+    <div class="err">
+      <div class="eq">把它當聊天機器人</div>
+      <div class="ea">症狀：一直問問題、複製答案、貼到別的地方。<br><b>修正：</b>給它目標和輸出位置，讓它自己交件。</div>
+      <div class="eq">沒有 CLAUDE.md</div>
+      <div class="ea">症狀：每次都要重講你是誰、你要什麼。<br><b>修正：</b>花一小時寫一次，之後每一次對話都省十分鐘。</div>
+      <div class="eq">CLAUDE.md 寫太長</div>
+      <div class="ea">症狀：寫了五百行，它還是不照做。<br><b>修正：</b>砍到 200 行以內，只留最關鍵的規則。</div>
+      <div class="eq">規則寫得太抽象</div>
+      <div class="ea">症狀：寫「文案要有質感」，它給你的東西還是一樣。<br><b>修正：</b>改成「IG 說明文案 100–180 字，禁用『不是 A 而是 B』句型」。</div>
+      <div class="eq">資料夾一團亂</div>
+      <div class="ea">症狀：它讀了一堆不相干的東西，回答歪掉。<br><b>修正：</b>一個專案一個資料夾，結構清楚。它的視野就是你的資料夾。</div>
+      <div class="eq">一次給太多任務</div>
+      <div class="ea">症狀：它做了一半，或每件事都做得很淺。<br><b>修正：</b>一次一個目標。做完再給下一個。</div>
+      <div class="eq">沒有要求它先講計畫</div>
+      <div class="ea">症狀：它動了你不想讓它動的檔案。<br><b>修正：</b>批次操作前，一律加「先列出計畫，等我確認」。</div>
+      <div class="eq">不驗證產出</div>
+      <div class="ea">症狀：它給的數字是錯的，你直接發出去了。<br><b>修正：</b>任何要對外發布的數據、引用、連結，自己再確認一次。</div>
+      <div class="eq">學了不用</div>
+      <div class="ea">症狀：看完教學，覺得很酷，然後關掉。<br><b>修正：</b>現在就挑一個你這週要做的重複工作，丟給它。</div>
+    </div>
+  </div>
+
+  <!-- 11 速查表 -->
+  <div class="sec fade">
+    <span class="sec-tag">11 · 指令速查表</span>
+    <h2>存起來<br><span class="g">忘了回來查</span></h2>
+    <div class="sub-h">對話中的斜線指令</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>指令</th><th>作用</th></tr></thead><tbody>
+      <tr><td>/init</td><td>掃描專案，自動生成 CLAUDE.md</td></tr>
+      <tr><td>/memory</td><td>開啟記憶檔編輯</td></tr>
+      <tr><td>/compact</td><td>壓縮對話上下文，繼續長任務</td></tr>
+      <tr><td>/clear</td><td>清空當前對話</td></tr>
+      <tr><td>/help</td><td>列出所有可用指令</td></tr>
+    </tbody></table></div>
+    <div class="sub-h">終端機指令</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>指令</th><th>作用</th></tr></thead><tbody>
+      <tr><td>claude</td><td>在當前資料夾啟動</td></tr>
+      <tr><td>claude -p "任務"</td><td>不進對話介面，直接跑完一件事</td></tr>
+      <tr><td>指令 | claude -p "任務"</td><td>把其他工具的輸出餵給它</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">指令句型的四個要素</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">四要素模板</div><pre>【對象】讀 research/ 裡的所有 PDF
+【動作】抓出每份的核心論點與方法
+【格式】整理成表格，欄位是：檔名 / 論點 / 方法 / 樣本數
+【去處】輸出成 output/文獻整理.md</pre></div>
+    <div class="tipline">缺任何一個，它就得用猜的。<b>四個都給，它一次到位。</b></div>
+
+    <div class="insight" style="margin-top:22px;"><div class="il">最後</div><div class="it">四個模組：檔案、指令、記憶、工具。它們每一次都在，多數人只用到第一個的一半。從記憶開始——花一小時寫好你的 CLAUDE.md，這是投報率最高的一小時。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>手冊你拿到了，<span class="g">接下來換我陪你把它跑成產線</span></h2>
+      <div class="cta-lead">這份手冊讓你把 Claude Code 從聊天視窗變成代理人。但要把四個模組接成一整條「選題 → 生產 → 變現」的內容產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把重複工作交出去、把時間換回來的人</div>
+        <div class="f">會用工具、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、有結果才拿出來講的工具與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">AI × 自媒體 × 把時間換回來</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具的實際用法、自媒體變現的工作流——都是我自己跑過、確認能省時間、能產出、能變現的東西<br>※ 本手冊技術內容依據 Claude Code 官方文件（code.claude.com/docs）整理，功能與指令可能隨版本更新，實作時請以官方文件為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude Code 四模組完整手冊——對應「四個模組」輪播的 DM 承接頁／lead magnet（定位：完整操作手冊，存起來當工具書查）
+· 內容：怎麼用這份文件 + 1 心智模型（agent vs chatbot＋四模組 ASCII 圖＋對照）+ 2 安裝與五介面 + 3 模組一檔案 + 4 模組二指令 + 中段 CTA + 5 模組三記憶（CLAUDE.md 完整指南＋兩份範本）+ 6 模組四工具（MCP/Skills/Hooks）+ 7 八職能範本（摺疊）+ 8 vs Vibe Coding + 9 三十天路徑（摺疊）+ 10 九個錯誤 + 11 速查表
+· 可複製區塊：約 27 個 .cp（安裝 5、資料夾結構 2、檔案指令 4、指令模組 6、記憶 /init /memory + 2 範本 + @引入 4、MCP 1、八職能 11、四要素 1）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，模組二與模組三之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準），換社群統一改這四個 id 的 href
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「Claude Code 四模組完整手冊」文件
+· 命名：日期前綴（2026-07-16-claude-code-modules.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
