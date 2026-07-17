@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>節奏小卡｜一場拜訪的 7 句話</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+
+.route{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin:14px 0 4px;line-height:2;overflow-x:auto;white-space:nowrap;}
+.route b{color:var(--gold);font-weight:500;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.scene{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 22px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.scene::before{content:"";position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--gold);}
+.scene .s-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.scene .s-n{font-family:"Inter";font-weight:800;font-size:13px;color:var(--gold);}
+.scene .s-name{font-weight:700;font-size:14px;color:var(--text);}
+.scene .s-en{font-family:var(--mono);font-size:10.5px;letter-spacing:0.14em;color:var(--faint);background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:50px;padding:2px 10px;}
+.scene .s-line{font-family:var(--serif);font-weight:900;font-size:18.5px;line-height:1.62;color:#2a2620;margin-bottom:11px;}
+.scene .s-line::before{content:"「";color:var(--gold);}
+.scene .s-line::after{content:"」";color:var(--gold);}
+.scene .s-why{font-size:13.5px;color:var(--dim);line-height:1.78;border-top:1px dashed var(--line);padding-top:11px;}
+.scene .s-why b{color:var(--gold);}
+
+.check{margin:14px 0 4px;}
+.check .ck{display:flex;gap:11px;margin-bottom:12px;font-size:14.5px;line-height:1.72;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:13px 16px;}
+.check .ck::before{content:"?";flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:2px;font-family:"Inter";}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:30px;}
+  .sec h2{font-size:21px;}
+  .scene .s-line{font-size:17px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>拿到這張卡後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>話會練<br><span class="g">收入系統也要練</span></h4>
+  <p>談話有節奏只是開始。怎麼用 AI ＋ 自媒體把時間做成收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">RHYTHM CARD · 隨身節奏小卡</div>
+    <h1>節奏小卡<br><span class="g">一場拜訪的 7 句話</span></h1>
+    <div class="hero-sub">台詞會忘，節奏不會。<br>這張卡不是要你背話，是給你一條可以走完的路線。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 場面</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">句 · 是問句</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">2</div><div class="l">分鐘 · 出門前走一遍</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在 AI × 自媒體變現。這裡教你用 AI 工具省下時間、把內容做成收入，一個人也能跑完整套流程。工具會練，話也會練——兩件事一起順了，事情才走得動。</div></div>
+  </div>
+
+  <!-- 這張卡怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這張卡怎麼用</span>
+    <h2>一場拜訪<br><span class="g">就是 7 個場面接著跑</span></h2>
+    <div class="route">開場 <b>→</b> 破冰 <b>→</b> 探需求 <b>→</b> 被質疑 <b>→</b> 被拒絕 <b>→</b> 收尾 <b>→</b> 結束</div>
+    <p>7 句話裡有 <span class="hl">5 句是問句</span>。主導權一直留在對方手上，聽起來像在意，不像在推。</p>
+    <p>出門談之前滑一遍，心裡有路線，臨場就不會慌。</p>
+  </div>
+
+  <!-- 7 個場面 -->
+  <div class="sec fade">
+    <span class="sec-tag">7 個場面 · 7 句話</span>
+    <h2>照著路線走<br><span class="g">每一段都有一句能接</span></h2>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">01</span><span class="s-name">開場</span><span class="s-en">OPEN</span></div>
+      <div class="s-line">今天不談產品，先聊聊你最近在忙什麼。</div>
+      <div class="s-why">說出「推銷」兩個字，對方的防備就會被叫醒。整句拿掉它，<b>先把人放在事情前面</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">02</span><span class="s-name">破冰</span><span class="s-en">ASK</span></div>
+      <div class="s-line">有個問題想請教你，方便嗎？</div>
+      <div class="s-why">請教比詢問低一階。<b>他說「好」的成本越低，對話越容易開始</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">03</span><span class="s-name">探需求</span><span class="s-en">LISTEN</span></div>
+      <div class="s-line">這件事，你自己心裡有想法嗎？</div>
+      <div class="s-why">讓他先開口。<b>他講出來的理由，說服力比你高</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">04</span><span class="s-name">被質疑</span><span class="s-en">DOUBT</span></div>
+      <div class="s-line">你會問這個，代表你已經在認真評估了。</div>
+      <div class="s-why">他問得越細，離決定越近。<b>質疑翻出來，就是在乎</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">05</span><span class="s-name">被拒絕</span><span class="s-en">NO</span></div>
+      <div class="s-line">完全理解。方便讓我知道，是哪個部分還不太合適嗎？</div>
+      <div class="s-why">「拒絕」是他的決定，「不合適」是事情的條件。<b>後者他好回答得多，門也還留著</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">06</span><span class="s-name">收尾</span><span class="s-en">FOCUS</span></div>
+      <div class="s-line">今天聊了不少，你最在意的是哪一塊？</div>
+      <div class="s-why">讓他自己說出重點。<b>決定是他下的，你只是遞筆</b>。</div>
+    </div>
+
+    <div class="scene">
+      <div class="s-head"><span class="s-n">07</span><span class="s-name">結束</span><span class="s-en">END</span></div>
+      <div class="s-line">謝謝你今天願意花時間，之後有新的東西我再跟你分享。</div>
+      <div class="s-why">留一個「下次」的理由，<b>關係就不會斷在今天</b>。</div>
+    </div>
+  </div>
+
+  <!-- 見面前 -->
+  <div class="sec fade">
+    <span class="sec-tag">見面前 · 花兩分鐘走一遍</span>
+    <h2>四個問題<br><span class="g">帶著答案再出門</span></h2>
+    <div class="check">
+      <div class="ck">這次見面，我想讓對方先開口的是哪一段？</div>
+      <div class="ck">如果被拒絕，我準備好用「不合適」接話了嗎？</div>
+      <div class="ck">收尾時，我要問哪一句，讓他自己講出重點？</div>
+      <div class="ck">結束前，我留了什麼下次見面的理由？</div>
+    </div>
+    <div class="insight"><div class="il">四個都有答案</div><div class="it">這場談話你就有節奏可循。</div></div>
+  </div>
+
+  <!-- 隨身帶著 -->
+  <div class="sec fade">
+    <span class="sec-tag">隨身帶著</span>
+    <h2>把這個連結存起來<br><span class="g">要用的時候回來看</span></h2>
+    <p>這頁就是你的節奏小卡。把連結存進手機備忘錄或瀏覽器書籤，想用的時候點開來看一下就好。</p>
+    <p>下次出門談之前，滑一遍。談完回來，對照哪一段接得順、哪一段卡住了，下一次再調。<span class="hl">走過幾輪，這 7 句就變成你自己的節奏了</span>。</p>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>卡你拿到了，<span class="g">接下來換我陪你把收入也跑順</span></h2>
+      <div class="cta-lead">談話有節奏，是把事情談成的基本功。但要把時間和技能做成一套持續的收入——用 AI 省時間、用自媒體放大——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">會做事、會談事，卻還沒把它變成系統的你</div>
+        <div class="f">收藏了一堆方法，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">工具會練，話也會練——兩件事一起順了，事情才走得動</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">更多 AI 工具 × 自媒體變現的內容，追蹤 @jasonxtsai</div>
+  </div>
+
+</div>
+
+<script>
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：節奏小卡（一場拜訪的 7 句話）——業務/談話節奏的 DM 承接頁／lead magnet（定位：隨身卡，出門前滑一遍）
+· 內容：怎麼用（路線圖＋5/7 問句）+ 7 場面卡（01開場OPEN…07結束END，各含金句＋為什麼）+ 見面前 4 問 + 隨身帶著
+· CTA：內容短，省略中段 CTA；保留前段（top/side）＋後段（cta）→ https://www.skool.com/d11-lab/about（無 ref 純網址）
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    後段 → .cta（id=skool-link）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）；場面卡左金邊＋serif 金句＋虛線分隔「為什麼」
+· 來源：傑森所長自有「節奏小卡」文件
+· 命名：日期前綴（2026-07-17-visit-rhythm.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
