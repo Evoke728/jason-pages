@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 五個外掛｜完整安裝與實戰指南</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:14px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--gold);margin-bottom:16px;line-height:1.6;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.cp .bad{color:#e0776a;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.nolink{font-size:12.5px;color:var(--dim);margin-top:10px;line-height:1.7;}
+.nolink b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝好這五個外掛後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>讓一個人<br><span class="g">做出團隊的產出</span></h4>
+  <p>裝好外掛只是開始。怎麼把 AI 接成能省時間、能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 五個外掛實戰指南</div>
+    <h1>Claude Code<br><span class="g">五個外掛</span></h1>
+    <div class="h-sub">完整安裝與實戰指南</div>
+    <div class="hero-sub">五個外掛的完整安裝、實際指令、使用時機，以及每一個的<b>限制與陷阱</b>。<br>我不會只講好話——每個工具後面都有「什麼時候不要用」，因為一個外掛裝錯場景，比不裝還糟。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · 外掛</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">23</div><div class="l">個 · impeccable 指令</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30+</div><div class="l">個 · 生圖生片模型</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在一件事：用 AI 工具，讓一個人做出一個團隊的產出。這個帳號分享的只有三類——AI 工具怎麼用、自媒體怎麼變現、以及怎麼把兩件事接在一起。沒有心法、沒有雞湯，只有能直接跑起來的東西。</div></div>
+  </div>
+
+  <!-- 這份文件會給你什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件會給你什麼</span>
+    <h2>不是清單<br><span class="g">是照著做完的指南</span></h2>
+    <ul class="bul">
+      <li>五個外掛的<b>可複製安裝指令</b></li>
+      <li>一套建議的安裝順序（<b>不要一次全裝</b>）</li>
+      <li>三個網路教學普遍寫錯的地方</li>
+      <li>一份給不寫程式的人的替代路徑</li>
+    </ul>
+    <div class="tipline">驗證日期：<b>2026 年 7 月</b>。所有安裝指令皆已對照官方 repo 與文件核實。開源專案更新快，若指令失效，以各專案 GitHub 為準。</div>
+  </div>
+
+  <!-- 先講一句實話 -->
+  <div class="sec fade">
+    <span class="sec-tag">先講一句實話</span>
+    <h2>這五個裡<br><span class="g">只有三個是真正的「外掛」</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名稱</th><th>它到底是什麼</th></tr></thead><tbody>
+      <tr><td>graphify</td><td>skill + hook</td></tr>
+      <tr><td>impeccable</td><td>skill + CLI + hook</td></tr>
+      <tr><td>ponytail</td><td>plugin（透過 marketplace 安裝）</td></tr>
+      <tr><td>Higgsfield</td><td>MCP server</td></tr>
+      <tr><td>Obsidian</td><td>根本不是外掛，它只是一個資料夾</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">它們解決同一件事的不同層面</div><div class="it">讓 Claude 少讀、少寫、少猜、有記憶。先理解這件事，再開始裝。</div></div>
+  </div>
+
+  <!-- 五個外掛 -->
+  <div class="sec fade">
+    <span class="sec-tag">五個外掛 · 逐個拆</span>
+    <h2>展開任一個<br><span class="g">安裝指令直接複製</span></h2>
+    <div class="acc">
+
+      <!-- 01 graphify -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">graphify<span class="en"> · 把 repo 建成知識圖譜</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>Claude 在大型專案裡最貴的成本不是輸出，是<span class="hl">定位</span>——它要先讀懂架構才能動手，而讀懂的方式就是一個檔案一個檔案 grep。專案愈大，這筆錢燒得愈兇。</p>
+        <p>graphify 用 tree-sitter 做 AST 靜態解析，把程式碼、文件、PDF、圖片全部解成一張圖：節點是概念，邊是關係，還會自動抓出 <b>community（模組群）</b>和 <b>god node（被最多東西依賴的核心）</b>。Claude 從此照著地圖走，不是盲目搜。</p>
+        <div class="sub-h">安裝（需要 Python 3.10+）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">套件名是 graphifyy（兩個 y）</div><pre><span class="cm"># 1. 安裝套件</span>
+pip install graphifyy
+<span class="cm"># 2. 安裝 skill</span>
+graphify install
+<span class="cm"># 3. 進專案資料夾，做 Claude Code 深度整合</span>
+cd your-project
+graphify claude install</pre></div>
+        <p style="font-size:13.5px;">第三步做兩件事：在 CLAUDE.md 寫入指令，要 Claude 回答架構問題前先讀 <b>graphify-out/GRAPH_REPORT.md</b>；並裝一個 <b>PreToolUse hook</b>，在每次 Glob／Grep 之前先攔截。這個 hook 是重點——它讓 Claude 在「搜之前」就先看圖。</p>
+        <div class="sub-h">建圖與查詢</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">建圖（在 Claude Code 裡）</div><pre>/graphify ./your-folder</pre></div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>產出</th><th>用途</th></tr></thead><tbody>
+          <tr><td>graph.html</td><td>可點擊的互動視覺化</td></tr>
+          <tr><td>GRAPH_REPORT.md</td><td>一頁式摘要：god nodes、communities、意外連結</td></tr>
+          <tr><td>graph.json</td><td>可查詢的持久化圖</td></tr>
+          <tr><td>cache/</td><td>增量快取</td></tr>
+        </tbody></table></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">三個查詢指令</div><pre>/graphify query "使用者登入流程經過哪些檔案"
+/graphify path A B          <span class="cm"># 追兩個東西之間的路徑</span>
+/graphify explain &lt;concept&gt; <span class="cm"># 解釋單一概念</span></pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">進階：讓圖自己更新（post-commit / post-checkout）</div><pre>graphify hook install</pre></div>
+        <div class="warn">⚠️ <b>什麼時候不要用：</b>小專案（檔案不到 100）Claude 直接讀比較快，建圖反而是額外成本。文件／PDF／圖片的語意抽取會呼叫模型（程式碼用 tree-sitter 是本機免費），大型混合專案第一次建圖要有心理準備。另外 graphify install 會覆寫 SKILL.md，客製過的話升級後要重新確認。</div>
+        <div class="nolink"><b>官方：</b>github.com/safishamsi/graphify｜graphify.net</div>
+      </div></details>
+
+      <!-- 02 impeccable -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">impeccable<span class="en"> · 抓出前端的 AI 痕跡</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>Claude 寫得出能跑的介面，但寫不出<span class="hl">有意圖</span>的介面。放著不管，它會往最安全的視覺平均值靠攏：Inter 用到底、紫到藍漸層 hero、卡片包卡片、彩色底放灰字、每個標題上面一個圓角 icon tile、彈跳動畫、所有東西置中。</p>
+        <p>這不是醜的問題，是<span class="hl">識別度的問題</span>。使用者看得出來，只是講不出名字。impeccable 給 Claude 一套設計詞彙，讓它知道「什麼不該做」——這比教它「該做什麼」有效得多。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在專案根目錄執行（會偵測你的 AI 工具裝對應版本）</div><pre>npx impeccable install</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">然後在 Claude Code 裡</div><pre>/impeccable init</pre></div>
+        <p style="font-size:13.5px;">init 會掃描 repo、合併 Tailwind theme、盤點元件，寫出 <b>PRODUCT.md</b>（產品脈絡）和 <b>DESIGN.md</b>（設計規範）。後面所有指令都靠這兩份檔案，<b>跳過這步效果減半</b>。</p>
+        <div class="sub-h">最常用的核心指令（共 23 個）</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>指令</th><th>做什麼</th></tr></thead><tbody>
+          <tr><td>/impeccable audit</td><td>掃描 + 評分報告</td></tr>
+          <tr><td>/impeccable critique</td><td>UX 檢視：層級、清晰度、情緒</td></tr>
+          <tr><td>/impeccable polish</td><td>上線前最後一遍（對齊、間距、細節）</td></tr>
+          <tr><td>/impeccable distill</td><td>砍掉沒有存在價值的複雜度</td></tr>
+          <tr><td>/impeccable typeset</td><td>修字體、層級、尺寸</td></tr>
+          <tr><td>/impeccable arrange</td><td>修版面、間距、視覺節奏</td></tr>
+          <tr><td>/impeccable bolder</td><td>把太安全太無聊的設計放大</td></tr>
+          <tr><td>/impeccable quieter</td><td>把太吵的設計壓下來</td></tr>
+          <tr><td>/impeccable animate</td><td>加有目的的動態（不是裝飾性抖動）</td></tr>
+          <tr><td>/impeccable harden</td><td>錯誤處理、i18n、邊界情況</td></tr>
+        </tbody></table></div>
+        <div class="sub-h">detect CLI：接進 CI</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">46 條確定性偵測規則，純規則比對不呼叫模型</div><pre>npx impeccable detect src/</pre></div>
+        <p style="font-size:13.5px;">抓的是 AI slop 特徵（漸層文字、側邊條、紫色系）、排版問題、WCAG 對比違規、版面反模式、動態問題。乾淨回傳 <b>0</b>，抓到問題回傳 <b>2</b>——可直接接進 PR check，在 merge 前擋掉 AI slop。加 <b>--json</b> 給機器讀。</p>
+        <div class="warn">⚠️ <b>一個常見錯誤資訊：</b>網路上很多文章寫「impeccable 偵測 24 個設計破綻」，那是舊版本的數字。<b>現在是 46 條偵測規則</b>，引用前先自己跑一次。</div>
+        <div class="warn">⚠️ <b>什麼時候不要用：</b>它不生 UI（不是 v0、不是 Stitch），只讓既有專案的 agent 輸出更好。規則有立場，做實驗性高創意的東西會綁手綁腳。Live Mode 還在 beta。detect CLI 需要 Node 24+。設計 pass 跑完還是要跑 axe 做無障礙測試。</div>
+        <div class="nolink"><b>官方：</b>github.com/pbakaus/impeccable｜impeccable.style｜作者 Paul Bakaus（jQuery UI 作者、前 Google DA）</div>
+      </div></details>
+
+      <!-- 03 ponytail -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">ponytail<span class="en"> · 全場最懶的資深工程師</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>你知道那種人。長馬尾、橢圓框眼鏡、在公司待得比版控還久。你給他看五十行程式碼，他看一眼，不說話，換成一行。</p>
+        <p>Claude 的毛病跟懶惰相反——它<span class="hl">蓋太多</span>。你要一個日期選擇器，它裝了 flatpickr、寫了 wrapper 元件、加了樣式表，順便開一個時區的討論。能跑，但一百行做了一行的事。ponytail 就是關掉這個反射。</p>
+        <div class="sub-h">懶惰階梯（Laziness Ladder）</div>
+        <p style="font-size:13.5px;">寫任何程式碼之前，agent 從上往下走這道階梯，<b>停在第一個成立的階</b>：</p>
+        <div class="cp"><div class="pl">Laziness Ladder</div><pre class="art">1. 這東西需要存在嗎？      → 不需要：跳過（YAGNI）
+2. codebase 裡已經有了？   → 重用，別重寫
+3. 標準函式庫做得到？       → 用標準函式庫
+4. 原生平台功能做得到？     → 用原生（&lt;input type="date"&gt;）
+5. 已安裝的相依套件做得到？ → 用它，絕不為幾行程式碼新增相依
+6. 一行寫得完？             → 一行
+7. 都不行                   → 才寫「剛好能動的最小量」</pre></div>
+        <div class="tipline">SKILL.md 裡定義了這個人格：<b>階梯是反射，不是研究計畫。第一個能動的懶方案就是對的方案。</b></div>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">透過 marketplace 安裝</div><pre>/plugin marketplace add DietrichGebert/ponytail
+/plugin install ponytail@ponytail</pre></div>
+        <p style="font-size:13.5px;">需要 <b>node 在 PATH 上</b>（跑兩個 Node lifecycle hook）。Nix／nvm 使用者要在非互動 shell 的 PATH 上。node 找不到的話 skill 還是會動，只是「每回合自動啟用」會安靜失效。</p>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>模式</th><th>行為</th></tr></thead><tbody>
+          <tr><td>lite</td><td>照你要的做，但一句話點出更懶的替代方案，你自己決定</td></tr>
+          <tr><td>full（預設）</td><td>執行階梯。最短的 diff，最短的解釋</td></tr>
+          <tr><td>ultra</td><td>YAGNI 極端派。丟出一行版本，同時質疑需求本身</td></tr>
+        </tbody></table></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">切換與附帶指令</div><pre>/ponytail lite
+/ponytail off
+/ponytail-review   <span class="cm"># 對一個 diff review，列出該刪的行</span>
+/ponytail-audit    <span class="cm"># 掃整包，給「該刪/簡化/換標準庫」排序清單</span>
+/ponytail-debt     <span class="cm"># 收集所有 ponytail: 註解，做成技術債帳本</span></pre></div>
+        <p style="font-size:13.5px;">ponytail 每走一個捷徑，都會留一個 <b>ponytail:</b> 註解，寫明天花板和升級路徑。「以後再說」不會變成「永遠不說」，因為債是可見、可收割的。</p>
+        <div class="warn">⚠️ <b>關於「少寫 94% 程式碼」那個數字：</b>網路瘋傳「省 42–75% 成本、快 3–6 倍」——<b>作者自己修正過</b>。原始 benchmark 是單次 completion 比對，裸模型 baseline 會塞一堆散文，落差有一部分是「對話式 baseline 的假象」。ponytail 有用，但別引用那個數字。它的價值是成本論述：agent 沒寫的每一行，就是沒人要 review、要測、要背風險的程式碼。</div>
+        <div class="warn">⚠️ <b>什麼時候不要用：</b>有正當抽象需求的專案（circuit breaker、retry、backoff 不會因為「一行」而變好）。簡潔型推理模型可能反效果（階梯是審慎步驟，會先花 thinking token）。你要 Claude 建大型架構時——這時需要它蓋，不是需要它懶。</div>
+        <div class="nolink"><b>官方：</b>github.com/DietrichGebert/ponytail｜授權 MIT</div>
+      </div></details>
+
+      <!-- 04 Higgsfield -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">Higgsfield MCP<span class="en"> · 一條線接 30+ 生成模型</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>一台 MCP server，把 Claude Code 接上 <span class="hl">30+ 個圖片與影片生成模型</span>——Soul、Cinema Studio、Flux、Seedream、Kling、Minimax Hailuo、Veo、Sora 等等。</p>
+        <p>最好的生圖模型每個禮拜都在換。以前用每一個都要管一組 API、一個帳號、一套 SDK，結果大部分人挑一個用到底——等於幾乎永遠沒在用最適合的工具。Higgsfield MCP 把這件事收攏成一個連線。</p>
+        <div class="sub-h">安裝（Claude Code）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">一行指令</div><pre>claude mcp add --transport http --scope user higgsfield https://mcp.higgsfield.ai/mcp</pre></div>
+        <p style="font-size:13.5px;"><b>--transport http</b>：這是 hosted HTTP server，不是本機 stdio。<b>--scope user</b>：寫進 ~/.claude/mcp.json，所有專案都能用（想只在單一 repo 並 commit 給團隊就換 --scope project）。第一次呼叫工具時會開瀏覽器跑 OAuth，登入 Higgsfield 帳號即可。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">驗證（或在 session 裡打 /mcp 看綠勾）</div><pre>claude mcp list</pre></div>
+        <div class="tipline"><b>沒看到？</b>完全關掉 Claude Code 再開。新的 MCP server 只在全新 session 才註冊。</div>
+        <p style="font-size:13.5px;"><b>claude.ai／桌面版：</b>Settings → Connectors → Add Custom Connector → 貼上 https://mcp.higgsfield.ai/mcp → Connect → 瀏覽器登入。</p>
+        <div class="warn">⚠️ <b>網路上最多人寫錯的地方：你不需要 API key。</b>Higgsfield 在 2026-04-30 才推出官方 hosted MCP server，在那之前的教學都教你貼 HIGGSFIELD_API_KEY——照著做你會卡住。官方 hosted server 走瀏覽器 OAuth，沒有 key 要管。</div>
+        <div class="cp"><div class="pl">❌ 這是舊做法，現在不用了</div><pre><span class="bad">{
+  "mcpServers": {
+    "higgsfield": {
+      "command": "higgsfield-mcp",
+      "env": {
+        "HIGGSFIELD_API_KEY": "your-key",
+        "HIGGSFIELD_SECRET": "your-secret"
+      }
+    }
+  }
+}</span></pre></div>
+        <div class="sub-h">使用時要知道的事</div>
+        <ul class="bul">
+          <li><b>它不會通知你。</b>生成跑在它自己的伺服器上，做完不會 ping。要明確叫 Claude「每 60–90 秒 poll 一次，把結果拉回來」，不然它會無限等待或直接跳過。</li>
+          <li><b>批次要分組。</b>一次丟 10 個，第四個之後會安靜失敗。三個一組送，然後 poll。</li>
+          <li><b>任務是持久的。</b>Session 斷掉沒關係，任務在伺服器端繼續跑。長影片可以放著不管。</li>
+          <li><b>先估 credit。</b>200 張圖在 creator plan 沒問題；200 支 Veo 影片會在一個下午燒掉一整個月。開始前先叫 Claude 估。</li>
+          <li><b>檢查品牌名拼字。</b>自動轉錄會把 Claude Code 寫成 Cloud Code、Seedance 寫成 C-Dance。聲音對、字幕錯，發布前自己看過。</li>
+        </ul>
+        <div class="warn">⚠️ <b>什麼時候不要用：</b>你只需要一種模型時，直接用那家 API 更便宜。你的內容不吃視覺時，這是內容生產工具、不是開發工具，裝著只會多一層 context。</div>
+        <div class="nolink"><b>官方：</b>higgsfield.ai/mcp｜Endpoint：https://mcp.higgsfield.ai/mcp</div>
+      </div></details>
+
+      <!-- 05 Obsidian -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">Obsidian<span class="en"> · 給 Claude 一份共用記憶</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>它不是外掛，是一個資料夾。但它解決這五個裡面<span class="hl">最根本的問題：Claude 沒有記憶</span>。每一次新 session 都是全新的——你上禮拜討論的架構決策、踩過的坑、定下的規範，全部歸零。</p>
+        <p>Obsidian vault 就是一堆 Markdown 檔的資料夾。把 Claude 指向它，你的筆記就變成<span class="hl">共用記憶</span>：可搜尋、會留存，每次新對話 Claude 都讀得到、也寫得回去。</p>
+        <div class="sub-h">設定（最小可行版本）</div>
+        <div class="steps">
+          <div class="st"><b>建一個 vault：</b>就是建一個資料夾放 .md 檔。Obsidian 本身不是必須的——你要的只是「一個裝滿 Markdown 的資料夾」。</div>
+          <div class="st"><b>在 CLAUDE.md 裡指路</b>（見下方範本）</div>
+          <div class="st"><b>確認 Claude 讀得到路徑：</b>vault 在專案外面的話，Claude Code 需要權限，第一次它會問你。</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製範本</button><div class="pl">加進專案根目錄的 CLAUDE.md</div><pre>## 專案記憶
+我的長期筆記在 ~/vault/（Obsidian vault，Markdown 格式）。
+
+在下列情況讀取它：
+- 回答架構問題前
+- 我提到「上次」「之前」「我們決定過」時
+- 開始一個新功能前，先看有沒有相關的決策紀錄
+
+在下列情況寫入它：
+- 我們做出一個架構決策時 → 寫進 ~/vault/decisions/
+- 我們踩到一個坑並解決時 → 寫進 ~/vault/gotchas/
+- 我明確說「記下來」時
+
+寫入格式：Markdown，開頭放日期與一句話摘要。</pre></div>
+        <div class="sub-h">進階：讓它自己整理</div>
+        <p style="font-size:13.5px;">在 ~/vault/ 放一個 INDEX.md，讓 Claude 每次寫入後更新它。這樣它有一份「目錄」可以先掃，不用每次全讀。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製範本</button><div class="pl">~/vault/INDEX.md</div><pre># Vault Index
+最後更新：&lt;Claude自動填&gt;
+
+## decisions/
+- 2026-07-01｜為什麼不用 Redis：流量規模不到，先用 in-memory
+- 2026-06-20｜前端狀態管理選 Zustand 不選 Redux
+
+## gotchas/
+- 2026-07-05｜Vercel edge function 不支援 Node fs，要改用 fetch</pre></div>
+        <div class="insight"><div class="il">為什麼這招被低估</div><div class="it">因為它太簡單，簡單到不像一個方案。但它門檻最低、回饋最大——前面四個都是讓 Claude 這一次做得更好，Obsidian 是讓它下一次不用重來。</div></div>
+        <div class="warn">⚠️ <b>什麼時候不要用：</b>筆記沒人維護時（過期的 vault 比沒有更糟，Claude 會照錯的資訊做決定）。vault 太大時（幾千個檔案需要索引或 graphify 上場）。裡面有機密時——Claude 讀得到的就是進了 context 的，API key、密碼、客戶資料不要放。</div>
+        <div class="nolink"><b>官方：</b>obsidian.md（其實你只需要一個資料夾）</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">五個外掛講完了</div>
+      <h3>裝好工具是基本<br><span class="g">接成系統才是重點</span></h3>
+      <p>這五個讓 Claude 少讀、少寫、少猜、有記憶。想把它們接成一條能省時間、能變現的產線——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 安裝順序 -->
+  <div class="sec fade">
+    <span class="sec-tag">安裝順序建議</span>
+    <h2>不要一次全裝<br><span class="g">五個都開會分不清誰在影響輸出</span></h2>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">W1</span><span class="ch-t">第一週｜Obsidian<span class="en"> · 門檻最低、零風險</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>回饋最大，而且不會改變 Claude 的行為——它只是給 Claude 多一個可以讀的東西。先建 vault、寫三份筆記，看 Claude 有沒有真的讀。</p></div></details>
+      <details class="ch"><summary><span class="ch-n">W2</span><span class="ch-t">第二週｜ponytail<span class="en"> · 先跑 lite</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>裝上，用 lite 模式跑一週。觀察它點出的「更懶的替代方案」有多少是對的。覺得講得有道理，再切 full。</p></div></details>
+      <details class="ch"><summary><span class="ch-n">W3</span><span class="ch-t">第三週｜impeccable<span class="en"> · 只有做前端才裝</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>純後端專案裝了沒用。先跑 /impeccable init，再跑一次 npx impeccable detect src/，看現有專案被抓出幾條——那個數字通常會讓你安靜三秒。</p></div></details>
+      <details class="ch"><summary><span class="ch-n">W4</span><span class="ch-t">第四週｜graphify<span class="en"> · 超過 200 檔再裝</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>小專案沒有效益。建一次圖，打開 graph.html 看一眼——就算之後不用它，那張圖本身也值得看，你會發現你對自己的專案結構有誤解。</p></div></details>
+      <details class="ch"><summary><span class="ch-n">需要時</span><span class="ch-t">Higgsfield<span class="en"> · 要做圖做片再裝</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>這是內容生產工具，不是開發工具。你要做圖、做影片的時候再裝。</p></div></details>
+    </div>
+  </div>
+
+  <!-- 給不寫程式的人 -->
+  <div class="sec fade">
+    <span class="sec-tag">給不寫程式的人</span>
+    <h2>不用 Claude Code<br><span class="g">你還是能用兩個</span></h2>
+    <ul class="bul">
+      <li><b>Higgsfield MCP</b>——在 claude.ai 的 Settings → Connectors 加自訂連接器，貼上 mcp.higgsfield.ai/mcp。之後在網頁版聊天裡就能直接叫 Claude 生圖生片。</li>
+      <li><b>Obsidian 的概念</b>——你不需要 Claude Code。在 Claude 的 Project 裡上傳你的筆記，效果類似：Claude 在那個 Project 裡永遠讀得到那些檔案。</li>
+    </ul>
+    <div class="tipline">其他三個（graphify／impeccable／ponytail）都是為寫程式的人設計的，硬裝沒有意義。</div>
+  </div>
+
+  <!-- 三個最後提醒 -->
+  <div class="sec fade">
+    <span class="sec-tag">三個最後提醒</span>
+    <h2>裝之前<br><span class="g">先想清楚這三件事</span></h2>
+    <div class="insight"><div class="il">一、外掛不是能力，是約束</div><div class="it">這五個沒有一個給了 Claude 新能力，它們都是在限制 Claude——限制它讀什麼、寫多少、用什麼設計、記得什麼。好的工具不是讓 AI 做更多，是讓它做得更少但更準。</div></div>
+    <div class="insight"><div class="il">二、每一個外掛都是一張會過期的支票</div><div class="it">ponytail 有效，是因為現在的模型會過度建構；impeccable 有效，是因為現在的模型有可辨識的視覺習慣。模型改了，這些外掛的價值就會縮水。裝的時候心裡有數。</div></div>
+    <div class="insight"><div class="il">三、skill 和 hook 都能執行程式碼</div><div class="it">你在信任第三方外掛去塑形你的每一次生成、並且在每一回合執行程式碼。裝之前看一眼 repo——這五個都開源、有社群檢視，但這個習慣要養。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>外掛你裝好了，<span class="g">接下來換我陪你把它接成系統</span></h2>
+      <div class="cta-lead">這五個讓 Claude 少讀、少寫、少猜、有記憶。但要把它們接成一整條「用 AI 省時間、用自媒體變現」的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 讓一個人做出一個團隊產出的人</div>
+        <div class="f">會裝工具、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、有結果才拿出來講的工具與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">你的時間值錢，工具的意義是把它還給你</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具怎麼用、自媒體怎麼變現、怎麼把兩件事接起來換回你的時間——都是我自己在跑的東西<br>※ 本文所有安裝指令驗證於 2026 年 7 月，開源專案更新頻繁，若指令失效請以各專案 GitHub 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude Code 五個外掛完整安裝與實戰指南——留言「插件」換的 DM 承接頁／lead magnet
+· 內容：文件總覽 + 先講一句實話（只有三個是真外掛表）+ 5 外掛摺疊（graphify／impeccable／ponytail／Higgsfield／Obsidian，各含它做什麼＋可複製安裝＋指令表＋⚠️陷阱＋什麼時候不要用＋官方連結）+ 中段 CTA + 安裝順序（W1–W4＋需要時，摺疊）+ 給不寫程式的人 + 三個最後提醒
+· 可複製區塊：約 14 個 .cp（含 Obsidian 兩份 md 範本；Higgsfield 舊 json 為 ❌ 示範、無複製鈕）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，5 外掛與安裝順序之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「Claude Code 五個外掛」文件
+· 命名：日期前綴（2026-07-20-claude-code-plugins.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
