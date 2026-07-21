@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>60 個 Claude 指令完整版｜複製貼上直接用</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:37px;line-height:1.34;margin-bottom:18px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.catgrid{display:flex;flex-direction:column;gap:10px;margin:14px 0 4px;}
+.catcard{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:15px 18px;}
+.catcard .cn{font-family:"Inter";font-weight:800;font-size:24px;color:var(--gold);flex-shrink:0;width:32px;text-align:center;}
+.catcard .cm{flex:1;}
+.catcard .ct{font-weight:700;font-size:14.5px;color:var(--text);}
+.catcard .cd{font-size:12.5px;color:var(--dim);margin-top:2px;}
+.catcard .cc{font-family:"Inter";font-weight:800;font-size:15px;color:var(--gold);flex-shrink:0;}
+
+.acc{display:flex;flex-direction:column;gap:8px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:14px 16px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:32px;height:28px;padding:0 8px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:11.5px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14px;color:var(--text);line-height:1.4;}
+.ch-mk{flex-shrink:0;width:20px;height:20px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:9px;left:3px;width:14px;height:2px;}
+.ch-mk::after{top:3px;left:9px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:4px 16px 16px;border-top:1px solid var(--line);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>拿到這 60 個指令後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>指令會用<br><span class="g">收入系統也要練</span></h4>
+  <p>拿到 60 個指令只是開始。怎麼把 AI ＋ 自媒體接成能省時間、能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">60 CLAUDE PROMPTS · 完整版</div>
+    <h1>60 個 Claude<br><span class="g">指令完整版</span></h1>
+    <div class="hero-sub">複製、貼上，把【】裡的內容換成你自己的，直接開始用。<br>不講理論，不講願景。只講你今天打開電腦就能執行的東西。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">60</div><div class="l">個 · 指令</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">大 · 分類</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">100%</div><div class="l">可直接複製</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">這個帳號在做的事情很單純：AI × 自媒體變現。我把自己實際在用的 AI 工具、Prompt、工作流拆開來講，讓你可以直接複製回去用在內容產出、接案流程、或變現路徑上。</div></div>
+  </div>
+
+  <!-- 這份文件怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件怎麼用</span>
+    <h2>60 個指令<br><span class="g">分成四大類</span></h2>
+    <div class="catgrid">
+      <div class="catcard"><span class="cn">一</span><div class="cm"><div class="ct">學習與吸收</div><div class="cd">想快速搞懂新領域、準備考試、消化大量資料</div></div><div class="cc">15</div></div>
+      <div class="catcard"><span class="cn">二</span><div class="cm"><div class="ct">研究與分析</div><div class="cd">需要處理報告、查核資訊、做決策的人</div></div><div class="cc">15</div></div>
+      <div class="catcard"><span class="cn">三</span><div class="cm"><div class="ct">Prompt 工程</div><div class="cd">想讓 AI 輸出穩定、可重複使用的人</div></div><div class="cc">15</div></div>
+      <div class="catcard"><span class="cn">四</span><div class="cm"><div class="ct">自動化工作流</div><div class="cd">想把重複工作交給機器的人</div></div><div class="cc">15</div></div>
+    </div>
+    <div class="tipline">
+      <b>使用方式：</b>找到你需要的那一個 → 整段複製到 Claude（ChatGPT、Gemini 都可以）→ 把【】換成你自己的內容 → 送出
+    </div>
+    <div class="insight"><div class="il">三個讓效果變好的小習慣</div><div class="it">括號填得越具體輸出越準；不滿意直接說「第三點太空泛，用實際數字重寫」不要重開對話；好用的指令存成 Project 或自訂指令，下次不用再貼。</div></div>
+  </div>
+
+  <!-- 一 學習與吸收 -->
+  <div class="sec fade">
+    <span class="sec-tag">一 · 學習與吸收（15）</span>
+    <h2>快速搞懂新領域<br><span class="g">消化大量資料</span></h2>
+    <div class="acc">
+      <details class="ch"><summary><span class="ch-n">01</span><span class="ch-t">四層講解法</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>用四個層次講解【主題】。
+第一層：用一個日常生活的比喻，讓十歲小孩聽懂這是什麼。
+第二層：講給一個聰明的初學者，加入正確術語，說明它實際怎麼運作。
+第三層：講給專家聽，涵蓋邊界情況、常見失敗模式、以及這個領域內部還在爭論的地方。
+第四層：用一句話濃縮核心。
+四層講完後，另外列出多數人對這個主題最常誤解的三件事，每件事說明為什麼會誤解、正確理解是什麼。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">蘇格拉底家教</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>你是【主題】的家教。
+規則：
+1. 一次只問我一個問題，問完就停下來等我回答
+2. 從基礎概念開始，隨著我答對逐漸加深
+3. 我答錯或答得模糊時，給我提示，不要直接公布答案
+4. 我連續答錯兩次同一個概念，換個角度重新解釋一次再繼續
+進行八個問題後，做一次總結：
+- 幫我的理解程度打 1 到 10 分
+- 明確指出我還缺哪些概念
+- 排出我接下來該補的順序
+現在開始問第一題。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">十四天間隔重複計畫</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我做【技能／主題】的十四天複習計畫。
+我目前的程度是【完全新手／有基礎／想深化】。
+我每天可以投入【X】分鐘。
+輸出格式：一個表格，欄位為「第幾天／要複習的概念／用什麼身分重講一次」。
+「用什麼身分重講」請在這幾種之間輪替：講給十歲小孩、講給懷疑論者、講給同行專家、寫成一則社群貼文。
+依照間隔重複原理安排：新概念在第 1、2、4、7、14 天各出現一次。
+最後附上五個問題，我到第十四天必須能不看筆記直接答出來。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">技能樹拆解</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我建一個從零到勝任【技能】的技能樹。
+分成四個階段：入門、能用、熟練、進階。
+每個階段給我：
+- 這階段必須掌握的三個核心概念
+- 一個能證明你到達這階段的實作專案
+- 一個檢核點：你能做到什麼，就代表可以進下一階段
+- 預估需要投入的小時數
+另外標出：哪些常見的入門建議其實可以跳過、哪個前置知識絕對不能省略。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">自我解釋檢驗</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要用自己的話解釋【概念】，你當我的嚴格考官。
+我的解釋：【貼上你的解釋】
+請你：
+1. 逐句指出我哪裡講得含糊、哪裡講錯、哪裡是背下來的套話
+2. 針對每一處，說明一個懂行的人會怎麼追問我
+3. 找出我解釋裡最弱的一環，給我一個更好的比喻
+4. 最後把我的解釋改寫成一個正確且清楚的版本，讓我對照
+不要客氣，我要的是找出漏洞。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">濃縮長文成可記憶結構</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>把這份資料整理成我能記住的結構：【貼上內容】
+輸出四個區塊：
+一、一句話總結：這份資料在講什麼
+二、三個核心主張：每個主張一行，附上它在原文的依據
+三、關鍵名詞表：列出我必須記住的術語，每個用一行白話解釋
+四、五個自我測驗題：讀完這份整理後，我應該要能回答的問題
+不要照原文順序抄。用概念的重要性重新排列。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">跨領域類比</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我懂【我熟悉的領域】，現在要學【陌生的領域】。
+請你用我熟悉的領域，建立一組類比來解釋新領域的核心概念。
+輸出格式：一個對照表，左欄是新領域的概念，中欄是我熟悉領域的對應物，右欄說明這個類比在哪裡會失效。
+第三欄很重要。所有類比都有極限，我需要知道邊界在哪，避免把錯的直覺帶過去。
+最後列出三個新領域裡「完全找不到類比」的概念，那些是我要重新建立直覺的部分。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">08</span><span class="ch-t">學習路徑排錯</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我學【主題】已經【X】週，目前卡在【描述你的卡點】。
+我做過的事：【列出你的學習方式】
+請你診斷：
+1. 我的卡點屬於哪一種：基礎沒打穩、方法錯誤、還是單純練習量不夠
+2. 針對這個診斷，我接下來兩週應該改做什麼
+3. 我目前的做法裡，哪一項應該立刻停掉
+4. 一個能在三天內驗證診斷正不正確的小實驗
+直接說我哪裡做錯，不用鋪陳。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">09</span><span class="ch-t">考點預測與弱點掃描</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要準備【考試／面試／檢定】，範圍是【範圍】。
+第一步：列出這個範圍內最高頻的十個考點，依出現機率排序。
+第二步：針對每個考點，出一題中等難度的題目給我。
+第三步：我作答後，逐題批改，並標出我的錯誤屬於哪一類（觀念錯、粗心、不熟練、完全沒學過）。
+第四步：根據錯誤類型，給我一份最後衝刺清單，只列真正該補的。
+現在先做第一步跟第二步。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">10</span><span class="ch-t">把知識變成內容</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我剛學會【概念】。幫我把它變成可以發佈的內容。
+輸出三個版本：
+一、社群短貼文（150 字內）：一個具體的鉤子開場，中間講清楚這個概念解決什麼問題，結尾留一個可以互動的點。
+二、教學大綱（條列）：如果我要教別人這個概念，投影片的架構長什麼樣，每一頁講什麼。
+三、一個比喻：能讓完全外行的人在三十秒內抓到重點的比喻。
+語氣要直接、口語，不要教科書腔。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">11</span><span class="ch-t">爭議地圖</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>【主題】這個領域裡，專家之間還在吵什麼？
+輸出一張爭議地圖：
+每個爭議點給我：
+- 爭議的核心問題是什麼
+- 立場 A 的主張與最強證據
+- 立場 B 的主張與最強證據
+- 目前的證據比較偏向哪一邊，還是真的沒有定論
+- 這個爭議對實際應用有什麼影響
+列出三到五個主要爭議。不要假裝有共識，也不要為了平衡而硬拉兩邊。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">12</span><span class="ch-t">從錯誤反推原理</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>列出初學者在【技能／領域】最常犯的十個錯誤。
+每個錯誤給我：
+1. 錯誤的具體樣子（實際會做出什麼）
+2. 背後誤解了什麼原理
+3. 正確做法
+4. 一個能立刻檢查自己有沒有犯這個錯的問題
+按照「犯了以後代價多大」排序，代價最大的放最前面。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">13</span><span class="ch-t">五分鐘速成簡報</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我等一下要跟【對象】講【主題】，只有五分鐘。
+對方的背景是【背景描述】，他們關心的是【他們的痛點或目標】。
+幫我準備：
+- 開場三十秒：一句話讓他們知道為什麼要聽
+- 中間三分鐘：三個重點，每個重點一句主張加一個具體例子
+- 結尾一分半：他們聽完該做什麼
+另外準備三個他們最可能問的問題，各附一個三十秒能講完的回答。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">14</span><span class="ch-t">書籍萃取</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>針對【書名／作者】，做一份萃取。
+一、這本書的核心主張，一句話
+二、支撐這個主張的三到四個關鍵論點，每個一段
+三、書中最實用的三個可執行方法，寫成我明天就能做的步驟
+四、這本書的盲點或已經過時的地方
+五、如果我只有十分鐘跟人介紹這本書，我該說什麼
+不要逐章摘要，我要的是提煉後的結構。如果你對這本書的內容不確定，直接說明哪些部分你不確定。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">15</span><span class="ch-t">學習進度自評</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我建一個【技能】的自評量表。
+分成五個維度，每個維度分四級（不會／勉強／能用／熟練）。
+每一級都要用「你能做到什麼」來描述，不要用「你理解多少」這種無法檢驗的說法。
+例如不要寫「理解基本概念」，要寫「能在沒有範例的情況下，獨立完成一次完整流程」。
+做完量表後，問我每個維度目前在第幾級，然後根據我的回答，指出我下一步最該投入的那一個維度，並說明理由。</pre></div></div></details>
+    </div>
+  </div>
+
+  <!-- 二 研究與分析 -->
+  <div class="sec fade">
+    <span class="sec-tag">二 · 研究與分析（15）</span>
+    <h2>處理報告<br><span class="g">查核資訊、做決策</span></h2>
+    <div class="acc">
+      <details class="ch"><summary><span class="ch-n">16</span><span class="ch-t">多來源整合</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>整合以下資料：【貼上來源，用 --- 分隔各份】
+輸出四個部分：
+一、共同結論：所有來源都同意的地方，附上分別出自哪一份
+二、直接衝突：哪些來源在同一件事上說法相反，各自的理由是什麼
+三、貫穿主題：橫跨多份資料的三到四個主題，即使原文沒有明講
+四、最大缺口：沒有任何一份處理到、但這個問題其實需要回答的部分
+每一項都要標明來源。找不到依據的推論，明確標示「這是我的推論」。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">17</span><span class="ch-t">三方壓力測試</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>壓力測試我的主張：【你的主張】
+給我三個標示清楚的聲音：
+【支持方】提出最強的論證，用具體證據，不要用空泛的形容詞。
+【懷疑方】建立最強的反駁。要用真實的反例或數據，不是為反對而反對。
+【中立裁判】評估雙方，說明目前哪一邊比較站得住腳、為什麼，以及什麼樣的新證據會改變這個判斷。
+三方都要誠實。支持方不要護航，懷疑方不要抬槓。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">18</span><span class="ch-t">逐條事實查核</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>檢查這段文字裡的每一個事實性說法：【貼上文字】
+輸出一個表格，欄位為：
+原文說法 | 判定 | 信心程度 | 理由 | 什麼會推翻它
+判定只能是三種之一：有根據、有爭議、無法驗證。
+信心程度分高中低。
+規則：
+- 查不到就標「無法驗證」，不要自己補來源
+- 不確定的引用來源，直接說不確定，不要編出看起來像真的的出處
+- 意見與價值判斷不需要查核，但要標出來哪些句子是意見而非事實</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">19</span><span class="ch-t">決策矩陣</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要在這幾個選項中做決定：【選項 A】、【選項 B】、【選項 C】
+我的目標是【目標】。
+我的限制是【預算／時間／人力等限制】。
+請你：
+1. 先列出真正該用來評估的五個標準（不要用通用標準，要根據我的目標推導）
+2. 說明每個標準為什麼重要，以及各自的權重
+3. 做成表格，每格填入評分加一行理由
+4. 給出首選、次選，以及一個「如果什麼條件成立，答案會翻盤」的判斷點
+最後那一項最重要，請寫得具體。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">20</span><span class="ch-t">訊號提取</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>從這份【逐字稿／討論串／報告】中提取真正有用的訊號：【貼上內容】
+輸出：
+一、最重要的五個發現，按「會多大程度改變我的決定」排序，每個一行
+二、單純是重複、閒聊、或個人意見包裝成事實的部分，另外列出來
+三、內容中彼此矛盾的地方
+四、看完之後仍然沒有答案的那一個關鍵問題
+不要摘要全文。我要的是過濾後剩下的東西。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">21</span><span class="ch-t">給決策者的摘要</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>把【文件】摘要給一個很忙的決策者。
+格式：
+**一句話結論**（放最上面，直接給答案）
+**三個關鍵發現**（每個一行，附數字或具體事實）
+**最大的但書或未知數**（一段，說明它會影響什麼）
+**這份文件在沒有證據的情況下斷言的部分**（如果有，列出來）
+跳過背景鋪陳，跳過方法論說明，跳過客套的開場。決策者只想知道要不要動、動什麼。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">22</span><span class="ch-t">反方最強論證</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我目前相信【你的立場】。
+請你完全站到對立面，建立一個我最難反駁的論證。
+要求：
+- 用真實存在的數據、案例、或研究，不要虛構
+- 針對我立場中最脆弱的假設下手，不要打稻草人
+- 論證要是一個聰明且誠實的反對者會提出的版本
+寫完後，另外列出：這個反方論證中，哪一點是我目前完全沒有答案的。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">23</span><span class="ch-t">資料異常掃描</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>檢查這組數據有什麼問題：【貼上數據或描述】
+請你檢查：
+1. 樣本量夠不夠支撐這個結論
+2. 有沒有可能是倖存者偏誤、選擇偏誤、或其他系統性偏差
+3. 有沒有沒被控制的干擾變數
+4. 相關性有沒有被當成因果
+5. 指標的定義有沒有可能在期間內改變過
+輸出：判定（真訊號／雜訊／無法判斷）、理由、以及我下一步該去查什麼來確認。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">24</span><span class="ch-t">競品拆解</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>拆解【競品名稱／網址】。
+輸出：
+一、他們主打的核心價值是什麼，用他們自己的語言
+二、實際交付的是什麼，用中性語言
+三、目標客群的樣貌，從定價、文案語氣、通路推斷
+四、明顯的優勢三項
+五、明顯的空缺三項，以及每個空缺代表的機會
+六、如果我要切進這個市場，最不該正面對打的一項是什麼
+推斷的部分請標明是推斷。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">25</span><span class="ch-t">訪談逐字稿分析</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>分析這份訪談逐字稿：【貼上內容】
+輸出：
+一、受訪者實際說出口的痛點，用他的原話（不要改寫成行銷語言）
+二、他沒明說但語氣中透露的顧慮
+三、他提到的具體場景與頻率
+四、他目前的替代方案是什麼，以及為什麼還在用
+五、這份訪談中，我最應該追問但沒問到的三個問題
+區分清楚：哪些是他說的，哪些是你的詮釋。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">26</span><span class="ch-t">文獻對照</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>針對【主題】，幫我對照目前的主要研究發現。
+輸出一個表格：研究方向 | 主要發現 | 證據強度 | 爭議點
+證據強度用「強／中／弱」，並簡短說明依據（樣本規模、是否可重複、是否有對照組）。
+表格之後，另外寫：
+- 目前學界較有共識的部分
+- 仍在爭論的部分
+- 常被大眾媒體誤傳的部分
+如果你對特定研究的細節不確定，明確標示，不要編造出處或數字。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">27</span><span class="ch-t">風險盤點</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要做【計畫／決定】。幫我盤點風險。
+輸出一個表格：風險 | 發生機率 | 發生後的影響 | 早期警訊 | 預先可做的準備
+「早期警訊」這欄請寫得具體：我要看到什麼跡象，就知道這個風險正在發生。
+列出八到十項，涵蓋：執行面、財務面、時間面、外部環境、以及我自己的盲點。
+最後標出：哪一項是「機率不高但發生就致命」的，那項要優先處理。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">28</span><span class="ch-t">假設盤點</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我的計畫是：【描述計畫】
+請你把這個計畫底下所有的隱含假設挖出來，包括我自己可能沒意識到的。
+每個假設給我：
+- 假設內容（寫成一句可以判斷真假的陳述）
+- 這個假設如果錯了，計畫會怎樣
+- 用什麼方法可以在低成本下驗證它
+最後排序：哪一個假設是「最關鍵且最未經驗證」的，那個要先去測。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">29</span><span class="ch-t">逆向拆解成功案例</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>拆解【案例／人物／產品】為什麼成功。
+分成四層：
+一、表面上大家歸因的原因
+二、實際上更關鍵的結構性因素
+三、運氣與時機的成分（誠實估計佔多少）
+四、可複製的部分 vs. 不可複製的部分
+第四點請寫得具體：如果我現在要學，哪些做法可以直接搬，哪些搬過來會壞掉，為什麼。
+避免事後諸葛式的敘事。如果某個成功因素其實無法確定，就說無法確定。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">30</span><span class="ch-t">問題重構</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我遇到的問題是：【描述問題】
+在給我解法之前，先幫我確認問題有沒有問對。
+請你：
+1. 指出我描述問題的方式裡，隱含了什麼未經檢驗的前提
+2. 提出三個不同的問題重構版本，每個從不同角度切入
+3. 說明每個重構會導向什麼樣的解法方向
+4. 判斷哪一個重構最可能是真正的問題所在，為什麼
+重構完再進到解法。</pre></div></div></details>
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">前 30 個講完了</div>
+      <h3>指令用得順是基本<br><span class="g">接成產線才是重點</span></h3>
+      <p>後面 30 個更靠近實作與變現。想把這些指令真正接成能省時間、能賺錢的系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 三 Prompt 工程 -->
+  <div class="sec fade">
+    <span class="sec-tag">三 · Prompt 工程（15）</span>
+    <h2>讓 AI 輸出<br><span class="g">穩定、可重複使用</span></h2>
+    <div class="acc">
+      <details class="ch"><summary><span class="ch-n">31</span><span class="ch-t">重寫我的 Prompt</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>把下面這個 prompt 改寫得清楚直接，像在交接給一個沒有任何背景的新人：
+【貼上你的 prompt】
+改寫要求：
+- 寫明目標（要達成什麼）
+- 寫明對象（輸出給誰看）
+- 寫明確切步驟（照什麼順序做）
+- 寫明例外處理（遇到資訊不足、遇到模糊指令時怎麼辦）
+- 寫明輸出格式
+改完後，另外列出你刪掉或改寫的每一處模糊，說明原本可能被解讀成什麼，讓我確認我的意思沒有被改掉。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">32</span><span class="ch-t">Prompt 鏈拆解</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>把【任務】拆成三到四個小步驟的 prompt 鏈，取代一個大 prompt。
+每一步給我：
+- 這一步唯一負責的事情
+- 完整的 prompt 文字
+- 輸入是什麼（前一步的哪個輸出）
+- 輸出用什麼 XML 標籤包起來
+要求：
+- 每一步只負責一件事，不要塞兩個任務
+- 標籤命名要一致，方便串接
+- 說明驗證或自我檢查的步驟該插在哪一環，以及為什麼是那一環</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">33</span><span class="ch-t">防幻覺設定</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫下面這個 prompt 加上防幻覺規則：
+【貼上你的 prompt】
+要加入的規則：
+1. 明確允許回答「我不知道」或「資料中沒有提到」
+2. 每個事實性陳述都要標明出處，沒有出處就標示「無來源」
+3. 引用前先從來源逐字抽出原文，再根據原文作答
+4. 區分「來源明講的」與「我的推論」，用不同標記
+5. 不確定的數字、日期、人名，一律標示不確定，不要填一個看起來合理的
+輸出改寫後的完整 prompt。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">34</span><span class="ch-t">Few-shot 範例生成</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要用範例教模型做【任務】。
+幫我產出三到四個高品質範例，涵蓋：
+- 一個標準情況
+- 一個邊界情況
+- 一個容易出錯的棘手情況
+- （若適用）一個應該拒絕或回報資訊不足的情況
+每個範例用 XML 包起來：&lt;example&gt; 內含 &lt;input&gt; 與 &lt;ideal_output&gt;。
+要求：範例之間格式完全一致，讓模型抓到的是結構而非內容。每個範例後面附一行說明「這個範例在示範什麼」，方便我日後調整。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">35</span><span class="ch-t">輸出格式鎖定</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我需要【任務】的輸出格式完全固定，方便後續程式處理。
+幫我寫一段格式規範，加進 prompt 裡，要求：
+- 明確定義輸出結構（JSON／Markdown 表格／固定標籤，你判斷哪個適合）
+- 每個欄位的名稱、型別、允許值
+- 遇到缺漏資料時該填什麼（而不是自由發揮）
+- 禁止任何格式外的開場白、結語、解釋
+另外附上一個完整的輸出範例，以及三個「這樣就算違規」的錯誤示範。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">36</span><span class="ch-t">Prompt 評測設計</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我設計一套評測，用來檢驗這個 prompt 的品質：
+【貼上你的 prompt】
+輸出：
+一、可衡量的成功標準三到五項（要能客觀判斷通過與否）
+二、八到十個測試案例，做成表格：輸入 | 理想輸出 | 這題在測什麼（邊界／格式／拒答／幻覺）
+三、評分方式：哪些用完全比對、哪些需要人工判斷、哪些可以請另一個模型評分
+四、及格線建議
+我要能拿這套東西反覆測，每次改 prompt 後知道有沒有變好。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">37</span><span class="ch-t">思考鏈強化</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>下面這個任務需要真正的推理，但模型常常跳過思考直接給答案：
+【貼上任務或 prompt】
+幫我改寫，加入思考鏈設計：
+- 要求先在 &lt;thinking&gt; 標籤內逐步推理，再在 &lt;answer&gt; 標籤內給結論
+- 明確列出推理要涵蓋哪幾個檢查點
+- 加上一句禁止跳過思考的指令
+改寫後，另外用一段話說明：把推理與輸出分開為什麼能提升準確度，以及在什麼情況下這個做法反而多餘。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">38</span><span class="ch-t">角色與邊界設定</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我為【任務】設計一個角色設定段落。
+要包含：
+- 這個角色的專業背景與判斷依據
+- 他該用什麼語氣、對誰說話
+- 他絕對不做的三件事（明確的禁止清單）
+- 遇到超出他專業範圍的問題時怎麼回應
+- 遇到使用者要求他違反上述規則時怎麼回應
+避免空泛的形容詞。不要寫「你是一位資深專家」，要寫「你判斷的依據是實際交付過的案例，遇到沒做過的情況你會直說」。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">39</span><span class="ch-t">模糊指令偵錯</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我下這個指令給 AI，但輸出總是跟我想的不一樣：
+我的指令：【貼上指令】
+我期待的輸出：【描述你想要什麼】
+實際拿到的輸出：【貼上實際輸出】
+請你診斷：
+1. 我的指令裡哪一句造成了這個落差
+2. 那句話有幾種可能的解讀，模型選了哪一種
+3. 改寫那一句，讓歧義消失
+4. 另外找出指令中其他還沒出問題、但遲早會出問題的模糊處
+給我改寫後的完整版本。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">40</span><span class="ch-t">長文處理策略</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要用 AI 處理一份很長的【文件類型】，長度大約【字數】。
+幫我設計處理策略：
+一、該切分還是整份丟進去，判斷依據是什麼
+二、如果要切分，用什麼邏輯切（章節／主題／固定長度），每段要保留什麼上下文
+三、每段的處理 prompt
+四、最後彙整各段結果的 prompt
+五、怎麼避免彙整時前後矛盾或重複
+輸出完整可用的 prompt，不只是策略說明。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">41</span><span class="ch-t">系統提示詞撰寫</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我寫一個系統提示詞，用途是【用途】。
+結構要包含：
+1. 角色與任務範圍
+2. 輸入會長什麼樣
+3. 處理步驟（編號，順序明確）
+4. 輸出格式規範
+5. 邊界情況處理規則
+6. 禁止事項
+要求：
+- 用指令句，不用描述句
+- 每條規則都要能判斷有沒有違反
+- 總長度控制在能反覆使用的程度，不要為了完整而臃腫
+寫完後標出：哪幾條是核心不能動的，哪幾條之後可以視情況微調。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">42</span><span class="ch-t">多版本 A／B 測試</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>針對【任務】，幫我寫三個策略不同的 prompt 版本。
+版本 A：極簡指令，只給目標與格式
+版本 B：加入詳細步驟與思考鏈
+版本 C：加入 few-shot 範例
+三個版本要達成的目標完全相同，只是路徑不同。
+另外給我：
+- 一組共用的測試輸入（五題，難度分布合理）
+- 一張比較表格模板，讓我填入三個版本的表現
+- 你預測哪個版本會贏，理由是什麼</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">43</span><span class="ch-t">拒答與安全邊界</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我為【應用場景】設計拒答規則。
+列出：
+一、哪些請求應該完全拒絕，以及拒絕時該說什麼
+二、哪些請求應該部分回答加上但書
+三、哪些請求應該先反問澄清再處理
+四、遇到使用者反覆施壓時的回應原則
+要求：拒絕的話術要保持有禮但不動搖，不要道歉連篇，也不要說教。每一類各給一個實際的回應範例。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">44</span><span class="ch-t">輸出精簡化</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>這個 prompt 產出的內容總是太長太囉唆：
+【貼上你的 prompt】
+幫我加上精簡規則：
+- 明確的長度上限（字數或行數）
+- 禁止的贅句類型（開場客套、結尾總結、重複問題內容、過度的免責聲明）
+- 要求每一句都必須帶新資訊
+- 遇到內容真的需要更長時，該怎麼標示而不是硬塞
+輸出改寫後的完整 prompt，並示範一段「改寫前 vs 改寫後」的對照。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">45</span><span class="ch-t">Prompt 版本管理</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我設計一套 prompt 的版本管理格式，我要長期維護一組常用 prompt。
+每個 prompt 的記錄應該包含哪些欄位？請設計並說明每欄的用途。
+至少要能回答：
+- 這個 prompt 解決什麼問題
+- 上一版改了什麼、為什麼改
+- 已知的失效情況
+- 測試通過率
+輸出一個可以直接複製到 Notion 的表格模板，加上一個填好的範例列。</pre></div></div></details>
+    </div>
+  </div>
+
+  <!-- 四 自動化工作流 -->
+  <div class="sec fade">
+    <span class="sec-tag">四 · 自動化工作流（15）</span>
+    <h2>把重複工作<br><span class="g">交給機器</span></h2>
+    <div class="acc">
+      <details class="ch"><summary><span class="ch-n">46</span><span class="ch-t">流程設計</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>設計一個 n8n 或 Make 的自動化流程。
+觸發條件：【觸發】
+目標：【目標】
+會用到的服務：【列出工具】
+輸出：
+一、編號的節點順序，每個節點寫明用哪個 app 的哪個動作
+二、每一步的欄位對應（來源欄位 → 目的欄位）
+三、篩選或分支條件寫在哪一步，判斷邏輯是什麼
+四、最終動作與成功的判定方式
+另外標出：哪些步驟可能踩到 API 流量限制，以及該怎麼處理。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">47</span><span class="ch-t">錯誤處理</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫呼叫【API／服務】的自動化流程加上正式的錯誤處理。
+輸出：
+一、重試策略：間隔一秒、兩秒、四秒的指數退避，加上隨機抖動，最多重試幾次
+二、哪些狀態碼該重試（例如 429、5xx），哪些該直接停（例如 400、401）
+三、永久失敗時的處理：訊息送到哪個頻道、內容要包含哪些欄位
+四、失敗資料的暫存與後續補跑方式
+每一項都要具體到我可以直接照著設定。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">48</span><span class="ch-t">人工確認關卡</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>在 AI 自動執行【高風險動作】之前，加一道人工確認關卡。
+輸出：
+一、判定規則：哪些動作必須過關卡，哪些可以直接放行（用可判斷的條件，不要用「重要的」這種模糊詞）
+二、送給審核者的訊息內容：包含哪些欄位、AI 的判斷理由、以及一個可編輯的欄位
+三、逾時處理：多久沒回應算逾時，低風險自動通過、高風險自動拒絕，各自的門檻
+四、審核記錄要留下什麼，方便日後追查</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">49</span><span class="ch-t">冪等性設計</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我的 webhook【觸發】設計冪等性保護，避免服務端重送造成重複處理。
+輸出：
+一、冪等鍵怎麼產生（用 header 還是 payload hash，各自的優缺點）
+二、用什麼儲存判重（Redis 或資料庫），存活時間設多久
+三、收到重複請求時的回應方式
+四、簽章驗證怎麼做，避免偽造請求
+五、處理要同步還是非同步，判斷依據
+寫成我可以直接交給工程師或自己實作的規格。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">50</span><span class="ch-t">API 串接規劃</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要把【輸入來源】的資料送到【目的地】。
+輸出：
+一、呼叫順序：先呼叫哪個端點，每個回應要取出哪個欄位餵給下一步
+二、分頁處理：用 cursor 還是 offset，怎麼判斷取完了
+三、欄位格式差異：兩邊哪些欄位型別或格式不一致，怎麼正規化
+四、哪些資料該快取、快取多久，避免打爆流量限制
+五、整體做成步驟表格
+不確定的 API 細節請標明，不要編造端點名稱或參數。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">51</span><span class="ch-t">內容產出流水線</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我設計一條內容產出的自動化流水線。
+輸入：【選題來源，例如 RSS、關鍵字清單、我的靈感筆記】
+輸出：【最終產物，例如 IG 貼文草稿、電子報、影片腳本】
+輸出：
+一、每個階段的節點與負責的事情
+二、每個 AI 節點的完整 prompt
+三、哪些環節必須人工介入，為什麼
+四、品質檢查點放在哪，檢查什麼
+五、產出的存放結構（資料庫欄位或 Notion 屬性）
+我要能照著這份直接建起來。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">52</span><span class="ch-t">資料清洗流程</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我有一批髒資料要清：【描述資料來源與問題】
+設計一條清洗流程：
+一、處理順序（型別轉換、去空白、統一大小寫、標準化分類、去重、欄位改名，排出正確順序並說明為什麼是這個順序）
+二、缺值處理：哪些欄位該刪列、哪些該補值、補什麼，每個決定寫明理由
+三、重複判定：完全重複與近似重複分別怎麼判
+四、輸出一份清洗前後的對照報告，包含每個步驟砍掉多少列
+附上可執行的程式碼，加行內註解。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">53</span><span class="ch-t">監控與告警</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我的自動化流程【流程名稱】設計監控。
+輸出：
+一、要監控的三到五個指標（要能反映使用者實際受到的影響，不要只監控技術指標）
+二、每個指標的正常範圍與告警門檻
+三、告警要送到哪、內容包含什麼、多久內必須有人回應
+四、什麼情況該告警、什麼情況只記錄不告警（避免告警疲勞）
+五、每週該看一次的健康度報表包含哪些數字</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">54</span><span class="ch-t">Agent 工具設計</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要建一個負責【任務】的 AI Agent。
+幫我設計它的工具組：
+一、三到六個高影響力的工具（不要每個 API 端點都做成一個工具）
+二、每個工具的名稱、一句話描述、輸入的 JSON Schema、回傳格式
+三、回傳要精簡：回 ID 與摘要，不要回完整資料
+四、標出哪些工具的輸出可能撐爆 context，該怎麼截斷
+五、哪些工具是唯讀、哪些會寫入，寫入類的要不要先確認</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">55</span><span class="ch-t">批次處理設計</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我要用 AI 批次處理【數量】筆【資料類型】。
+設計方案：
+一、批次大小怎麼決定，考量哪些因素
+二、單筆處理的完整 prompt
+三、失敗的單筆怎麼處理（跳過、重試、還是中斷全部）
+四、進度追蹤與中斷後續跑的機制
+五、成本估算：大約會用掉多少 token、怎麼降低
+如果適合用 Batch API，說明什麼情況下該用、省多少。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">56</span><span class="ch-t">通知分流</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我的自動化流程會產生各種通知，現在全部塞在同一個頻道，很吵。
+幫我設計分流規則：
+一、通知分級（緊急、需處理、僅知會），每級的判定條件
+二、每一級送到哪裡、用什麼形式（即時推播、每日彙整、只寫進記錄）
+三、彙整型通知的格式：一天一封，內容包含什麼
+四、去重與合併規則：同一個問題連續發生三十次時該怎麼處理</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">57</span><span class="ch-t">定期報表自動化</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>設計一個每【週／月】自動產出的報表流程。
+資料來源：【來源】
+收件對象：【對象】
+他們關心的是：【對象在意的事】
+輸出：
+一、資料抓取的節點與查詢邏輯
+二、AI 分析節點的完整 prompt（要能指出異常與趨勢，不只是列數字）
+三、報表格式：一句話結論、三個關鍵數字、值得注意的變化、建議動作
+四、寄送與存檔方式
+報表要能讓人三十秒讀完就知道要不要做什麼。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">58</span><span class="ch-t">工作流成本控管</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我控制自動化流程【流程名稱】的 AI 成本。
+輸出：
+一、目前哪些節點最耗 token，怎麼判斷
+二、哪些節點可以換成更便宜的模型而不影響品質，判斷標準是什麼
+三、哪些步驟可以用程式邏輯取代 AI 呼叫
+四、快取策略：什麼樣的輸入可以複用結果
+五、設定用量上限與超標時的降級方案
+給我一份預估的節省幅度。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">59</span><span class="ch-t">流程文件化</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>幫我把這個自動化流程寫成文件：【描述流程】
+文件結構：
+一、這個流程解決什麼問題，沒有它的話原本要花多久
+二、觸發到完成的完整步驟圖（用文字描述節點順序）
+三、每個外部服務的依賴與所需權限
+四、已知的失效情況與各自的處理方式
+五、要修改時該從哪裡下手、有哪些地方不能亂動
+六、負責人與檢查頻率
+寫給三個月後的自己看，那時你已經忘光了。</pre></div></div></details>
+
+      <details class="ch"><summary><span class="ch-n">60</span><span class="ch-t">自動化可行性評估</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><pre>我想把【重複性工作】自動化。
+在動手之前，幫我評估：
+一、這件事目前花我多少時間、多少頻率、錯誤成本多高
+二、自動化的建置成本大概多少（時間與費用）
+三、多久可以回本
+四、哪些環節適合自動化、哪些環節自動化反而更貴或更危險
+五、有沒有更簡單的做法（減少頻率、換工具、直接不做）
+如果評估結果是不該自動化，直接說，不要為了自動化而自動化。</pre></div></div></details>
+    </div>
+
+    <div class="insight" style="margin-top:22px;"><div class="il">最後</div><div class="it">這 60 個指令的共同點只有一件事：把要求講清楚。要幾層、什麼格式、哪裡不准編、遇到例外怎麼辦——同樣的問題，講清楚跟隨手一問，出來的東西差一個等級。拿回去改成你自己的版本，用得順的存起來，下次不用再想。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>指令你拿到了，<span class="g">接下來換我陪你把它接成系統</span></h2>
+      <div class="cta-lead">這 60 個指令幫你把要求講清楚，讓 AI 每次都給你能用的東西。但要把這些指令接成一整條「學習 → 研究 → 產出 → 自動化」的變現產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">指令用得順、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">把時間換回來，換成作品、換成流量、換成收入</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具的實際用法與工作流拆解、可以直接複製的 Prompt 與模板、內容產出的自動化流程、自媒體從零到變現的實際路徑</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：60 個 Claude 指令完整版——lead magnet／DM 承接頁
+· 內容：這份文件怎麼用（四大類卡片＋使用方式＋三習慣）+ 一學習與吸收(15) + 中段CTA + 三Prompt工程(15) + 四自動化工作流(15)，共 60 個可複製指令摺疊卡（二研究與分析 15 個併在學習吸收後、中段CTA前）
+· 實際章節順序：一學習吸收(15)+二研究分析(15) → 中段CTA → 三Prompt工程(15)+四自動化工作流(15)
+· 可複製區塊：60 個指令 .cp，每個純指令文字、無額外說明（沿用原文極簡格式）
+· 三段 Skool CTA（指向 奇點研究所 × D11）：
+    前段 → .side-cta（skool-side）／.top-cta（skool-top）｜中段 → .mid-cta（skool-mid，第30與31題之間）｜後段 → .cta（skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「60 個 Claude 指令完整版」文件
+· 命名：日期前綴（2026-07-21-60-prompts.html），對齊 kma-pages 慣例；與同日的 2026-07-21-claude-plugin-pack.html 為不同主題，不衝突
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
