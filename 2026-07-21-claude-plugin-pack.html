@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 5 大 Plugin｜完整安裝與實戰教學包</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.34;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--mono);font-weight:500;color:var(--dim);font-size:12px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin:2px 0 8px;line-height:1.7;}
+.meta b{color:var(--gold);font-weight:500;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.cp .bad{color:#e0776a;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.nolink{font-size:12.5px;color:var(--dim);margin-top:10px;line-height:1.7;}
+.nolink b{color:var(--gold);}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:14.5px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:13.8px;color:var(--dim);line-height:1.8;}
+.faq .a b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝好這五個 Plugin 後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>把工具<br><span class="g">接成變現系統</span></h4>
+  <p>裝好 plugin 只是開始。怎麼把 AI ＋ 自媒體接成能省時間、能變現的流程——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 5 大 PLUGIN 教學包</div>
+    <h1>Claude Code<br><span class="g">5 大 Plugin</span><br>完整安裝與實戰</h1>
+    <div class="hero-sub">從零到能用。安裝指令、驗證方式、常用指令、實際情境、什麼時候該關掉，一次寫完。<br>所有指令都取自各專案官方 README，逐一查證過來源——沒有的東西我不會寫。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · Plugin</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">套 · 實戰工作流</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">100%</div><div class="l">指令可複製</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">經營「傑森所長」，專門分享 AI ＋ 自媒體變現：怎麼用 AI 把內容產出的時間壓縮，把省下來的時間換成作品、換成流量、換成收入。我不寫看完很爽但打不開電腦的內容——每一篇的標準是：你照著做，今天就能用得出來。</div></div>
+  </div>
+
+  <!-- 這份文件會給你什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件會給你什麼</span>
+    <h2>七個章節<br><span class="g">從準備到移除全寫完</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>章節</th><th>內容</th></tr></thead><tbody>
+      <tr><td>第 0 章</td><td>安裝前準備：環境檢查、名詞解釋、安裝順序建議</td></tr>
+      <tr><td>claude-mem</td><td>跨 session 記憶</td></tr>
+      <tr><td>caveman</td><td>砍輸出 token</td></tr>
+      <tr><td>humanizer</td><td>洗掉 AI 味</td></tr>
+      <tr><td>taste-skill</td><td>讓 AI 做的介面不像 AI 做的</td></tr>
+      <tr><td>marketingskills</td><td>行銷技能包</td></tr>
+      <tr><td>第 6–7 章</td><td>五個一起用的實戰工作流、疑難排解與移除</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 第 0 章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 0 章 · 安裝前準備</span>
+    <h2>先把地基<br><span class="g">弄清楚</span></h2>
+    <div class="sub-h">0-1 環境檢查</div>
+    <p style="font-size:14px;">打開終端機（macOS 用「終端機 Terminal」，Windows 用「PowerShell」），貼上這兩行：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檢查版本</div><pre>node -v
+claude --version</pre></div>
+    <ul class="bul">
+      <li><b>Node.js 需要 18.0.0 以上。</b>沒裝或太舊，去 nodejs.org 下載安裝完重開終端機。</li>
+      <li><b>Claude Code 要是支援 plugin 的版本。</b>建議先更新到最新版再往下走。</li>
+    </ul>
+    <div class="tipline">Windows 出現 <b>npm : The term 'npm' is not recognized</b>，代表 Node.js 沒加進 PATH，重跑一次官方安裝檔，然後把終端機關掉重開。</div>
+
+    <div class="sub-h">0-2 三個名詞先搞懂</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名詞</th><th>是什麼</th><th>怎麼裝</th></tr></thead><tbody>
+      <tr><td>Skill</td><td>一個 SKILL.md 檔，本質是一段寫好的指令，告訴 Claude 遇到某類任務怎麼做</td><td>npx skills add</td></tr>
+      <tr><td>Plugin</td><td>官方擴充機制，可帶 hooks、slash commands、subagents，能力比 skill 大</td><td>/plugin marketplace + install</td></tr>
+      <tr><td>Marketplace</td><td>Plugin 的來源清單。加了才能從裡面裝 plugin</td><td>/plugin marketplace add</td></tr>
+    </tbody></table></div>
+    <div class="tipline">本包裡：<b>claude-mem</b>、<b>caveman</b> 是 plugin（有 hooks 自動運作）；<b>taste-skill</b>、<b>humanizer</b>、<b>marketingskills</b> 主要是 skill 集合。<b>npx skills</b> 是 vercel-labs 出的跨 agent 安裝 CLI，五個裡有四個都支援。</div>
+
+    <div class="sub-h">0-3 建議安裝順序</div>
+    <ul class="bul">
+      <li><b>主要在寫程式：</b>claude-mem → caveman → taste-skill → humanizer → marketingskills</li>
+      <li><b>主要在做內容／自媒體：</b>humanizer → claude-mem → marketingskills → taste-skill → caveman</li>
+    </ul>
+    <div class="tipline"><b>一次只裝一個</b>，裝完重開 Claude Code，確認有動再裝下一個。五個一起灌，出問題你會找不到是誰的鍋。</div>
+
+    <div class="sub-h">0-4 一個安裝陷阱（很多人踩）</div>
+    <div class="warn">⚠️ 如果你「叫 Claude Code 幫你安裝」（在 agent session 裡跑 npx skills add），CLI 偵測不到互動環境，可能只裝到通用的 .agents/skills/ 目錄，而 <b>Claude Code 不讀那個目錄</b>。裝完看起來成功，實際沒生效。</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">解法：明確指定 agent</div><pre>npx skills add &lt;作者&gt;/&lt;專案&gt; -a claude-code</pre></div>
+    <div class="tipline"><b>建議做法：</b>自己開一個新的終端機視窗跑安裝指令，不要在 Claude Code 對話裡面裝。</div>
+  </div>
+
+  <!-- 五個 plugin -->
+  <div class="sec fade">
+    <span class="sec-tag">五個 Plugin · 逐個拆</span>
+    <h2>展開任一個<br><span class="g">安裝指令直接複製</span></h2>
+    <div class="acc">
+
+      <!-- 1 claude-mem -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">claude-mem<span class="en"> · 讓 Claude 記得住上一次</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="meta"><b>GitHub</b> thedotmack/claude-mem｜<b>授權</b> Apache 2.0｜<b>作者</b> Alex Newman</div>
+        <p>Claude Code 每開一個新 session，前面講過的東西全部歸零——專案架構、命名習慣、上次踩的坑，每次都要重講。claude-mem 用 lifecycle hooks 在你工作時自動側錄，把過程用 AI 壓縮成語意摘要存進<span class="hl">本機 SQLite</span>，下次開新 session 時把相關部分自動注入回去。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 A（推薦，一行搞定）</div><pre>npx claude-mem install</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 B（從 plugin marketplace）</div><pre>/plugin marketplace add thedotmack/claude-mem
+/plugin install claude-mem</pre></div>
+        <p style="font-size:13.5px;">裝完 <b>重啟 Claude Code</b>。</p>
+        <div class="warn">⚠️ <b>這個一定要注意：</b>官方明講 <b>npm install -g claude-mem</b> 只會裝 SDK／library，不會註冊 plugin hooks，也不會啟動 worker service——用了等於沒裝。一律用 npx claude-mem install 或 /plugin 指令。</div>
+        <div class="sub-h">驗證有沒有裝成功</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">重啟後在瀏覽器打開</div><pre>http://localhost:37777</pre></div>
+        <p style="font-size:13.5px;">看得到即時記憶串流介面，就代表 worker service 有跑起來。這個網頁 UI 可以直接看它記了什麼、切換設定、切 stable／beta 版。</p>
+        <div class="sub-h">怎麼用</div>
+        <p style="font-size:13.5px;"><b>基本上不用管它</b>——自動側錄、自動注入。要查歷史直接問 Claude「我們上禮拜怎麼處理那個登入的 bug？」，它會自己跑 search → timeline → get_observations 三層流程（先撈精簡索引、再撈細節），官方說約可省 10 倍 token。</p>
+        <div class="sub-h">語言模式與隱私</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">~/.claude-mem/settings.json（改完重啟）</div><pre>{
+  "CLAUDE_MEM_MODE": "code--zh"
+}</pre></div>
+        <div class="tipline"><b>給台灣使用者：</b>官方目前的中文模式是簡體（code--zh），沒有繁體。觀察摘要是給 Claude 讀的、不是給你讀，用預設英文完全不影響使用。不想被記的內容用 &lt;private&gt;…&lt;/private&gt; 包起來。資料全存你自己電腦的 SQLite，不是雲端。</div>
+        <div class="warn">⚠️ <b>什麼時候該關掉：</b>處理極機密專案、連本機摘要都不想留時；專案上下文每次都完全不同、沒有延續性時（記憶反而變雜訊）。</div>
+        <div class="nolink"><b>官方：</b>github.com/thedotmack/claude-mem</div>
+      </div></details>
+
+      <!-- 2 caveman -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">caveman<span class="en"> · 讓 Claude 少講廢話</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="meta"><b>GitHub</b> JuliusBrussee/caveman｜<b>授權</b> MIT｜<b>作者</b> Julius Brussee</div>
+        <p>Claude 回你一段話，前兩句是「當然！我很樂意幫你」，中間三句在解釋要做什麼，真正答案只有一句。caveman 直接叫 agent 砍掉贅字、用碎句回答，<span class="hl">但程式碼、指令、錯誤訊息一個字元都不動</span>。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 A（推薦，自動偵測所有 agent · macOS/Linux/WSL）</div><pre>curl -fsSL https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.sh | bash</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Windows · PowerShell 5.1+</div><pre>irm https://raw.githubusercontent.com/JuliusBrussee/caveman/main/install.ps1 | iex</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 B（只裝 Claude Code）</div><pre>claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman</pre></div>
+        <p style="font-size:13.5px;">約 30 秒，需要 Node ≥ 18，沒裝的 agent 會自動跳過，重複執行安全。<b>在 Claude Code、Codex、Gemini 上，安裝完從第一則訊息就是開著的。</b></p>
+        <div class="sub-h">開關與壓縮等級</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>等級</th><th>效果</th></tr></thead><tbody>
+          <tr><td>lite</td><td>輕度，句子還完整</td></tr>
+          <tr><td>full（預設）</td><td>碎句化，資訊密度高</td></tr>
+          <tr><td>ultra</td><td>極限壓縮</td></tr>
+          <tr><td>wenyan</td><td>文言文模式，每 token 塞的意思最多</td></tr>
+        </tbody></table></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">開關與常用指令</div><pre>/caveman              <span class="cm"># 開啟（說 normal mode 關閉）</span>
+/caveman ultra        <span class="cm"># 切換壓縮等級</span>
+/caveman-commit       <span class="cm"># 產 Conventional Commit 訊息</span>
+/caveman-review       <span class="cm"># 一行式 PR 註解</span>
+/caveman-stats        <span class="cm"># 算實際省下的 token 與美金（--share 產社群版）</span>
+/caveman-compress &lt;檔案&gt; <span class="cm"># 把 CLAUDE.md 這類記憶檔改寫成壓縮版</span></pre></div>
+        <div class="tipline"><b>語言不會被翻譯。</b>你用中文問，它就用中文咕嚕，壓縮的是「風格」不是語言（wenyan 是刻意的例外）。<b>/caveman-compress</b> 把每次都載入的記憶檔重寫成精簡版，之後每個 session 都少載——官方測 5 個記憶檔平均縮減 46%。</div>
+        <div class="warn">⚠️ <b>誠實的數字：</b>官方 benchmark 10 個 prompt 平均輸出 token 減 65%（範圍 22–87%），但作者自己標注：<b>只砍輸出 token</b>，skill 本身每回合多吃約 1–1.5k 輸入 token，整個 session 實際節省比 65% 小很多，在本來就簡潔的任務上甚至可能倒賠。真正的收穫是閱讀速度與效率，省錢是附加的。外面拿「省 65%」當標題在賣，作者自己都沒這樣講。</div>
+        <div class="warn">⚠️ <b>什麼時候該關掉：</b>要寫給人看的長文／貼文／email 時；做需要來回推敲的策略討論時；任務本來輸出就很短時。<b>跟 humanizer 一起用要注意順序</b>——要產出給人看的文案時，先說 normal mode 關掉 caveman，再叫 humanizer，兩個都開會互相打架。</div>
+        <div class="nolink"><b>官方：</b>github.com/JuliusBrussee/caveman｜無 telemetry、無帳號、零網路請求</div>
+      </div></details>
+
+      <!-- 3 humanizer -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">humanizer<span class="en"> · 把 AI 味洗掉</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="meta"><b>GitHub</b> blader/humanizer｜<b>授權</b> MIT</div>
+        <p>AI 寫的文字有一股味道。「在當今快速演變的環境中」、「這不僅僅是 X，更是 Y」、三點式排比、結尾一定要昇華。讀者說不上來哪裡怪，但知道這不是人寫的。humanizer 把這件事拆成 <span class="hl">33 個具名的模式</span>，一條一條抓出來改掉，依據是 Wikipedia 的「Signs of AI writing」指南。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 A（跨 agent CLI）</div><pre>npx skills add blader/humanizer</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 B（Claude Code plugin，呼叫方式 /humanizer:humanizer）</div><pre>/plugin marketplace add blader/humanizer
+/plugin install humanizer@humanizer</pre></div>
+        <div class="sub-h">進階：Voice Calibration（這才是重點）</div>
+        <p style="font-size:13.5px;">直接用會得到「乾淨但沒有人味」的文字。要它像<b>你</b>寫的，先餵自己的樣本：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">先餵樣本再改寫</div><pre>/humanizer
+Here's a sample of my writing for voice matching:
+[貼 2–3 段你自己寫的東西]
+
+Now humanize this text:
+[貼要處理的 AI 文字]</pre></div>
+        <div class="tipline">它會先分析你的句子節奏、用字習慣、個人癖好，再套用到改寫。<b>這一步做跟不做，差距非常大</b>——建議把自己最滿意的 3 段文字存成一個檔，每次直接貼。</div>
+        <div class="insight"><div class="il">為什麼把它放進這份清單</div><div class="it">它抓的模式裡有「負向排比（這不只是 X，這是 Y）、格言公式、假坦白式開場」——跟我自己文案裡的禁用句型幾乎一模一樣。它還有一個「明顯是 AI 寫的」最終稽核回合，會再掃一次殘留。</div></div>
+        <div class="warn">⚠️ <b>什麼時候該關掉：</b>寫技術文件、API 說明、規格書（這種文體本來就該工整）；你的品牌調性本來就偏正式。</div>
+        <div class="nolink"><b>官方：</b>github.com/blader/humanizer</div>
+      </div></details>
+
+      <!-- 4 taste-skill -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">taste-skill<span class="en"> · 介面不像 AI 做的</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="meta"><b>GitHub</b> Leonxlnx/taste-skill｜<b>官網</b> tasteskill.dev｜<b>授權</b> MIT</div>
+        <p>叫 AI 做一個 landing page，出來的東西技術上沒問題，但一看就是套版：置中大標、三個並排卡片、間距全一樣、零動態。taste-skill 是一組可攜的 Agent Skills，專門處理版面、字體、動態、間距——不綁框架（React／Vue／Svelte 都能用），因為它規範的是<span class="hl">設計意圖</span>，不是某個 API。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">一次裝全部（掃 skills/ 資料夾）</div><pre>npx skills add https://github.com/Leonxlnx/taste-skill</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">只裝單一 skill（用 install name，不是資料夾名）</div><pre>npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"</pre></div>
+        <div class="warn">⚠️ <b>v1／v2 版本問題：</b>預設的 design-taste-frontend 目前是 v2（experimental），是 v1 的大幅重寫。裝過 v1 的重跑安裝就會升級。若你依賴 v1、v2 弄壞你的流程，可明確指定 --skill "design-taste-frontend-v1"。</div>
+        <div class="sub-h">主要 skill（實作類，產出程式碼）</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>Install name</th><th>用途</th></tr></thead><tbody>
+          <tr><td>design-taste-frontend</td><td>主力，讀需求、推斷設計語言、調三個旋鈕</td></tr>
+          <tr><td>gpt-taste</td><td>GPT／Codex 專用嚴格版，版面變化更大</td></tr>
+          <tr><td>image-to-code</td><td>圖像優先：先生參考圖 → 分析 → 實作</td></tr>
+          <tr><td>redesign-existing-projects</td><td>既有專案：先稽核 UI 再修版面層級</td></tr>
+          <tr><td>high-end-visual-design</td><td>高級感：低對比、大留白、premium 字體</td></tr>
+          <tr><td>full-output-enforcement</td><td>治「只做一半就交件」，強制完整輸出</td></tr>
+          <tr><td>minimalist-ui</td><td>Notion／Linear 那種編輯感 UI</td></tr>
+          <tr><td>industrial-brutalist-ui</td><td>工業粗獷：瑞士字體、強對比</td></tr>
+        </tbody></table></div>
+        <div class="sub-h">圖像生成類（只出參考圖，不出程式碼）</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>Install name</th><th>用途</th></tr></thead><tbody>
+          <tr><td>imagegen-frontend-web</td><td>網站視覺稿：hero、landing、多區塊</td></tr>
+          <tr><td>imagegen-frontend-mobile</td><td>手機畫面與流程：iOS／Android</td></tr>
+          <tr><td>brandkit</td><td>品牌識別板：logo 方向、色票、字體</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>自媒體經營者注意：</b>這三個圖像生成 skill 可以搭 ChatGPT Images 使用。做個人品牌官網、電子報版型、產品視覺稿，這條路比從零開 Figma 快。用 image-to-code 時在 prompt 裡講明「follow the skill: generate images, then analyze, then code」。</div>
+        <div class="sub-h">三個旋鈕（skill 檔最上方，1–10 直接改）</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>參數</th><th>低</th><th>高</th></tr></thead><tbody>
+          <tr><td>DESIGN_VARIANCE</td><td>置中、乾淨</td><td>不對稱、現代</td></tr>
+          <tr><td>MOTION_INTENSITY</td><td>只有 hover</td><td>scroll 觸發、磁吸</td></tr>
+          <tr><td>VISUAL_DENSITY</td><td>大量留白</td><td>高密度儀表板</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>作者聲明：</b>taste-skill 沒有任何官方 token、幣或加密貨幣專案。任何用作者名字、形象、專案名的 token 都與作者無關、未經背書。看到相關投資訊息請直接無視。</div>
+        <div class="nolink"><b>官方：</b>github.com/Leonxlnx/taste-skill｜tasteskill.dev</div>
+      </div></details>
+
+      <!-- 5 marketingskills -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">marketingskills<span class="en"> · 一整個行銷團隊</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="meta"><b>GitHub</b> coreyhaines31/marketingskills｜<b>官網</b> marketing-skills.com｜<b>授權</b> MIT｜<b>作者</b> Corey Haines</div>
+        <p>將近 50 個行銷技能包，涵蓋 CRO、文案、SEO、廣告、分析、成長工程。裝完之後你講「幫我優化這個 landing page 的轉換率」，Claude 會自動抓對應 skill，套用該領域的框架去做。設計給的是<span class="hl">技術型行銷人和獨立創業者</span>——自己一個人要扛完所有行銷的那種角色。</p>
+        <div class="sub-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方法 A（推薦）</div><pre><span class="cm"># 全部裝</span>
+npx skills add coreyhaines31/marketingskills
+<span class="cm"># 只裝指定的</span>
+npx skills add coreyhaines31/marketingskills --skill cro copywriting
+<span class="cm"># 先看有哪些</span>
+npx skills add coreyhaines31/marketingskills --list</pre></div>
+        <div class="warn">⚠️ <b>這裡最容易裝錯：</b>在 agent session 裡跑（叫 Claude Code 幫你裝），CLI 用非互動模式，可能只裝到通用的 .agents/skills/ 目錄，而 Claude Code 不讀那個目錄。明確指定 agent：</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">明確指定 agent</div><pre>npx skills add coreyhaines31/marketingskills -a claude-code</pre></div>
+        <div class="insight"><div class="il">🔑 裝完第一件事：跑 product-marketing</div><div class="it">product-marketing 是整套的地基，其他每一個 skill 動手前都會先讀它，用來理解你的產品、受眾、定位。跑一次 /product-marketing，跟著問題回答，它會產出 context 存在 .agents/product-marketing.md。跳過這步，你會得到一堆泛泛而談的通用建議。</div></div>
+        <div class="sub-h">給自媒體經營者的三個切入點</div>
+        <ul class="bul">
+          <li><b>lead-magnets</b> — 規劃、評估、優化引流磁鐵（你現在看的這份文件就是一個 lead magnet）</li>
+          <li><b>ai-seo</b> — 針對 AI 搜尋做優化，讓 LLM 回答時引用到你（這塊現在還沒什麼人在做）</li>
+          <li><b>marketing-loops</b> — 設定可重複、自己跑的行銷流程，讓 AI agent 定期執行</li>
+        </ul>
+        <div class="tipline">用法直接講人話：「幫我優化這個 landing page 的轉換率」→ 自動用 cro；「幫我的 SaaS 寫首頁文案」→ 自動用 copywriting；也可直接叫 /cro、/emails、/seo-audit。近 50 個 skill 涵蓋轉換優化、內容文案、SEO、付費投放、數據測試、留存、成長工程、策略變現。</div>
+        <div class="nolink"><b>官方：</b>github.com/coreyhaines31/marketingskills｜marketing-skills.com</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">五個都裝好了</div>
+      <h3>裝完是一台新機器<br><span class="g">但怎麼用才決定產出</span></h3>
+      <p>工具只是工具。怎麼把記憶、省 token、去 AI 味、設計、行銷五件事接成一條變現產線——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 第 6 章 工作流 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 6 章 · 五個一起用</span>
+    <h2>三套<br><span class="g">實戰工作流</span></h2>
+    <div class="sub-h">工作流 A｜做一個個人品牌 Landing Page</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Landing Page 流程</div><pre>1. /product-marketing          <span class="cm"># 先建立定位 context（marketingskills）</span>
+2. 用 imagegen-frontend-web 出 3 個首頁視覺方向（taste-skill）
+3. follow the skill: generate images, then analyze, then code
+4. /copywriting                <span class="cm"># 頁面文案，自動讀第 1 步 context</span>
+5. 說 normal mode 關 caveman → /humanizer + 貼你的寫作樣本
+6. /cro                        <span class="cm"># 上線前做一次轉換率稽核</span></pre></div>
+    <div class="tipline">claude-mem 全程在背景記錄，下次要改這個網站不用重講一遍。</div>
+    <div class="sub-h">工作流 B｜內容產出線</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">內容流程</div><pre>1. /content-strategy   <span class="cm"># 決定這個月發什麼</span>
+2. /social             <span class="cm"># 產出貼文初稿</span>
+3. 關 caveman → /humanizer（含 voice calibration）洗味道
+4. /lead-magnets       <span class="cm"># 規劃這篇要送什麼引流磁鐵</span>
+5. /emails             <span class="cm"># 收到名單後的後續信件序列</span></pre></div>
+    <div class="sub-h">相容性提醒</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>組合</th><th>狀況</th></tr></thead><tbody>
+      <tr><td>caveman + humanizer</td><td>會打架。要人味長文時先 normal mode</td></tr>
+      <tr><td>caveman + claude-mem</td><td>相容。一個壓縮輸出、一個壓縮記憶</td></tr>
+      <tr><td>taste-skill + marketingskills</td><td>互補。一個管視覺、一個管轉換</td></tr>
+      <tr><td>taste-skill v2 + gpt-taste</td><td>同時觸發可能指令衝突，一次用一個</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 第 7 章 疑難排解 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 7 章 · 疑難排解與移除</span>
+    <h2>卡住的時候<br><span class="g">回來翻這裡</span></h2>
+    <div class="faq">
+      <div class="q">裝完沒反應，Claude 完全沒變</div>
+      <div class="a">最常見是裝到 Claude Code 讀不到的目錄。重跑安裝並加 <b>-a claude-code</b>，然後<b>完全關掉 Claude Code 再重開</b>（不是開新對話，是關掉整個程式）。</div>
+      <div class="q">claude-mem 的 localhost:37777 打不開</div>
+      <div class="a">Worker service 沒起來。先確認 Node ≥ 18，再重跑 npx claude-mem install。之前若用過 npm install -g claude-mem，那只裝了 SDK，要用正確指令重裝。</div>
+      <div class="q">怎麼知道 skill 到底有沒有被觸發</div>
+      <div class="a">直接問 Claude：「你剛剛用了哪個 skill？」它會告訴你。</div>
+      <div class="q">Windows 出現 npm is not recognized</div>
+      <div class="a">Node.js 沒進 PATH。到 nodejs.org 重裝，裝完<b>重開終端機</b>。</div>
+    </div>
+    <div class="sub-h">移除 · 更新</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">移除 caveman</div><pre>npx -y github:JuliusBrussee/caveman -- --uninstall</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">更新（skills CLI 通用）</div><pre>npx skills update &lt;skill 名稱&gt;</pre></div>
+    <div class="tipline">其他 plugin 在 Claude Code 裡用 /plugin 指令管理；skill 類直接刪掉對應目錄的資料夾即可。</div>
+  </div>
+
+  <!-- 附錄速查表 -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 · 速查表</span>
+    <h2>五個專案<br><span class="g">一頁看完</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Plugin</th><th>一句話</th><th>安裝指令</th></tr></thead><tbody>
+      <tr><td>claude-mem</td><td>跨 session 記憶</td><td>npx claude-mem install</td></tr>
+      <tr><td>caveman</td><td>砍輸出 token</td><td>curl … install.sh | bash</td></tr>
+      <tr><td>humanizer</td><td>洗掉 AI 味</td><td>npx skills add blader/humanizer</td></tr>
+      <tr><td>taste-skill</td><td>介面設計品味</td><td>npx skills add …/taste-skill</td></tr>
+      <tr><td>marketingskills</td><td>行銷技能包</td><td>npx skills add coreyhaines31/marketingskills -a claude-code</td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>關於版本：</b>本文件資訊整理自各專案官方 README（2026 年 7 月）。開源專案更新很快，指令若失效請以該專案 GitHub 上的最新 README 為準。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工具裝完了，<span class="g">接下來換我陪你把它接成系統</span></h2>
+      <div class="cta-lead">這五個裝完，你的 Claude Code 會變成另一台機器。但工具只是工具，決定產出的是你怎麼用它——把它接成一條「用 AI 省時間、用自媒體變現」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI 把內容產出時間壓縮、換成收入的人</div>
+        <div class="f">會裝工具、卻不知道怎麼搭成工作流的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">我實際在跑、驗證過有效的工具與流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">工具怎麼選、工作流怎麼搭、流量怎麼變成收入</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI 工具怎麼選、工作流怎麼搭、內容怎麼產、流量怎麼變成收入——都是我自己在跑、驗證過有效的東西<br>※ 本文件資訊整理自各開源專案官方 README（2026 年 7 月），開源專案更新頻繁，指令若失效請以各專案 GitHub 最新 README 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude Code 5 大 Plugin 完整安裝與實戰教學包——lead magnet／DM 承接頁
+· 內容：文件總覽 + 第0章安裝前準備（環境檢查/三名詞/安裝順序/⚠️陷阱）+ 5 plugin 摺疊（claude-mem/caveman/humanizer/taste-skill/marketingskills，各含 meta＋做什麼＋可複製安裝＋指令表＋⚠️陷阱＋什麼時候關掉＋官方）+ 中段 CTA + 第6章三套工作流（A/B＋相容性表）+ 第7章疑難排解 FAQ＋移除更新 + 附錄速查表
+· 可複製區塊：約 22 個 .cp
+· 三段 Skool CTA（指向 奇點研究所 × D11）：
+    前段 → .side-cta（skool-side）／.top-cta（skool-top）｜中段 → .mid-cta（skool-mid，5 plugin 與工作流之間）｜後段 → .cta（skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「Claude Code 5 大 Plugin」文件
+· 命名：日期前綴（2026-07-21-claude-plugin-pack.html），對齊 kma-pages 慣例
+· 注意：與 2026-07-20-claude-code-plugins.html 是「不同的兩份五外掛教學」，內容不重疊（那份是 graphify/impeccable/ponytail/Higgsfield/Obsidian）
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
