@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>42 個真的裝得起來的 Claude Skills｜逐一驗證過的完整清單</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+.warn code{font-family:var(--mono);font-size:12.5px;background:rgba(200,70,40,0.10);border-radius:4px;padding:1px 5px;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-family:var(--mono);font-size:12px;color:var(--gold);white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+/* 4 行安裝 */
+.install{margin:14px 0 4px;counter-reset:ins;}
+.install .ins{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:14px 16px 15px;margin-bottom:10px;position:relative;}
+.install .ins .n{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:9px;max-width:calc(100% - 80px);line-height:1.5;}
+.install .ins pre{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+
+/* skill 卡片 */
+.sk-list{display:flex;flex-direction:column;gap:11px;margin:14px 0 4px;}
+.sk-item{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:15px 17px;transition:border-color .2s ease;}
+.sk-item:hover{border-color:var(--gold-dim);}
+.sk-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px;}
+.sk-num{font-family:"Inter";font-weight:800;font-size:11px;color:var(--faint);}
+.sk-name{font-family:var(--mono);font-weight:500;font-size:14.5px;color:var(--gold);}
+.badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:50px;letter-spacing:0.03em;white-space:nowrap;}
+.b-skill{background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);}
+.b-super{background:rgba(212,144,42,0.05);border:1px dashed var(--gold-dim);color:#9a7433;}
+.b-plugin{background:#2a2620;border:1px solid #2a2620;color:var(--gold-bright);}
+.sk-desc{font-size:13.7px;line-height:1.78;color:var(--text);}
+.sk-desc b{color:var(--gold);}
+.sk-desc .u{color:var(--dim);}
+
+/* 單行指令 */
+.cmd{display:flex;align-items:center;gap:10px;background:var(--code);border:1px solid rgba(212,144,42,0.22);border-radius:9px;padding:8px 10px 8px 13px;margin-top:10px;}
+.cmd code{flex:1;font-family:var(--mono);font-size:11.5px;color:var(--code-tx);word-break:break-all;line-height:1.5;}
+.cmd button{flex-shrink:0;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10px;font-weight:700;padding:4px 10px;border-radius:50px;cursor:pointer;transition:all .2s;}
+.cmd button:hover{background:var(--gold);color:#1a1406;}
+.cmd button.done{background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝好之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>工具裝好了<br><span class="g">產線還沒接</span></h4>
+  <p>42 個 skill 只是零件。怎麼把 AI 接成能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE SKILLS · 逐一 CLONE 驗證過</div>
+    <h1>42 個真的<br><span class="g">裝得起來的 Claude Skills</span></h1>
+    <div class="hero-sub">網路上流傳的 Claude Skills 清單很多，抄的人也很多。<br>這份清單裡的每一個項目，都是實際 clone 下來、打開資料夾確認過的——而且只要 <b>4 行指令</b>就能裝完大半。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">42</div><div class="l">個 · 可安裝項目</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">行 · 裝完 28 個</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">個 · 排掉的假清單項</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">做 AI × 自媒體變現的個人品牌帳號，主題只有兩件事：怎麼用 AI 工具把內容做出來，以及怎麼讓這些內容變成收入。不談概念，只談你今天打開電腦就能照做的步驟。</div></div>
+  </div>
+
+  <!-- 這份文件怎麼來的 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件是怎麼來的</span>
+    <h2>每一個項目<br><span class="g">都打開資料夾確認過</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>來源</th><th>內容</th></tr></thead><tbody>
+      <tr><td>anthropics/skills</td><td>Anthropic 官方 skills，逐一比對每個資料夾的 SKILL.md</td></tr>
+      <tr><td>anthropics/<br>claude-plugins-official</td><td>Anthropic 官方 plugin 目錄</td></tr>
+      <tr><td>obra/superpowers</td><td>社群使用度最高的 skill 集合</td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ <b>順手排掉的常見錯誤：</b><code>root-cause-tracing</code>、<code>defense-in-depth</code>、<code>condition-based-waiting</code> 這三個常被列成獨立 skill，實際上它們只是 <code>systematic-debugging</code> 底下的參考文件，<b>沒辦法單獨安裝</b>。抄清單前先自己 clone 一次，五分鐘的事。</div>
+  </div>
+
+  <!-- 4 行裝完 -->
+  <div class="sec fade">
+    <span class="sec-tag">先講最重要的</span>
+    <h2>4 行<br><span class="g">裝完大半</span></h2>
+    <p>不用一個一個裝。這 42 個項目分屬三個來源，總共 4 行指令。在 Claude Code 裡面依序執行：</p>
+    <div class="install">
+      <div class="ins"><div class="n">1 · 註冊 Anthropic 官方 skills marketplace</div><pre>/plugin marketplace add anthropics/skills</pre><div class="cmd" style="margin-top:9px;"><code>/plugin marketplace add anthropics/skills</code><button onclick="copyCmd(this)">複製</button></div></div>
+      <div class="ins"><div class="n">2 · 裝 12 個範例 skills（設計、藝術、MCP、品牌、測試）</div><div class="cmd" style="margin-top:0;border:none;background:transparent;padding:0;"><code style="font-size:12.5px;">/plugin install example-skills@anthropic-agent-skills</code><button onclick="copyCmd(this)">複製</button></div></div>
+      <div class="ins"><div class="n">3 · 裝 4 個文件處理 skills（Word / Excel / PPT / PDF）</div><div class="cmd" style="margin-top:0;border:none;background:transparent;padding:0;"><code style="font-size:12.5px;">/plugin install document-skills@anthropic-agent-skills</code><button onclick="copyCmd(this)">複製</button></div></div>
+      <div class="ins"><div class="n">4 · 裝 superpowers（一次帶進 12 個流程與驗證 skills）</div><div class="cmd" style="margin-top:0;border:none;background:transparent;padding:0;"><code style="font-size:12.5px;">/plugin install superpowers@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+    </div>
+    <div class="insight"><div class="il">跑完這 4 行</div><div class="it">42 個裡面有 28 個已經在你機器上了。剩下 14 個是獨立 plugin，要哪個裝哪個——下面每一項都標了它的安裝方式。</div></div>
+  </div>
+
+  <!-- 三種來源差別 -->
+  <div class="sec fade">
+    <span class="sec-tag">三種安裝來源的差別</span>
+    <h2>看懂色標<br><span class="g">就知道怎麼裝</span></h2>
+    <div class="sk-list">
+      <div class="sk-item"><div class="sk-head"><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">Anthropic 官方 skills repo 裡的 skill<span class="u">　→　用上面的第 2、3 行裝</span></div></div>
+      <div class="sk-item"><div class="sk-head"><span class="badge b-super">Superpowers</span></div><div class="sk-desc">superpowers plugin 內附的 skill<span class="u">　→　用上面的第 4 行裝</span></div></div>
+      <div class="sk-item"><div class="sk-head"><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">Anthropic plugin 目錄裡的獨立 plugin<span class="u">　→　各項目附完整指令，點複製即可</span></div></div>
+    </div>
+    <div class="insight"><div class="il">Plugin 跟 Skill 不是同一個東西</div><div class="it">Skill 是一份 SKILL.md 指示文件；Plugin 可以同時包含 skills、commands、agents、hooks 和 MCP server。裝 plugin 通常會一次帶進好幾個能力。</div></div>
+  </div>
+
+  <!-- 第 1 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 1 層 · 前端與介面</span>
+    <h2>做得出來<br><span class="g">而且不像 AI 做的</span></h2>
+    <div class="sk-list">
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">01</span><span class="sk-name">frontend-design</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">處理 AI 生成前端長得都一樣的問題。設計目標明確寫著要避開 Inter 字體、紫色漸層、圓角卡片、置中排版這一套 AI 預設美學。用在需要有設計主張的頁面，不是只要能跑就好的內部工具。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">02</span><span class="sk-name">web-artifacts-builder</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">做需要狀態管理、路由、多元件的複雜 artifact。跟單檔 HTML/JSX 的差別在於它假設你要做的是一個應用，不是一個片段。支援 React、Tailwind、shadcn/ui。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">03</span><span class="sk-name">theme-factory</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">輸入幾個主色，產出完整的色階系統。省掉手動調 50 到 900 每一階的時間。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">04</span><span class="sk-name">brand-guidelines</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">把品牌色與字級規範載入，套用到任何產出上，包含簡報、文件、報告、HTML 頁面。預設帶的是 Anthropic 自己的品牌設定，你可以照著結構改成自己的。<b>最大的價值是當範本用</b>——看它怎麼把一套品牌規範寫成機器讀得懂的格式。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">05</span><span class="sk-name">canvas-design</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">輸出可編輯的向量圖，不是點陣圖。做完之後可以進 Figma 或 Illustrator 繼續改。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">06</span><span class="sk-name">webapp-testing</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">用瀏覽器實際打開頁面測試，看畫面到底長什麼樣，而不是只看程式碼推測。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">07</span><span class="sk-name">playwright</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">Microsoft 出的瀏覽器自動化 MCP server。讓 Claude 可以真的操作網頁：截圖、填表單、點按鈕、跑端對端測試。跟 webapp-testing 搭著用，一個負責測試方法，一個負責實際操作瀏覽器。</div><div class="cmd"><code>/plugin install playwright@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">08</span><span class="sk-name">project-artifact</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">把專案現況做成一個可分享的 claude.ai artifact 頁面，包含專案概覽、成功條件、工作流順序、下一步。每次重新整理會重新抓最新狀態並重新部署。適合拿來當專案的對外進度頁。</div><div class="cmd"><code>/plugin install project-artifact@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">09</span><span class="sk-name">code-simplifier</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">在不改變功能的前提下，把程式碼整理得更清楚、更一致、更好維護。它會針對最近改動過的部分下手，不會整包翻。</div><div class="cmd"><code>/plugin install code-simplifier@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">10</span><span class="sk-name">code-modernization</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">改寫老舊程式碼，包含 COBOL、舊版 Java/C++、單體式網頁應用。流程分成盤點、評估、對照、抽出規則、重新設計、轉換、加固幾個階段，附帶互動式架構檢視器。<b>這是重型工具，小專案用不到。</b></div><div class="cmd"><code>/plugin install code-modernization@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+    </div>
+  </div>
+
+  <!-- 第 2 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 2 層 · 圖像、文件與素材</span>
+    <h2>做圖、做檔<br><span class="g">做能交出去的東西</span></h2>
+    <div class="sk-list">
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">11</span><span class="sk-name">algorithmic-art</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">用數學生成視覺，流場、粒子、幾何圖形這一類。產出是程式碼，參數改一改就是新的一張，適合做大量變化的視覺素材。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">12</span><span class="sk-name">slack-gif-creator</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">生成動態 GIF。名字寫 Slack，但產出的檔案哪裡都能用。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">13</span><span class="sk-name">pptx</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">讀取、生成、修改簡報檔。可以處理版面、母片、講者備忘稿、註解。<b>這是 Claude 產品裡實際在用的同一份 skill</b>，不是示範用的簡化版。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">14</span><span class="sk-name">docx</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">Word 文件的建立與編輯，支援追蹤修訂與註解。要做需要來回改稿的正式文件時用這個。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">15</span><span class="sk-name">xlsx</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">試算表操作：公式、圖表、資料轉換。也能處理 CSV 進 Excel 的清理工作。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">16</span><span class="sk-name">pdf</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">PDF 的讀取、文字與表格抽取、合併、拆分、填表單、加浮水印。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">17</span><span class="sk-name">doc-coauthoring</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">文件協作的三階段流程：先收集素材，再打磨內容，最後做讀者測試。<b>它的價值在流程本身</b>——多數人寫文件是一路寫到底，這個 skill 強迫你把三件事分開做。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">18</span><span class="sk-name">internal-comms</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">內部溝通文案：公告、週報、跨部門說明。重點在調整資訊密度與語氣，讓不同角色的人都讀得懂。</div></div>
+
+    </div>
+  </div>
+
+  <!-- 第 3、4 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 3、4 層 · 系統與擴充</span>
+    <h2>把 Claude<br><span class="g">改造成你的版本</span></h2>
+    <div class="sk-list">
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">19</span><span class="sk-name">mcp-builder</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">建立自己的 MCP server。從零開始的話從這裡入門。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">20</span><span class="sk-name">mcp-server-dev</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">比 mcp-builder 更完整的一套。涵蓋部署模式的選擇（遠端 HTTP、MCPB、本機）、工具設計模式、驗證機制、互動式 MCP app。<b>要做給別人用的 MCP server，用這個。</b></div><div class="cmd"><code>/plugin install mcp-server-dev@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">21</span><span class="sk-name">agent-sdk-dev</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">用 Claude Agent SDK 開發代理的工具包。</div><div class="cmd"><code>/plugin install agent-sdk-dev@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">22</span><span class="sk-name">skill-creator</span><span class="badge b-skill">官方 Skill</span></div><div class="sk-desc">生成新的 skill。會引導你把一段重複的工作寫成 SKILL.md 的標準結構。<b>判斷標準很簡單：同一段 prompt 你在不同對話裡打過三次以上，就該做成 skill。</b></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">23</span><span class="sk-name">plugin-dev</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">開發 Claude Code plugin 的完整工具包，內含 7 個 skill，涵蓋 hooks、MCP 整合、commands、agents 與最佳實踐，含建立與驗證流程。做完 skill 想打包發佈給別人裝，用這個。</div><div class="cmd"><code>/plugin install plugin-dev@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">24</span><span class="sk-name">hookify</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">建立自訂 hook 來擋掉不想要的行為。可以分析對話模式自動生成規則，也可以直接下明確指令，規則用 markdown 檔定義。<span class="u">例：你不想讓它每次都自動 commit，寫成 hook 規則就不會再發生。</span></div><div class="cmd"><code>/plugin install hookify@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">25</span><span class="sk-name">claude-md-management</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">維護 CLAUDE.md 的工具：檢查品質、把這次對話學到的東西寫回去、讓專案記憶保持在最新狀態。<b>CLAUDE.md 會隨專案長大而腐化，這個 plugin 就是處理這件事。</b></div><div class="cmd"><code>/plugin install claude-md-management@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">26</span><span class="sk-name">claude-code-setup</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">分析你的 codebase，反過來建議你這個專案該裝哪些 hooks、skills、MCP servers、subagents。<b>新專案開場先跑這個，比自己憑感覺挑快。</b></div><div class="cmd"><code>/plugin install claude-code-setup@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">27</span><span class="sk-name">session-report</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">讀取本機 ~/.claude/projects 的對話紀錄，產出可瀏覽的 HTML 報告：token 用量、快取效率、subagent 使用狀況、skill 使用狀況，以及最花錢的那幾段 prompt。<b>想知道錢花在哪裡，看這個。</b></div><div class="cmd"><code>/plugin install session-report@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">28</span><span class="sk-name">receipts</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">產出個人的使用成果報告：你做出了什麼、進了哪些專案、每個專案佔你用量的比例。設計用途是拿去跟主管證明這筆錢花得值得，或是自評用。</div><div class="cmd"><code>/plugin install receipts@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">工具講完一半</div>
+      <h3>裝得起來是基本<br><span class="g">接成產線才是重點</span></h3>
+      <p>42 個 skill 都是零件。想把它們接成一條能省時間、能變現的產線——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 第 5 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 5 層 · 行為與流程</span>
+    <h2>這一層<br><span class="g">改的是它怎麼做事</span></h2>
+    <p>以下大部分包含在 superpowers 裡，<span class="hl">裝一次全拿</span>：</p>
+    <div class="cmd" style="margin-bottom:16px;"><code>/plugin install superpowers@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div>
+    <div class="sk-list">
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">29</span><span class="sk-name">using-superpowers</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">教 Claude 怎麼判斷該叫出哪個 skill。<b>沒有這個，其他 skill 常常裝了但不會被觸發</b>——先裝這個，其他才會動起來。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">30</span><span class="sk-name">writing-skills</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">寫出會被正確觸發的 skill。重點在 description 欄位怎麼寫，因為那是 Claude 判斷要不要載入的唯一依據。附帶一份用 subagent 測試 skill 的方法。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">31</span><span class="sk-name">brainstorming</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">把模糊的需求問成明確的規格。它會反過來問你問題，直到需求收斂成可以動工的程度。<b>直接叫它寫程式跟先跑一輪這個再寫，產出品質差很多。</b></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">32</span><span class="sk-name">writing-plans</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">把規格拆成一份逐步可執行的計畫文件。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">33</span><span class="sk-name">executing-plans</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">照著計畫一步一步跑完，中途不會自己改主意跳步驟。<b>brainstorming → writing-plans → executing-plans 是一條完整的鏈，三個一起用效果最好。</b></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">34</span><span class="sk-name">subagent-driven-development</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">把任務分派給不同的 subagent 各做各的，內建 code review 環節。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">35</span><span class="sk-name">dispatching-parallel-agents</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">多個代理平行處理不同的工作。適合彼此不相依的任務。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">36</span><span class="sk-name">explanatory-output-style</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">在輸出裡加上對實作選擇與程式碼模式的說明，模擬已經停用的 Explanatory output style。<span class="u">想邊做邊學的時候開，趕時間的時候關。</span></div><div class="cmd"><code>/plugin install explanatory-output-style@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+    </div>
+  </div>
+
+  <!-- 第 6 層 -->
+  <div class="sec fade">
+    <span class="sec-tag">第 6 層 · 驗證與信任</span>
+    <h2>做完之後<br><span class="g">憑什麼相信它做對了</span></h2>
+    <div class="sk-list">
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">37</span><span class="sk-name">test-driven-development</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">紅燈綠燈重構的完整 TDD 循環。先寫會失敗的測試，再寫讓它通過的程式碼。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">38</span><span class="sk-name">systematic-debugging</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">四階段找出真正原因：重現、隔離、定位、驗證修復。它底下還帶了三份參考文件（root-cause-tracing、defense-in-depth、condition-based-waiting），會在需要的時候自動載入。<b>這三份不是獨立 skill，裝不了也不用裝。</b></div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">39</span><span class="sk-name">verification-before-completion</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">收工前強制驗證，避免修完沒測就說做完了。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">40</span><span class="sk-name">requesting-code-review</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">主動要求檢查，附帶一份 code reviewer 的角色設定。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">41</span><span class="sk-name">receiving-code-review</span><span class="badge b-super">Superpowers</span></div><div class="sk-desc">接住檢查意見並確實修正，而不是敷衍過去。</div></div>
+
+      <div class="sk-item"><div class="sk-head"><span class="sk-num">42</span><span class="sk-name">security-guidance</span><span class="badge b-plugin">官方 Plugin</span></div><div class="sk-desc">針對 Claude 生成的程式碼做安全檢查。三層機制：編輯時的模式比對警告、停止時的 LLM diff 審查、commit 時的代理審查。涵蓋注入攻擊、XSS、SSRF、寫死的密鑰等 25 種以上的漏洞類型。<b>只要你會把 AI 寫的程式碼推上線，這個是必裝。</b></div><div class="cmd"><code>/plugin install security-guidance@claude-plugins-official</code><button onclick="copyCmd(this)">複製</button></div></div>
+
+    </div>
+  </div>
+
+  <!-- 使用提醒 -->
+  <div class="sec fade">
+    <span class="sec-tag">幾個實際使用上的提醒</span>
+    <h2>裝之前<br><span class="g">先知道這五件事</span></h2>
+    <div class="sk-list">
+      <div class="sk-item"><div class="sk-desc"><b>裝太多會互相打架。</b>Skill 是靠 description 觸發的，裝了 42 個之後，語意接近的 skill 會搶同一個任務。建議依專案性質分批裝，不要一次全開。</div></div>
+      <div class="sk-item"><div class="sk-desc"><b>Plugin 和 Skill 的成本不一樣。</b>Skill 在待機時只佔約 100 個 token（只載入名稱與描述），被觸發才載入完整內容。Plugin 如果帶 MCP server，那個 server 的工具定義是常駐的，開太多會吃掉 context。</div></div>
+      <div class="sk-item"><div class="sk-desc"><b>官方 repo 明講這些是示範用途。</b>anthropics/skills 的 README 寫著這些 skill 是為了展示與教學，實際行為可能與你在 Claude 產品裡遇到的不同，正式用途前請自己測過。<span class="u">文件類的四個（docx / pdf / pptx / xlsx）是例外，那是產品裡實際在跑的版本。</span></div></div>
+      <div class="sk-item"><div class="sk-desc"><b>Skills 需要付費方案。</b>免費方案沒有 Skills 功能。</div></div>
+      <div class="sk-item"><div class="sk-desc"><b>清單會變。</b>官方 repo 隨時在加減內容，這份是實際 clone 驗證後的結果。你自己跑一次 marketplace 指令再看列表，是最準的做法。</div></div>
+    </div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>清單你拿到了，<span class="g">接下來換我陪你把它跑成產線</span></h2>
+      <div class="cta-lead">這份清單背後的工作方式，就是我平常在做的事：不抄現成的說法，自己打開來看一遍再寫。但要把這些工具接成一條「內容 → 流量 → 收入」的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆清單，卻從來沒真的裝起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">不抄現成的說法，自己打開來看一遍再寫</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——怎麼用 AI 把內容做出來，以及怎麼讓內容變成收入<br>※ 官方 repo 內容隨時更動，安裝前建議自己跑一次 marketplace 指令確認最新清單</div>
+  </div>
+
+</div>
+
+<script>
+function copyCmd(btn){
+  var code = btn.parentElement.querySelector('code');
+  var text = code.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：42 個真的裝得起來的 Claude Skills——輪播 DM 承接頁／lead magnet（定位：逐一 clone 驗證過的可安裝清單）
+· 差異化賣點：排掉了 root-cause-tracing / defense-in-depth / condition-based-waiting 三個常見假清單項（實為 systematic-debugging 的參考文件）
+· 內容：文件來源驗證表 + 4 行安裝（可複製）+ 三種來源色標說明 + 第1層前端介面(01-10) + 第2層圖像文件(11-18) + 第3、4層系統擴充(19-28) + 中段 CTA + 第5層行為流程(29-36) + 第6層驗證信任(37-42) + 5 個使用提醒
+· 版型決策：42 項太多，不用摺疊（會一直點），改用緊湊卡片 .sk-item：編號＋mono 名稱＋來源色標 badge＋說明；需指令者附單行 .cmd 可複製條
+· 色標系統：.b-skill 金色實心（官方 Skill）／.b-super 金色虛線（Superpowers）／.b-plugin 深色（官方 Plugin，需單獨安裝）
+· 可複製指令：19 個（4 行主安裝 + superpowers 重複一次 + 14 個獨立 plugin）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，第3、4層與第5層之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「42 個真的裝得起來的 Claude Skills」文件
+· 命名：日期前綴（2026-07-29-42-skills.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
