@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 10 個 Project 設定表｜把一個帳號拆成十個職務</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:rgba(200,70,40,0.06);border:1px solid rgba(200,70,40,0.22);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:#b1431f;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-family:var(--sans);font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+
+.blk-h{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin:16px 0 7px;text-transform:uppercase;}
+.feed{margin:6px 0 2px;}
+.feed li{list-style:none;position:relative;padding-left:18px;font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:6px;}
+.feed li::before{content:"\2022";position:absolute;left:2px;color:var(--gold);font-weight:700;}
+.ask{margin:6px 0 2px;counter-reset:q;}
+.ask li{list-style:none;position:relative;padding-left:24px;font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:7px;}
+.ask li::before{counter-increment:q;content:counter(q);position:absolute;left:0;top:1px;width:17px;height:17px;border-radius:50%;background:rgba(212,144,42,0.16);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;}
+.pass{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:14px 0 2px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.pass b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 70px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--dim);line-height:1.8;}
+
+.ckl{margin:12px 0 2px;list-style:none;}
+.ckl li{margin-bottom:9px;}
+.ckl label{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 15px;cursor:pointer;transition:border-color .2s ease,background .2s ease;user-select:none;}
+.ckl label:hover{border-color:var(--gold-dim);}
+.ckl input{position:absolute;opacity:0;width:0;height:0;}
+.ckl .box{flex-shrink:0;width:20px;height:20px;border:2px solid var(--gold-dim);border-radius:5px;background:var(--bg2);margin-top:1px;position:relative;transition:background .2s ease,border-color .2s ease;}
+.ckl .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #1a1406;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:transform .2s cubic-bezier(0.34,1.56,0.64,1);}
+.ckl .txt{font-size:14px;line-height:1.7;color:var(--text);transition:color .2s ease;}
+.ckl .txt b{color:var(--gold);}
+.ckl input:checked ~ .box{background:var(--gold);border-color:var(--gold);}
+.ckl input:checked ~ .box::after{transform:rotate(45deg) scale(1);}
+.ckl input:checked ~ .txt{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--gold-dim);}
+.ckl input:focus-visible ~ .box{outline:2px solid var(--gold);outline-offset:2px;}
+.ck-bar{display:flex;align-items:center;gap:12px;margin:6px 0 16px;}
+.ck-track{flex:1;height:7px;background:rgba(0,0,0,0.08);border-radius:50px;overflow:hidden;}
+.ck-fill{height:100%;width:0;background:var(--gold);border-radius:50px;transition:width .35s cubic-bezier(0.34,1.56,0.64,1);}
+.ck-num{font-family:"Inter";font-weight:800;font-size:13px;color:var(--gold);white-space:nowrap;}
+.ck-reset{background:none;border:1px solid var(--line);color:var(--dim);font-family:var(--sans);font-size:11.5px;font-weight:500;padding:4px 12px;border-radius:50px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.ck-reset:hover{border-color:var(--gold-dim);color:var(--gold);}
+.ck-done{font-size:13px;color:var(--gold);font-weight:700;margin-top:4px;opacity:0;transition:opacity .3s ease;}
+.ck-done.show{opacity:1;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>設定好十個職務後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>一個帳號<br><span class="g">十個職務</span></h4>
+  <p>設定好 Project 只是開始。怎麼把它接成能省時間、能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE PROJECTS · 10 個職務設定表</div>
+    <h1>Claude 10 個<br><span class="g">Project 設定表</span></h1>
+    <div class="hero-sub">用 Claude 的 Project 功能，把一個帳號拆成十個職務。<br>每個 Project 附完整指示文、要餵的資料清單、開場提問與驗收標準，全部可以直接複製使用。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">10</div><div class="l">個 · 職務指示文</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">步 · 設定流程</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">1</div><div class="l">週 · 只開一個</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">教的是用 AI 工具把自媒體做成收入。內容集中在兩件事：怎麼用 Claude、Claude Code、NotebookLM 把產出時間壓下來，以及一個人怎麼把內容變成可以重複運轉的生意。所有方法都是自己實際跑過才寫出來，工具有限制的地方會直接寫在文章裡。</div></div>
+  </div>
+
+  <!-- 怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件怎麼用</span>
+    <h2>一次開十個<br><span class="g">會全部半途而廢</span></h2>
+    <div class="steps">
+      <div class="st">先看〈<b>五步驟設定流程</b>〉，把第一個 Project 開起來</div>
+      <div class="st">從〈<b>10 個設定表</b>〉挑一個最痛的職務，把指示文複製進去</div>
+      <div class="st">照〈<b>要餵的資料</b>〉把檔案上傳，跑三天</div>
+      <div class="st">用〈<b>驗收標準</b>〉檢查，過關再開第二個</div>
+    </div>
+    <div class="tipline">第一週<b>只開一個</b>。</div>
+  </div>
+
+  <!-- 三個事實 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前 · 三個事實</span>
+    <h2>先搞懂這三件<br><span class="g">再動手</span></h2>
+    <ul class="bul">
+      <li><b>Project 功能所有帳號都能用。</b>免費帳號最多開 5 個，付費方案才開得到 10 個以上。這份文件的前五個職務，就是為了免費帳號的 5 個名額排序的。</li>
+      <li><b>Project 跟一般對話的差別在記憶。</b>一般對話關掉就沒了；Project 裡的檔案跟指示文會在這個 Project 的每一次對話裡自動生效。設定一次，之後不用再解釋你是誰。</li>
+      <li><b>指示文只寫規則，資料放檔案。</b>指示文寫得越長，Claude 越容易漏掉重點。把「你是誰、你賣什麼、你的價格」寫成檔案上傳，指示文只留下「怎麼回答、輸出什麼格式、不准做什麼」。</li>
+    </ul>
+  </div>
+
+  <!-- 五步驟 -->
+  <div class="sec fade">
+    <span class="sec-tag">五步驟設定流程</span>
+    <h2>從零到跑起來<br><span class="g">照順序做</span></h2>
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">步驟1</span><span class="ch-t">開第一個 Project</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>側邊欄 → Projects → 新增專案。名稱直接用職務名，例如「內容組」。</p>
+        <div class="tipline">專案名稱與描述 <b>Claude 讀不到</b>，寫給自己看就好。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">步驟2</span><span class="ch-t">準備你的基本資料檔</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>新開一個文字檔，命名為 <span class="hl">00_品牌基本資料</span>，寫進以下六項：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製範本</button><div class="pl">00_品牌基本資料</div><pre>我是誰：一句話說明身份與專業領域
+我賣什麼：產品或服務名稱、內容、定價
+賣給誰：受眾年齡、職業、他們最常卡住的三件事
+我的語氣：三個形容詞 + 兩個我常用的句子範例
+我不用的說法：列出你看了會出戲的句型或詞
+現在的目標：接下來三個月要達成的一件事</pre></div>
+        <div class="tipline">這個檔案<b>十個 Project 都會用到</b>，寫一次重複用。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">步驟3</span><span class="ch-t">上傳檔案到專案知識</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>把 <span class="hl">00_品牌基本資料</span> 上傳，再依照各職務的〈要餵的資料〉補上專屬檔案。</p>
+        <div class="tipline">檔案格式：Notion 頁面匯出成 Markdown、PDF、純文字檔都可以。內容越具體越有用，<b>避免上傳只有標題沒有內文的大綱</b>。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">步驟4</span><span class="ch-t">貼上指示文</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>專案頁面 → 專案指示（Project instructions）→ 貼上該職務的指示文。</p>
+        <div class="tipline">指示文裡有 <b>〔中括號〕</b> 的地方要換成你自己的內容，換完再存。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">步驟5</span><span class="ch-t">跑一次驗收</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>用該職務的〈開場提問〉丟第一題，對照〈驗收標準〉檢查輸出。</p>
+        <div class="warn">⚠️ 沒過關就<b>改指示文，不要改提問</b>。八成的問題出在指示文太模糊。</div>
+      </div></details>
+    </div>
+  </div>
+
+  <!-- 通用骨架 -->
+  <div class="sec fade">
+    <span class="sec-tag">通用指示文骨架</span>
+    <h2>自己新增職務時<br><span class="g">照這五段寫</span></h2>
+    <p>順序不要換。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製骨架</button><div class="pl">通用五段骨架</div><pre>【角色】
+你是〔職務名稱〕。你的工作是〔一句話講清楚產出什麼〕。
+
+【資料】
+背景資料在 Project 檔案裡，回答前先讀 〔檔名〕。
+資料裡沒有的事直接說沒有，不要推測。
+
+【規則】
+1. 〔最重要的一條規則〕
+2. 〔第二條〕
+3. 〔第三條〕
+（規則寫三到六條，超過就開新 Project）
+
+【輸出格式】
+〔用實際範例示範一次格式，不要只用形容詞描述〕
+
+【禁止】
+- 不要在開頭重複我的問題
+- 不要在結尾做總結或鼓勵
+- 〔你自己的禁用清單〕</pre></div>
+    <div class="insight"><div class="il">多數人漏掉的一段</div><div class="it">「禁止」那段是多數人漏掉的。寫清楚可以省掉大量刪改時間。</div></div>
+  </div>
+
+  <!-- 十個 Project 總表 -->
+  <div class="sec fade">
+    <span class="sec-tag">10 個 Project 設定表</span>
+    <h2>免費帳號<br><span class="g">請先開 01–05</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>No</th><th>Project</th><th>一句話用途</th></tr></thead><tbody>
+      <tr><td>01</td><td>主管秘書</td><td>決定今天做哪三件事</td></tr>
+      <tr><td>02</td><td>內容組</td><td>選題、標題、貼文結構</td></tr>
+      <tr><td>03</td><td>文案組</td><td>銷售頁、CTA、轉換文案</td></tr>
+      <tr><td>04</td><td>客服組</td><td>DM 與 Email 回覆草稿</td></tr>
+      <tr><td>05</td><td>營運組</td><td>進度追蹤與交付檢查</td></tr>
+      <tr><td>06</td><td>提案組</td><td>合作提案與報價</td></tr>
+      <tr><td>07</td><td>研究組</td><td>競品與市場資料整理</td></tr>
+      <tr><td>08</td><td>課程組</td><td>課綱、講義、練習題</td></tr>
+      <tr><td>09</td><td>自動化組</td><td>流程盤點與串接設計</td></tr>
+      <tr><td>10</td><td>覆盤教練</td><td>每週檢討與下一步</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 十個職務詳表 -->
+  <div class="sec fade" style="padding-top:22px;">
+    <h2>展開任一個<br><span class="g">指示文直接複製</span></h2>
+    <div class="acc">
+
+      <!-- 01 -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">主管秘書<span class="en"> · 決定今天做哪三件事</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>早上打開電腦不知道先做什麼的時候，用它決定順序。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>00_品牌基本資料</li>
+          <li>本月目標（三項以內，附完成的判定標準）</li>
+          <li>固定行程（每週重複的事、固定會議）</li>
+          <li>待辦清單（可直接把專案管理工具的匯出檔丟進來）</li>
+          <li>目前卡住的事（寫清楚卡在哪一步）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">01 主管秘書 · Project instructions</div><pre>【角色】
+你是我的行政幕僚。你的工作是幫我決定順序，執行由我自己做。
+
+【資料】
+回答前先讀 Project 裡的目標檔與待辦清單。
+我沒寫進檔案的事情不要幫我補，直接問我。
+
+【規則】
+1. 我描述當天狀況後，輸出「今天做這三件」，最多三件。
+2. 每件事標註預估耗時，以及為什麼排在今天。
+3. 同一件事被我延後兩次以上，直接點名，問我要刪掉還是排定時間。
+4. 我的可用時間不足以完成三件事時，先砍到我做得完的量。
+5. 只回答我問的，不要附加建議。
+
+【輸出格式】
+【今天】
+1. 事項（預估 XX 分鐘）— 排在今天的理由
+2. ...
+3. ...
+【可以延後】
+- 事項（延後理由，一行）
+【要我決定】
+- 需要我拍板才能往下走的事
+
+【禁止】
+- 不要鼓勵我，不要評論我的狀態
+- 不要在結尾加總結</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>今天我有四小時，手上有〔列出五件事〕，幫我排順序</li>
+          <li>這週目標是〔目標〕，現在進度落後，接下來三天要怎麼調</li>
+          <li>這件事我已經拖了兩週，幫我判斷該砍掉還是拆小</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>輸出只有三件事，而且每件都寫得出「為什麼是今天」。</div>
+      </div></details>
+
+      <!-- 02 -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">內容組<span class="en"> · 選題、標題、貼文結構</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>選題卡住、標題寫不出來、貼文結構鬆散的時候用。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>00_品牌基本資料</li>
+          <li>過去表現最好的 10 篇貼文全文（附數據，把「為什麼你覺得它好」也寫上）</li>
+          <li>過去表現最差的 5 篇貼文全文（同樣寫上你的判斷）</li>
+          <li>你的禁用句型清單</li>
+          <li>受眾常問的問題清單</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">02 內容組 · Project instructions</div><pre>【角色】
+你是我的內容企劃。你的工作是產出選題、標題與貼文結構，不寫完整成稿。
+
+【資料】
+回答前先讀 Project 裡的高表現貼文與禁用句型清單。
+我的語氣以那些貼文為準，不要用你預設的社群寫法。
+
+【規則】
+1. 我給你一個主題，先給我五個切角，每個切角一句話說明差異。
+2. 我選定切角後，才輸出標題與結構。
+3. 標題一次給八個，分成三類：數字型、結果型、對比型。
+4. 結構用條列輸出，每一段標註「這段要讓讀者知道什麼」。
+5. 禁用句型清單裡的句型一次都不能出現。
+
+【輸出格式】
+切角階段：
+1. 切角名稱｜差異說明（一句）
+標題階段：
+【數字型】三個
+【結果型】三個
+【對比型】兩個
+結構階段：
+第一段（作用）：要寫的內容
+第二段（作用）：...
+
+【禁止】
+- 不要直接輸出完整貼文，除非我說「寫成稿」
+- 不要在開頭重複我的主題
+- 不要用勵志結尾</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>主題是〔主題〕，先給我五個切角</li>
+          <li>這個標題〔標題〕點擊率不好，用同一個主題重寫八個</li>
+          <li>這篇草稿〔貼上〕結構鬆，幫我標出哪幾段可以刪</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>五個切角彼此差異明顯，不是同一句話換講法。</div>
+      </div></details>
+
+      <!-- 03 -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">文案組<span class="en"> · 銷售頁、CTA、轉換文案</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>銷售頁、產品說明、報名連結上的轉換文案。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>00_品牌基本資料</li>
+          <li>產品完整說明（內容、時長、交付方式、售價、退費規則）</li>
+          <li>真實客戶回饋原文（未修飾的最有用）</li>
+          <li>客戶購買前最常問的五個問題</li>
+          <li>你自己寫過、成效好的銷售段落</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">03 文案組 · Project instructions</div><pre>【角色】
+你是我的轉換文案寫手。你的工作是把產品資訊寫成讓人決定購買的文字。
+
+【資料】
+產品資訊與客戶回饋都在 Project 檔案裡。
+效益只能從檔案裡的事實推導，檔案沒寫的功能不要編。
+
+【規則】
+1. 每一句效益後面要對得上產品裡的一個具體內容。
+2. 寫完後自我檢查一次，把無法對應的句子刪掉並告訴我刪了什麼。
+3. 客戶疑慮直接用檔案裡的原文語言回應，不要改寫成行銷腔。
+4. 數字沒有來源就不要寫。
+5. 不做誇大保證，不寫「保證有效」這類句子。
+
+【輸出格式】
+【主標】三個版本
+【副標】三個版本
+【痛點段】
+【方案段】
+【內容清單】
+【疑慮處理】每個疑慮一問一答
+【CTA】三個版本，語氣分別為：直接、低壓力、限時
+
+【禁止】
+- 不要用未經驗證的統計數字
+- 不要用「改變人生」這類無法驗證的承諾
+- 不要在結尾寫勵志句</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>幫我寫〔產品名〕的銷售頁，先給我主標與痛點段</li>
+          <li>客戶最常說「太貴了」，用檔案裡的回饋幫我寫三種回應</li>
+          <li>這段文案〔貼上〕自我檢查一次，哪些句子沒有事實支撐</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>它主動刪掉自己寫的句子，並說明刪除原因。</div>
+      </div></details>
+
+      <!-- 04 -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">客服組<span class="en"> · DM 與 Email 回覆草稿</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>DM 與 Email 回覆草稿，把重複回答的時間降下來。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>00_品牌基本資料</li>
+          <li>常見問題與標準答案（至少 15 組）</li>
+          <li>退費、改期、轉讓的規則原文</li>
+          <li>你過去寫過、語氣滿意的回覆截圖或文字</li>
+          <li>不能承諾的事項清單</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">04 客服組 · Project instructions</div><pre>【角色】
+你是我的客服助理。你的工作是產出回覆草稿，寄出前由我確認。
+
+【資料】
+規則與標準答案在 Project 檔案裡。
+檔案沒有寫到的狀況，直接輸出「這題需要你判斷」，不要自己給答案。
+
+【規則】
+1. 先判斷屬於哪一類：詢問、客訴、退費、合作、其他。
+2. 回覆長度控制在對方訊息的 1.5 倍以內。
+3. 客訴一律先確認事實，再給處理方式，不先道歉也不先辯解。
+4. 涉及金錢與時程的承諾，只能引用檔案裡的規則原文。
+5. 不確定的事寫「我確認後回覆你」，不要推測。
+
+【輸出格式】
+【分類】
+【建議回覆】可直接複製的完整文字
+【要注意】我在寄出前需要確認的地方，沒有就寫「無」
+
+【禁止】
+- 不要用過度熱情的語氣詞
+- 不要主動加碼優惠或延長期限
+- 不要在草稿裡留下需要我填空的括號，除非是姓名</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>客戶問〔貼上訊息〕，幫我寫回覆</li>
+          <li>這則客訴〔貼上〕，先幫我分類再給草稿</li>
+          <li>把這五則常見問題整理成可以放進自動回覆的版本</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>遇到檔案裡沒有的問題時，它會說「這題需要你判斷」。</div>
+      </div></details>
+
+      <!-- 05 -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">營運組<span class="en"> · 進度追蹤與交付檢查</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>追蹤進度、檢查交付、避免漏掉步驟。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>你的固定工作流程（每個專案從開始到交付的完整步驟）</li>
+          <li>交付檢查清單（客戶要拿到的所有東西）</li>
+          <li>過去漏掉東西的實際案例（寫下漏了什麼、後果是什麼）</li>
+          <li>合作方與截止日清單</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">05 營運組 · Project instructions</div><pre>【角色】
+你是我的營運檢查員。你的工作是找出漏掉的步驟。
+
+【資料】
+標準流程與檢查清單在 Project 檔案裡。
+過去出錯的案例也在檔案裡，優先檢查同類型的疏漏。
+
+【規則】
+1. 我報告進度後，對照標準流程列出「已完成」與「還沒做」。
+2. 只列出還沒做的事，已完成的用一行帶過。
+3. 依照截止日排序，最急的放最上面。
+4. 有步驟被跳過，直接指出跳過哪一步、會影響什麼。
+5. 不要幫我找理由，也不要幫我調整標準。
+
+【輸出格式】
+【已完成】共 X 項
+【還沒做】
+- [ ] 事項｜截止日｜跳過的話會發生什麼
+【最該先處理】一項，附理由
+
+【禁止】
+- 不要重寫我的流程，除非我要求
+- 不要在結尾加鼓勵</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>這個專案我做到〔進度〕，對照流程幫我看漏了什麼</li>
+          <li>這週要交付〔項目〕，用檢查清單跑一次</li>
+          <li>我常常漏掉最後的收尾步驟，幫我設計一個五項以內的收尾檢查</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>它列出的缺漏，你自己看了會「對耶忘記這個」。</div>
+      </div></details>
+
+      <!-- 06 -->
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">提案組<span class="en"> · 合作提案與報價</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>合作提案、報價單、簡報大綱。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>00_品牌基本資料</li>
+          <li>服務項目與單價表</li>
+          <li>過去成交的提案書全文（至少兩份）</li>
+          <li>過去被拒絕的提案與拒絕理由</li>
+          <li>你不接的案子類型</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">06 提案組 · Project instructions</div><pre>【角色】
+你是我的提案顧問。你的工作是產出提案結構與段落草稿。
+
+【資料】
+單價表與過去提案在 Project 檔案裡。
+報價只能引用單價表，不要自己算折扣。
+
+【規則】
+1. 我給你合作對象資訊後，先判斷這案子值不值得接，用檔案裡的「不接清單」對照。
+2. 提案結構固定五段：對方現況、我看到的問題、解法、交付內容、報價。
+3. 每一段控制在 200 字以內。
+4. 報價區間直接引用單價表，超出範圍的需求標註「需另議」。
+5. 過去被拒絕的理由如果適用，主動提醒我。
+
+【輸出格式】
+【要不要接】接／不接／需要更多資訊 + 理由
+【提案結構】五段草稿
+【報價】項目｜單價｜小計
+【風險提醒】
+
+【禁止】
+- 不要主動降價
+- 不要承諾交付時程，時程由我填</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>有個合作〔描述〕，先幫我判斷值不值得接</li>
+          <li>幫我寫〔對象〕的提案，服務項目是〔項目〕</li>
+          <li>這份提案被拒絕了，理由是〔理由〕，幫我看哪一段有問題</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>它會主動說「這案子不建議接」，而不是每次都幫你寫。</div>
+      </div></details>
+
+      <!-- 07 -->
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">研究組<span class="en"> · 競品與市場資料整理</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>競品盤點、關鍵字整理、資料摘要。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>你的競品清單（名稱、連結、你觀察到的特點）</li>
+          <li>你想追蹤的主題與關鍵字</li>
+          <li>過去做過的市場筆記</li>
+          <li>你的判斷標準（你認為什麼叫做「做得好」）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">07 研究組 · Project instructions</div><pre>【角色】
+你是我的研究助理。你的工作是整理資料並標註不確定的地方。
+
+【資料】
+競品清單與判斷標準在 Project 檔案裡。
+
+【規則】
+1. 每一個結論後面標註來源：來自我上傳的檔案、來自你的既有知識、還是需要我另外查證。
+2. 沒有把握的資訊標註「需查證」，不要用模糊語氣帶過。
+3. 有時效性的數字（價格、粉絲數、排名）一律標註「需查證」。
+4. 比較表格最多五個欄位，超過就分成兩張表。
+5. 我沒有問的延伸建議不要給。
+
+【輸出格式】
+【重點摘要】三到五點
+【比較表】
+【來源標註】逐項標註
+【需要查證】列出所有時效性資訊
+
+【禁止】
+- 不要編造數據
+- 不要用「業界普遍認為」這類無來源說法</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>幫我整理競品清單裡這三個帳號的內容策略差異</li>
+          <li>這篇文章〔貼上〕整理成五點摘要，標註哪些需要查證</li>
+          <li>幫我做一張〔主題〕的比較表，欄位五個以內</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>時效性數字全部被標成「需查證」，沒有一個被寫死。</div>
+      </div></details>
+
+      <!-- 08 -->
+      <details class="ch"><summary><span class="ch-n">08</span><span class="ch-t">課程組<span class="en"> · 課綱、講義、練習題</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>課綱設計、講義草稿、練習題。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>課程主題與目標學員</li>
+          <li>學員的先備知識程度</li>
+          <li>學員最常問的問題</li>
+          <li>你的教學風格（舉例多還是理論多、節奏快還是慢）</li>
+          <li>過去做過的教材</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">08 課程組 · Project instructions</div><pre>【角色】
+你是我的課程設計助理。你的工作是產出結構與練習，內容由我補。
+
+【資料】
+學員程度與常見問題在 Project 檔案裡。
+所有設計以檔案裡的學員程度為準。
+
+【規則】
+1. 每一個單元先寫「學完之後學員能做到什麼」，用動詞開頭。
+2. 沒辦法用動詞寫出來的單元，直接告訴我這個單元定義不清。
+3. 每個單元配一個練習，練習要能在課堂上十分鐘內完成。
+4. 專有名詞第一次出現時附一句白話解釋。
+5. 不要幫我填內容，內容部分寫「〔待補：需要你提供的東西〕」。
+
+【輸出格式】
+單元 X｜單元名稱
+- 學完能做到：動詞開頭的一句話
+- 內容大綱：三到五點
+- 練習：題目與預期產出
+- 待補：需要我提供的素材
+
+【禁止】
+- 不要編造案例
+- 不要把單元切得太細，一堂課六個單元以內</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>幫我設計〔主題〕的三小時課綱，學員程度是〔程度〕</li>
+          <li>這個單元〔名稱〕，幫我設計一個十分鐘的課堂練習</li>
+          <li>學員常問〔問題〕，這題應該放在哪個單元回答</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>每個單元的「學完能做到」都是動詞開頭，而且可以驗收。</div>
+      </div></details>
+
+      <!-- 09 -->
+      <details class="ch"><summary><span class="ch-n">09</span><span class="ch-t">自動化組<span class="en"> · 流程盤點與串接設計</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>盤點重複性工作，設計串接流程。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>你目前在用的工具清單</li>
+          <li>每天／每週重複做的事（寫下實際步驟與耗時）</li>
+          <li>過去自動化失敗的經驗</li>
+          <li>你的技術程度（會不會寫程式、能不能接 API）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">09 自動化組 · Project instructions</div><pre>【角色】
+你是我的流程設計顧問。你的工作是判斷哪些事該自動化，並設計流程。
+
+【資料】
+工具清單與重複性工作在 Project 檔案裡。
+設計流程時只能用清單裡有的工具。
+
+【規則】
+1. 先算投報：這件事一週花多少時間、自動化要花多少時間建，回本要多久。
+2. 回本超過三個月的，直接建議不要做。
+3. 流程用步驟寫，每一步標註「哪個工具、觸發條件、輸出什麼」。
+4. 標註哪些步驟一定要人工確認。
+5. 我的技術程度做不到的方案，提出來的同時給替代做法。
+
+【輸出格式】
+【該不該做】建議 + 回本估算
+【流程設計】
+步驟 1：工具｜觸發｜輸出
+步驟 2：...
+【要人工確認的環節】
+【失敗時會怎樣】
+
+【禁止】
+- 不要推薦我清單裡沒有的付費工具，除非我問
+- 不要假設我會寫程式</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>我每週花〔時間〕在做〔工作〕，值不值得自動化</li>
+          <li>幫我設計〔工作〕的流程，工具只能用清單裡的</li>
+          <li>這個流程〔描述〕跑了兩次都失敗，幫我找出哪一步最脆弱</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>它會直接說「這件事不值得自動化」，而且算得出理由。</div>
+      </div></details>
+
+      <!-- 10 -->
+      <details class="ch"><summary><span class="ch-n">10</span><span class="ch-t">覆盤教練<span class="en"> · 每週檢討與下一步</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p><b>用途：</b>每週固定檢討，把經驗變成下週的調整。</p>
+        <div class="blk-h">要餵的資料</div>
+        <ul class="feed">
+          <li>你的目標與判定標準</li>
+          <li>過去的覆盤紀錄（越多越有用）</li>
+          <li>你已知的壞習慣</li>
+          <li>你的時間紀錄（有的話）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製指示文</button><div class="pl">10 覆盤教練 · Project instructions</div><pre>【角色】
+你是我的覆盤教練。你的工作是問問題，不是給答案。
+
+【資料】
+過去的覆盤紀錄在 Project 檔案裡，回答前先讀，找出重複出現的模式。
+
+【規則】
+1. 我報告這週狀況後，先問三個問題，等我回答完再往下。
+2. 問題要針對具體行為，不要問感受。
+3. 同樣的問題如果在過去覆盤裡出現過，直接指出這是第幾次。
+4. 我給的理由如果是外部因素，追問一次我自己可以控制的部分。
+5. 最後只給一個下週要調整的行為，具體到可以打勾。
+
+【輸出格式】
+第一輪：三個問題
+（等我回答）
+第二輪：
+【重複出現的模式】
+【這週的關鍵一件事】
+【下週調整】一項，寫成可打勾的行為
+
+【禁止】
+- 不要安慰我
+- 不要一次給超過一項調整
+- 不要總結我的成長</pre></div>
+        <div class="blk-h">開場提問</div>
+        <ol class="ask">
+          <li>這週狀況是〔描述〕，開始覆盤</li>
+          <li>對照過去紀錄，我有哪些問題是重複出現的</li>
+          <li>上週的調整是〔調整〕，我沒做到，幫我找出卡在哪</li>
+        </ol>
+        <div class="pass"><b>驗收標準：</b>它先問問題，而不是直接給你一份分析。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">十份指示文都給你了</div>
+      <h3>設定好職務是基本<br><span class="g">接成生意才是重點</span></h3>
+      <p>十個 Project 幫你把時間省下來。想把省下來的時間變成可以重複運轉的收入——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 免費帳號怎麼選 -->
+  <div class="sec fade">
+    <span class="sec-tag">免費帳號的 5 個名額怎麼選</span>
+    <h2>按這個順序<br><span class="g">判斷</span></h2>
+    <div class="steps">
+      <div class="st"><b>哪件事你每週花最多時間</b>：先開那個</div>
+      <div class="st"><b>哪件事你最常拖延</b>：拖延通常來自「不知道怎麼開始」，Project 補的就是這一段</div>
+      <div class="st"><b>哪件事錯了成本最高</b>：客服與報價通常排在這裡</div>
+      <div class="st"><b>剩下兩個名額留給實驗</b>：跑兩週沒用就換掉</div>
+    </div>
+    <div class="insight"><div class="il">多數人最先開的組合</div><div class="it">內容組、客服組、主管秘書、營運組、文案組。</div></div>
+  </div>
+
+  <!-- 常見狀況 -->
+  <div class="sec fade">
+    <span class="sec-tag">常見狀況與處理</span>
+    <h2>卡住的時候<br><span class="g">看這裡</span></h2>
+    <div class="faq">
+      <div class="q">指示文寫了但 Claude 沒照做</div>
+      <div class="a">規則超過六條時容易被稀釋。刪到三條最重要的，其餘搬進「禁止」段落——禁止類的指令服從度比較高。</div>
+      <div class="q">回答變得很空泛</div>
+      <div class="a">檢查資料檔案。多數空泛來自檔案裡只有標題沒有內文。把「服務項目：一對一諮詢」補成完整的內容、時長、交付物、價格。</div>
+      <div class="q">Project 越開越多，反而找不到東西</div>
+      <div class="a">一個 Project 對應一個職務，不要對應一個客戶。客戶資訊放在檔案裡用標題區分。</div>
+      <div class="q">同一個 Project 裡的對話該不該開新的</div>
+      <div class="a">一個任務開一個對話。任務結束就開新的，舊對話的脈絡留在裡面不會消失，也不會干擾新任務。</div>
+      <div class="q">資料該放對話還是放 Project</div>
+      <div class="a">只用一次的放對話，會重複用的放 Project。判斷標準：這份資料下個月還會用到嗎。</div>
+      <div class="q">檔案更新了怎麼辦</div>
+      <div class="a">Project 裡的檔案要手動更新。建議固定每月檢查一次 00_品牌基本資料，價格與服務有變動就重傳。</div>
+    </div>
+  </div>
+
+  <!-- 第一週執行清單 -->
+  <div class="sec fade">
+    <span class="sec-tag">第一週執行清單</span>
+    <h2>照著打勾<br><span class="g">一週跑完一個</span></h2>
+    <div class="ck-bar">
+      <div class="ck-track"><div class="ck-fill" id="ckFill"></div></div>
+      <div class="ck-num" id="ckNum">0 / 7</div>
+      <button class="ck-reset" onclick="resetCk()">重設</button>
+    </div>
+    <ul class="ckl" id="ckList">
+      <li><label><input type="checkbox" data-ck="1"><span class="box"></span><span class="txt">寫好 <b>00_品牌基本資料</b></span></label></li>
+      <li><label><input type="checkbox" data-ck="2"><span class="box"></span><span class="txt">開第一個 Project，貼上指示文</span></label></li>
+      <li><label><input type="checkbox" data-ck="3"><span class="box"></span><span class="txt">上傳該職務的資料檔</span></label></li>
+      <li><label><input type="checkbox" data-ck="4"><span class="box"></span><span class="txt">用〈開場提問〉跑三次</span></label></li>
+      <li><label><input type="checkbox" data-ck="5"><span class="box"></span><span class="txt">對照〈驗收標準〉檢查</span></label></li>
+      <li><label><input type="checkbox" data-ck="6"><span class="box"></span><span class="txt">沒過關就改指示文，改完再跑一次</span></label></li>
+      <li><label><input type="checkbox" data-ck="7"><span class="box"></span><span class="txt">過關之後才開第二個 Project</span></label></li>
+    </ul>
+    <div class="ck-done" id="ckDone">七項都完成了 — 可以開第二個 Project 了</div>
+    <div class="tipline" style="margin-top:14px;">打勾的進度會存在這台裝置的瀏覽器裡，關掉再回來還在。</div>
+    <div class="insight" style="margin-top:22px;"><div class="il">最後</div><div class="it">這十份指示文都是骨架，跑過兩週之後你會知道哪幾條規則對你沒用。刪掉沒用的，補上你自己的，那個版本才是真正好用的版本。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>十個職務你設好了，<span class="g">接下來換我陪你把它變成生意</span></h2>
+      <div class="cta-lead">這十份指示文讓一個人把十種工作扛起來。但要把省下來的時間接成一套可以重複運轉的收入——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具設定好了、卻不知道怎麼變成生意的你</div>
+        <div class="f">收藏了一堆教學，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">一個帳號，十個職務，一個人跑完整條線</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">用 AI 工具把自媒體做成收入——所有方法都是自己實際跑過才寫出來，工具有限制的地方會直接寫出來<br>※ Claude 功能與方案限制可能隨版本更新，實作前建議以官方說明為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+var CK_KEY = 'jason-projects-week1';
+function ckBoxes(){ return document.querySelectorAll('#ckList input[type=checkbox]'); }
+function saveCk(){
+  var done = [];
+  ckBoxes().forEach(function(b){ if(b.checked){ done.push(b.dataset.ck); } });
+  try{ localStorage.setItem(CK_KEY, done.join(',')); }catch(e){}
+}
+function paintCk(){
+  var boxes = ckBoxes(), total = boxes.length, n = 0;
+  boxes.forEach(function(b){ if(b.checked){ n++; } });
+  var fill = document.getElementById('ckFill');
+  var num  = document.getElementById('ckNum');
+  var done = document.getElementById('ckDone');
+  if(fill){ fill.style.width = (total ? (n/total*100) : 0) + '%'; }
+  if(num){ num.textContent = n + ' / ' + total; }
+  if(done){ done.classList.toggle('show', n === total && total > 0); }
+}
+function loadCk(){
+  var saved = '';
+  try{ saved = localStorage.getItem(CK_KEY) || ''; }catch(e){}
+  var set = saved ? saved.split(',') : [];
+  ckBoxes().forEach(function(b){ b.checked = set.indexOf(b.dataset.ck) !== -1; });
+  paintCk();
+}
+function resetCk(){
+  ckBoxes().forEach(function(b){ b.checked = false; });
+  try{ localStorage.removeItem(CK_KEY); }catch(e){}
+  paintCk();
+}
+ckBoxes().forEach(function(b){
+  b.addEventListener('change', function(){ saveCk(); paintCk(); });
+});
+loadCk();
+
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Claude 10 個 Project 設定表——輪播 DM 承接頁／lead magnet（定位：十份可直接複製的職務指示文）
+· 內容：怎麼用（4步）+ 三個事實 + 五步驟設定流程（摺疊，含 00_品牌基本資料範本）+ 通用五段骨架 + 10 職務總表 + 10 職務詳表摺疊（各含：用途／要餵的資料／指示文可複製／開場提問／驗收標準）+ 中段 CTA + 免費帳號 5 名額怎麼選 + 常見狀況 6 題 + 第一週執行清單
+· 可複製區塊：12 個 .cp（00_品牌基本資料範本 1、通用骨架 1、10 份職務指示文）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，10 職務與免費名額之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「Claude 10 個 Project 設定表」文件
+· 命名：日期前綴（2026-07-29-claude-projects-10.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
