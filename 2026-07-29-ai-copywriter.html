@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓 AI 寫出不像 AI 的文案｜三題訪談清單 × 四道故事測試</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:35px;line-height:1.38;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+/* 三題卡 */
+.qcard{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-lg);padding:22px 22px 20px;margin-bottom:16px;}
+.qcard .qh{display:flex;align-items:center;gap:11px;margin-bottom:14px;}
+.qcard .qn{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--gold);color:#1a1406;font-family:"Inter";font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.qcard .qt{font-family:var(--serif);font-weight:900;font-size:19px;color:#2a2620;}
+.qcard .qt .en{font-family:var(--mono);font-weight:500;font-size:12px;color:var(--dim);margin-left:5px;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:15px 0 6px;}
+.qcard p{font-size:14px;line-height:1.8;color:var(--text);margin:0 0 4px;}
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+.qask{margin:6px 0 2px;}
+.qask li{list-style:none;position:relative;padding-left:19px;font-size:13.6px;line-height:1.72;color:var(--text);margin-bottom:6px;}
+.qask li::before{content:"\203A";position:absolute;left:3px;color:var(--gold);font-weight:700;font-size:15px;top:-1px;}
+.pass{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin-top:13px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pass b{color:var(--gold);}
+
+/* 四道測試 */
+.tests{display:flex;flex-direction:column;gap:10px;margin:14px 0 4px;}
+.test{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:15px 17px;}
+.test .tn{flex-shrink:0;font-family:"Inter";font-weight:800;font-size:13px;color:var(--gold);background:rgba(212,144,42,0.13);border:1px solid var(--gold-dim);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.test .tq{font-size:14.5px;line-height:1.6;color:var(--text);font-weight:500;}
+
+/* 三條規則 */
+.rule{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:17px 19px;margin-bottom:12px;}
+.rule .rh{font-family:var(--serif);font-weight:900;font-size:16.5px;color:#2a2620;margin-bottom:9px;}
+.rule .rh .rn{color:var(--gold);}
+.rule p{font-size:14px;line-height:1.8;color:var(--text);margin:0 0 6px;}
+.rule ol{margin:8px 0 2px;padding-left:0;counter-reset:rr;}
+.rule ol li{list-style:none;position:relative;padding-left:24px;font-size:13.8px;line-height:1.75;color:var(--text);margin-bottom:8px;}
+.rule ol li::before{counter-increment:rr;content:counter(rr);position:absolute;left:0;top:2px;width:17px;height:17px;border-radius:50%;background:rgba(212,144,42,0.16);border:1px solid var(--gold-dim);color:var(--gold);font-family:"Inter";font-weight:800;font-size:10px;display:flex;align-items:center;justify-content:center;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.words{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;}
+.words span{font-size:13px;color:var(--no);background:var(--no-bg);border:1px solid var(--no-line);border-radius:50px;padding:4px 13px;text-decoration:line-through;text-decoration-color:rgba(177,67,31,0.4);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+/* 主打模板 */
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:27px;}
+  .sec h2{font-size:21px;}
+  .qcard .qt{font-size:17px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>拿到模板之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>文案寫得好<br><span class="g">還要賣得動</span></h4>
+  <p>這套方法讓 AI 寫得不像 AI。怎麼把內容做成收入——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">AI COPYWRITER · 拆解與中文化</div>
+    <h1>讓 AI 寫出<br><span class="g">不像 AI 的文案</span></h1>
+    <div class="hero-sub">三題訪談清單 × 四道故事測試 × 三條交付規則。<br>從一個 GitHub 開源專案裡拆出來的方法，全部翻成中文，附一份可以直接複製貼進任何 AI 對話框的訪談模板。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">3</div><div class="l">題 · 訪談清單</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">道 · 故事測試</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">1</div><div class="l">份 · 可複製模板</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」。每天在做的事情很單純：把新出現的 AI 工具實際跑過一遍，留下真的能用的，把不能用的講清楚為什麼不能用。</div></div>
+  </div>
+
+  <!-- 這份文件在講什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件在講什麼</span>
+    <h2>它不會馬上動筆<br><span class="g">會先反問你三個問題</span></h2>
+    <p>GitHub 上有一個叫 <span class="hl">ai-copywriter</span> 的 Claude Skill，作者是 Mickey Haslavsky。它的行為跟一般 AI 文案工具很不一樣：你叫它寫文案，它不會馬上動筆，會先反問你三個問題，<span class="hl">而且答案不夠具體它會繼續追問</span>。</p>
+    <p>它的底層沿用了 blader/humanizer 那套「AI 寫作特徵偵測」，把維基百科 WikiProject AI Cleanup 整理的 <i>Signs of AI writing</i> 收斂成 33 種可偵測、可修正的模式。它加的是反過來的那一半：<span class="hl">生成的當下就不踩那 33 個雷</span>，省掉寫完再洗一次的步驟。</p>
+    <div class="tipline">授權 MIT，開源免費。整包工具就是一份 Markdown 檔（SKILL.md，約 8,000 tokens），<b>沒有程式碼、沒有任何依賴套件</b>。</div>
+    <div class="insight"><div class="il">先講清楚</div><div class="it">這份文件的價值不在於叫你去裝它。底下整理的三題訪談、四道測試、三條交付規則，你複製到任何一個 AI 對話框裡都能用。裝不裝是另一回事。</div></div>
+  </div>
+
+  <!-- Part 1 三題訪談 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 三題訪談清單</span>
+    <h2>動筆前<br><span class="g">一定要拿到的三件事</span></h2>
+    <p>三題一次問完，<span class="hl">不要一題一題慢慢磨</span>。</p>
+
+    <div class="qcard">
+      <div class="qh"><span class="qn">1</span><span class="qt">受眾<span class="en">ICP</span></span></div>
+      <div class="blk-h">問什麼</div>
+      <p>這篇文案是寫給誰看的。職位、處境、他已經試過什麼方法、<b>他半夜十一點會在搜尋框打進去的那句話</b>。</p>
+      <div class="judge no"><span class="jl">✕ 這種答案不算數</span>「創辦人」不算。「20 到 35 歲的女性」不算。這些是人口統計欄位，裡面沒有一個活人。</div>
+      <div class="judge ok"><span class="jl">✓ 這種才算數</span>「一個種子輪創辦人，自己在做陌生開發，已經不太敢打開自己的後台數據。」</div>
+      <div class="blk-h">答案太籠統時直接丟這三句</div>
+      <ul class="qask">
+        <li>他們會用什麼字抱怨？講他們自己會用的原話。</li>
+        <li>他們已經試過什麼、失敗了？</li>
+        <li>這個東西不適合誰？</li>
+      </ul>
+      <div class="pass"><b>過關標準：</b>你能一字不差地寫出他半夜會打的那句搜尋。寫不出來，就是還不夠了解他。</div>
+    </div>
+
+    <div class="qcard">
+      <div class="qh"><span class="qn">2</span><span class="qt">類別<span class="en">Category</span></span></div>
+      <div class="blk-h">問什麼</div>
+      <p>讀者會把你放在哪個貨架上。「一套 CRM」「一個筆記軟體」「一份講定價的電子報」。</p>
+      <div class="blk-h">為什麼這題重要</div>
+      <p>貨架決定你跟誰比、哪些承諾是基本盤、哪些承諾會讓人挑眉。<b>同一句話放在不同貨架上，強度完全不同。</b></p>
+      <div class="blk-h">遇到「我們是全新的類別」怎麼辦</div>
+      <p>問他：讀者第一眼會把你誤認成什麼？<b>那個誤認的東西就是貨架。</b></p>
+      <div class="blk-h">追問句</div>
+      <ul class="qask">
+        <li>讀者會把你誤認成什麼？</li>
+        <li>你的競品全部都在承諾什麼？</li>
+        <li>有什麼宣稱是整個類別裡沒人敢講的？</li>
+      </ul>
+      <div class="pass"><b>過關標準：</b>你說得出這個類別裡哪些是基本盤、哪些會讓人挑眉。說不出來就繼續問。</div>
+    </div>
+
+    <div class="qcard">
+      <div class="qh"><span class="qn">3</span><span class="qt">故事<span class="en">Story</span></span></div>
+      <div class="blk-h">問什麼</div>
+      <p>文案背後真實發生的那一刻。發生了什麼、代價是什麼、後來變成怎樣，<b>帶真實數字、真實對話</b>。</p>
+      <div class="blk-h">為什麼這題最卡</div>
+      <p>前兩題是資訊，這題是原料。<b>只有你有，AI 生不出來。</b>整套「不編造事實」的規則保護的就是這一塊。</p>
+      <div class="pass"><b>過關標準：</b>往下看 Part 2 的四道測試。</div>
+    </div>
+  </div>
+
+  <!-- Part 2 四道測試 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · 四道故事測試</span>
+    <h2>拿到故事之後<br><span class="g">先過這四題</span></h2>
+    <div class="tests">
+      <div class="test"><span class="tn">01</span><span class="tq">裡面有沒有一個讓人意外的數字？</span></div>
+      <div class="test"><span class="tn">02</span><span class="tq">有沒有一個差點失敗的時刻？</span></div>
+      <div class="test"><span class="tn">03</span><span class="tq">有沒有一件你原本相信、後來發現是錯的事？</span></div>
+      <div class="test"><span class="tn">04</span><span class="tq">沒人問你，你會不會主動在飯桌上講這件事？</span></div>
+    </div>
+    <div class="warn"><b>四題全掛怎麼辦：</b>繼續挖，不要動筆。用弱故事寫出來的文案，後面再厲害的技巧都救不回來。</div>
+    <div class="sub-h">挖故事的四個追問</div>
+    <ul class="qask">
+      <li>整件事裡，最讓你意外的是什麼？</li>
+      <li>在它成功之前，你付出了什麼代價？</li>
+      <li>你刪掉了什麼、回頭撤銷了什麼、後悔了什麼？</li>
+      <li>客戶對這件事的原話是怎麼講的？</li>
+    </ul>
+    <div class="insight"><div class="il">一條原則</div><div class="it">無聊但真實，永遠贏過有趣但編造。這個挖掘迴圈之所以存在，是因為幾乎每次都找得到一個既真實又有趣的版本，只是要挖。</div></div>
+  </div>
+
+  <!-- Part 3 三條規則 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 3 · 三條交付規則</span>
+    <h2>拿去檢查<br><span class="g">任何 AI 給你的稿子</span></h2>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">規則一</span>　理由只能是讀者的感受</div>
+      <p>它給你版本的時候要說明為什麼選這一版。理由只能扣回讀者當下的心情。</p>
+      <div class="judge ok"><span class="jl">✓ 算理由</span>「她現在正在慌，這一版是唯一第一句就給解法的。」</div>
+      <div class="judge no"><span class="jl">✕ 不算理由</span>「這句比較有力。」「這版讀起來比較順。」</div>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">規則二</span>　不編造產品事實</div>
+      <p>文案裡出現的任何好處、數字、功能，都必須來自你或你給的素材。缺數字的時候它會回頭問你，或者寫一個沒有數字的版本，<b>不會自己生一個</b>。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">規則三</span>　三道自我審查</div>
+      <p>每一句交出去之前過這三題，任何一題不過就砍掉重寫，<b>不要加字去補</b>：</p>
+      <ol>
+        <li>說出讀者看到這句話當下的感受。這句話有接住那個感受，還是講到旁邊去了？</li>
+        <li>讀者看完一次之後，能不能用自己的話把這個承諾複述出來？</li>
+        <li>這句話單獨放在一面看板上還站得住嗎，還是只有跟其他版本擺在一起才顯得好？</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">方法講完了</div>
+      <h3>寫得不像 AI 是基本<br><span class="g">賣得動才是重點</span></h3>
+      <p>這套訪談讓文案有料。想把內容接成一條會賺錢的產線——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 4 中文但書 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 4 · 給中文使用者的但書</span>
+    <h2>這是最需要<br><span class="g">你花時間看的一段</span></h2>
+    <div class="warn"><b>那 33 條，大部分是英文寫作的病徵。</b>包括 em dash 濫用、標題用 Title Case、避免使用 is/are、特定英文濫用詞、被動語態、彎引號、否定平行結構。這些是<b>英文</b> AI 文本的指紋——直接搬到中文貼文上會失準，你會刪掉一堆其實沒問題的句子。</div>
+    <div class="sub-h">能跨語言搬走的部分</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>可以直接用</th><th>原因</th></tr></thead><tbody>
+      <tr><td>三題訪談</td><td>跟語言無關，是流程</td></tr>
+      <tr><td>四道故事測試</td><td>跟語言無關，是判準</td></tr>
+      <tr><td>三條交付規則</td><td>跟語言無關，是紀律</td></tr>
+      <tr><td>不編造事實</td><td>跟語言無關</td></tr>
+      <tr><td>標題禁用詞邏輯</td><td>概念可搬，字詞要自己換成中文版</td></tr>
+      <tr><td>具體優於抽象</td><td>概念可搬</td></tr>
+    </tbody></table></div>
+    <div class="sub-h">中文版的標題禁用詞</div>
+    <p style="font-size:14px;">照它的邏輯換過一輪，供參考：</p>
+    <div class="words">
+      <span>終極</span><span>顛覆</span><span>革命性</span><span>賦能</span><span>必看</span><span>揭密</span><span>你絕對想不到</span><span>一招搞定</span><span>直接封神</span><span>值得收藏的 N 個</span>
+    </div>
+    <div class="tipline">判準是原文那句：<b>讀者的過濾器看到這些字會直接刪掉，而且它們本身就是 AI 味的來源。</b></div>
+  </div>
+
+  <!-- Part 6 模板（提前，因為最有價值） -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · 直接複製的中文訪談模板</span>
+    <h2>不想裝任何東西<br><span class="g">貼這一段就好</span></h2>
+    <p>把下面這段整個貼進任何一個 AI 對話框，<span class="hl">效果七成以上</span>。</p>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份模板</button><div class="pl">中文訪談模板 · 貼進任何 AI 對話框</div><pre>你是一個文案寫手。在我給你完整資訊之前，不要寫任何一句文案。
+
+【第一步】先問我這三件事，一次問完：
+
+1. 受眾：這篇是寫給誰看的？我要具體到能寫出他半夜十一點
+   會在搜尋框打進去的那句話。如果我回答得太籠統，
+   追問我：他們會用什麼字抱怨？他們試過什麼失敗了？
+   這東西不適合誰？
+
+2. 類別：讀者會把這個東西放在哪個貨架上？
+   如果我說「我們是全新的類別」，追問我：
+   讀者第一眼會把它誤認成什麼？
+
+3. 故事：這篇文案背後真實發生的那一刻是什麼？
+   要有真實數字、真實對話。
+
+【第二步】拿到故事之後，先用這四題測它：
+   - 有沒有一個讓人意外的數字？
+   - 有沒有一個差點失敗的時刻？
+   - 有沒有一件我原本相信、後來發現是錯的事？
+   - 沒人問我，我會不會主動在飯桌上講這件事？
+
+   四題全掛的話，不要寫，繼續問我這四句：
+   最讓你意外的是什麼？成功前付出什麼代價？
+   你刪掉或後悔了什麼？客戶的原話怎麼講？
+
+【第三步】開始寫。規則：
+   - 給我 5 到 10 個版本，角度要不一樣
+   - 告訴我你選哪一個，理由只能是「讀者當下的感受」，
+     不接受「這句比較有力」這種答案
+   - 文案裡的所有數字和功能都要來自我提供的資訊，
+     缺什麼就回頭問我，不要自己生
+   - 禁用詞：終極、顛覆、革命性、賦能、必看、揭密、
+     你絕對想不到、一招搞定
+
+【第四步】交稿前每一句過這三題，不過就砍掉重寫：
+   - 讀者看到這句的當下是什麼感受？這句有接住嗎？
+   - 讀者看一次之後能用自己的話複述這個承諾嗎？
+   - 這句單獨放在一面看板上還站得住嗎？
+
+現在開始問我第一步的三個問題。</pre></div>
+  </div>
+
+  <!-- Part 5 安裝 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 6 · 安裝方式</span>
+    <h2>想裝原版<br><span class="g">六種方式</span></h2>
+    <p>版本 1.5.1，MIT 授權。</p>
+    <div class="warn">⚠️ LICENSE 檔案的著作權人掛的是 <b>Siqi Chen</b>（原 humanizer 作者），這點在引用時要注意。</div>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">方式一</span><span class="ch-t">Skills CLI<span class="en"> · 跨工具，最推薦</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">全域安裝</div><pre>npx skills add mikiarlo3/ai-copywriter --global</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">更新</div><pre>npx skills update ai-copywriter --global</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">裝進所有支援的 agent 環境</div><pre>npx skills add mikiarlo3/ai-copywriter --global --agent '*'</pre></div>
+        <div class="tipline">拿掉 <b>--global</b> 就是專案內安裝，可以 commit 進去跟協作者共用。裝完要開新的 session 或重新載入 skills。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">方式二</span><span class="ch-t">Claude Code Plugin</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">兩行安裝</div><pre>/plugin marketplace add mikiarlo3/ai-copywriter
+/plugin install ai-copywriter@ai-copywriter</pre></div>
+        <div class="tipline">呼叫方式：<b>/ai-copywriter:ai-copywriter</b></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">方式三</span><span class="ch-t">claude.ai<span class="en"> · 網頁與 App</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <ul class="qask">
+          <li>開一個新的 Project</li>
+          <li>把 SKILL.md 上傳到 Project 的知識庫</li>
+          <li>Project 指示欄位貼一行指令（見下）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Project 指示欄位</div><pre>Follow SKILL.md for all copywriting and humanizing requests.</pre></div>
+        <div class="tipline">單次對話的話，直接把檔案附在第一則訊息，配同一句話。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">方式四</span><span class="ch-t">ChatGPT</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>建一個 Custom GPT，把 SKILL.md 全文貼進 Instructions 欄位。之後每一次對話都會跑這套流程。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">單次使用時，貼完全文後加這句</div><pre>Follow these instructions for the rest of this conversation.</pre></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">方式五</span><span class="ch-t">Manus</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>Manus 原生支援 skill 格式，<span class="hl">不要用貼的，用安裝的</span>。Settings → Skills → 「+ Add」，貼 repo 網址從 GitHub 匯入，或下載 ZIP 上傳。裝完用 <b>/ai-copywriter</b> 呼叫。</p>
+        <div class="tipline">GitHub 匯入報錯的話<b>改用 ZIP，一定會過</b>。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">方式六</span><span class="ch-t">任何其他 LLM</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <p>SKILL.md 放進 system prompt（你控制得到的話），或放進第一則訊息。約 8,000 tokens，<span class="hl">現在的模型都塞得下</span>。</p>
+      </div></details>
+
+    </div>
+
+    <div class="sub-h">四種呼叫模式</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模式</th><th>觸發方式</th><th>它會給你什麼</th></tr></thead><tbody>
+      <tr><td>貼文字（預設）</td><td>直接貼一段文字給它</td><td>草稿 + 問題清單 + 最終版</td></tr>
+      <tr><td>寫文案</td><td>叫它寫標題、描述、微文案</td><td>多個版本 + 它的選擇與理由</td></tr>
+      <tr><td>檔案模式</td><td>指定一個檔案</td><td>直接改寫檔案內容，回報改了什麼</td></tr>
+      <tr><td>嵌入模式</td><td>被其他流程當作一個步驟呼叫</td><td>只給最終文字，沒有過程</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">語氣校準</div>
+    <p style="font-size:14px;">想讓它寫得像你，把你自己寫過的 2 到 3 段文字貼給它：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">語氣校準指令</div><pre>這是我自己寫的東西，請先分析我的語氣：
+<span class="ph">[貼你的文章]</span>
+
+現在用這個語氣，幫我寫：
+<span class="ph">[你的需求]</span></pre></div>
+    <div class="tipline">它會去抓你的句長節奏、用字習慣、段落開頭方式。<b>你的樣本優先權高於它自己的風格規則。</b></div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>卡最久的<br><span class="g">是第三題</span></h2>
+    <p>受眾和類別想一想就答得出來，<span class="hl">故事沒有就是沒有，AI 補不了</span>。</p>
+    <div class="insight"><div class="il">建議做法</div><div class="it">先花二十分鐘把三題的答案寫在一個檔案裡，之後每一次寫文案都直接貼給 AI，重複使用。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>方法你拿到了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這套訪談讓 AI 寫出有料、不像 AI 的文案。但要把文案接成一整條「內容 → 流量 → 收入」的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">寫得出東西、卻不知道怎麼變現的你</div>
+        <div class="f">收藏了一堆模板，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">無聊但真實，永遠贏過有趣但編造</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">每週拆一個真的跑過的工具或工作流——能用的講清楚怎麼用，不能用的講清楚為什麼<br>※ 內容整理自 GitHub 開源專案 mikiarlo3/ai-copywriter（MIT 授權）與其 SKILL.md，版本與指令可能更新，請以 repo 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：讓 AI 寫出不像 AI 的文案——輪播 DM 承接頁／lead magnet（定位：方法論拆解＋可直接用的中文訪談模板）
+· 來源脈絡：mikiarlo3/ai-copywriter（2026-07-24 建立，一週 875★，本 session 稍早由 GitHub 搜尋找出並回報給操盤手）
+· 內容：文件定位（不是叫你裝它）+ Part1 三題訪談（受眾／類別／故事，各含問什麼＋✕不算數／✓算數對照＋追問句＋過關標準）+ Part2 四道故事測試 + Part3 三條交付規則 + 中段 CTA + Part4 中文使用者但書（33 條多為英文病徵＋可跨語言對照表＋中文禁用詞）+ Part5 可複製中文訪談模板（主打）+ Part6 六種安裝方式（摺疊）＋四種呼叫模式＋語氣校準
+· 版型決策：
+  - Part1 三題用 .qcard，內含 .judge no／.judge ok 紅綠對照（原文「什麼答案不算數／算數」是最有教學價值的段落）
+  - 原文 Part 6 的中文模板實際價值最高，調到安裝方式之前，用 .hero-cp（金色雙框＋放大複製鈕）主打
+  - 中文禁用詞做成 .words 刪除線膠囊
+· 可複製區塊：8 個 .cp（主模板 1、Skills CLI 3、Claude Code 1、claude.ai 1、ChatGPT 1、語氣校準 1）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，Part3 與 Part4 之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）；新增紅綠對照色 --ok / --no
+· 來源：傑森所長自有「ai-copywriter-lead-magnet」文件
+· 命名：日期前綴（2026-07-29-ai-copywriter.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
