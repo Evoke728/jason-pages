@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 AI 工具汰換清單｜十個場景，十個現在最準的工具</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:35px;line-height:1.38;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .yes{color:var(--gold);font-weight:700;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row span{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--card2);border:1px solid var(--line);border-radius:50px;padding:3px 11px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.fitchip{display:flex;flex-direction:column;gap:8px;margin:8px 0 2px;}
+.fitchip .fy,.fitchip .fn{border-radius:10px;padding:9px 13px;font-size:13.3px;line-height:1.6;}
+.fitchip .fy{background:rgba(212,144,42,0.07);border:1px solid var(--gold-dim);color:var(--text);}
+.fitchip .fn{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.fitchip .fl{font-weight:700;font-size:11px;letter-spacing:0.04em;display:block;margin-bottom:3px;}
+.fitchip .fy .fl{color:var(--gold);}
+.fitchip .fn .fl{color:var(--no);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 80px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+
+/* 流程圖 */
+.flow{margin:16px 0 4px;}
+.flow .fnode{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:13px 16px;}
+.flow .fname{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--gold);min-width:132px;}
+.flow .fdo{font-size:13.5px;color:var(--text);line-height:1.6;}
+.flow .farrow{text-align:center;color:var(--gold-dim);font-size:16px;line-height:1;margin:5px 0;}
+
+.err{margin:6px 0;}
+.err .eq{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.err .eq::before{content:"\2717";color:var(--no);font-weight:800;margin-right:8px;}
+.err .ea{font-size:13.8px;color:var(--dim);line-height:1.8;}
+.err .ea b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:27px;}
+  .sec h2{font-size:21px;}
+  .flow .fnode{flex-direction:column;align-items:flex-start;gap:4px;}
+  .flow .fname{min-width:0;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>清單看完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>工具配對好了<br><span class="g">產線還沒接</span></h4>
+  <p>十個場景是零件。怎麼把它們串成一個人的內容產線——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">2026 · AI 工具汰換清單</div>
+    <h1>2026 AI<br><span class="g">工具汰換清單</span></h1>
+    <div class="hero-sub">十個場景，十個現在最準的工具，附操作方式與可複製 Prompt。<br>大多數人卡住的地方不是不知道有哪些 AI，是把所有任務都丟給同一個——一個模型同時負責寫文案、找資料、做圖、跑流程，結果每一項都是六十分。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">10</div><div class="l">個 · 場景與工具</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">套 · 組合工作流</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30</div><div class="l">天 · 導入節奏</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">主題是 AI × 自媒體變現。每天實際用 AI 做內容、做流程、做產品，把踩過的坑和跑得通的方法整理成可以直接套用的東西。這裡不做工具導覽，只放我自己在用、而且真的省下時間的做法。</div></div>
+  </div>
+
+  <!-- 這份清單怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份清單要怎麼用</span>
+    <h2>把任務拆開<br><span class="g">配對到各自最強的工具</span></h2>
+    <p>把任務拆開，配對到各自最強的工具，同樣的時間可以做出完全不同品質的東西。</p>
+    <div class="steps">
+      <div class="st">先看「十個場景對照表」，找出你每週花最多時間的兩個場景</div>
+      <div class="st">只換這兩個，先跑一週</div>
+      <div class="st">跑順了再往下加，<b>一次換十個工具的人通常兩週後全部退回 ChatGPT</b></div>
+    </div>
+    <div class="insight"><div class="il">心態設定</div><div class="it">工具會一直換。你要建立的是「拆解任務 → 配對工具」這個判斷力。判斷力不會過期，工具會。</div></div>
+  </div>
+
+  <!-- 十個場景對照表 -->
+  <div class="sec fade">
+    <span class="sec-tag">十個場景對照表</span>
+    <h2>先掃過一遍<br><span class="g">找出你最痛的兩個</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>#</th><th>場景</th><th>建議工具</th><th>免費方案</th></tr></thead><tbody>
+      <tr><td>1</td><td>寫作 / 長文 / 文案</td><td>Claude</td><td class="yes">有</td></tr>
+      <tr><td>2</td><td>圖片生成與修圖</td><td>Nano Banana 2</td><td class="yes">有</td></tr>
+      <tr><td>3</td><td>搜尋與研究</td><td>Perplexity</td><td class="yes">有</td></tr>
+      <tr><td>4</td><td>跑多步驟任務</td><td>Manus</td><td class="yes">有</td></tr>
+      <tr><td>5</td><td>做網站 / 做工具</td><td>Lovable</td><td class="yes">有</td></tr>
+      <tr><td>6</td><td>影片生成</td><td>Kling</td><td class="yes">有</td></tr>
+      <tr><td>7</td><td>瀏覽器操作</td><td>Comet</td><td class="yes">有</td></tr>
+      <tr><td>8</td><td>讀資料 / 整理筆記</td><td>NotebookLM</td><td class="yes">有</td></tr>
+      <tr><td>9</td><td>會議記錄</td><td>tl;dv</td><td class="yes">有</td></tr>
+      <tr><td>10</td><td>Google 生態整合</td><td>Gemini</td><td class="yes">有</td></tr>
+    </tbody></table></div>
+    <div class="tipline">各家方案內容與價格變動頻繁，下方每個工具都附了官方定價頁，<b>實際以官網為準</b>。</div>
+  </div>
+
+  <!-- 十個工具卡 -->
+  <div class="sec fade">
+    <span class="sec-tag">逐一拆解</span>
+    <h2>展開任一個<br><span class="g">看定位、場景、可複製 Prompt</span></h2>
+    <div class="acc">
+
+      <!-- 01 Claude -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">Claude<span class="en"> · 寫作</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>claude.ai</span><span>docs.claude.com</span><span>claude.com/pricing</span></div>
+        <div class="pos"><b>定位：</b>長文、結構化寫作、需要維持語氣一致的內容。Claude 在處理長篇脈絡與細緻語氣調整上表現穩定，適合拿來寫貼文、腳本、電子報、產品文案。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>一次餵三千字素材要求整理成結構化文章／給五篇範例模仿語氣／嚴格遵守很長的規則清單</div>
+          <div class="fn"><span class="fl">不適合</span>需要即時網路資訊的任務（改用 Perplexity）／大量重複的資料整理（試算表或腳本更快）</div>
+        </div>
+        <div class="blk-h">上手三步驟</div>
+        <div class="steps">
+          <div class="st">建立一個 Project，把品牌定位、目標受眾、語氣規則放進 Project Knowledge</div>
+          <div class="st">之後在這個 Project 裡對話，不用每次重貼背景</div>
+          <div class="st">常用任務寫成固定 Prompt 存起來，重複呼叫</div>
+        </div>
+        <div class="blk-h">可複製 Prompt · 語氣複製器</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">語氣複製器</div><pre>你的任務是分析我的寫作語氣，並用同樣的語氣寫新內容。
+
+【第一步：分析】
+我會貼上 3 到 5 篇我寫過的文章。請你分析並列出：
+1. 句子長度分布（短句多還是長句多）
+2. 標點使用習慣
+3. 常出現的詞彙與句型
+4. 段落節奏（幾句換一段）
+5. 開頭與結尾的處理方式
+6. 我明顯避開的表達方式
+
+【第二步：建立規則】
+根據分析結果，寫出一份「語氣規則書」，用可執行的指令描述，
+不要用「親切」「專業」這種抽象形容詞。
+例：「平均句長 15 到 25 字，每 2 到 3 句換行」。
+
+【第三步：等待指令】
+規則書輸出後停下來，等我給你新主題再開始寫。
+
+現在開始，以下是我的文章：
+<span class="ph">[貼上你的文章]</span></pre></div>
+        <div class="blk-h">可複製 Prompt · 長文結構化</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">長文結構化</div><pre>角色：資深內容編輯
+
+以下是我口述的內容逐字稿，內容雜亂、有重複、有口語贅字。
+
+任務：
+1. 先讀完全部，找出核心觀點（最多 3 個）
+2. 依照這 3 個觀點重組結構，刪掉重複段落
+3. 保留我原本的用字習慣，不要改成書面語
+4. 每個觀點下方保留原逐字稿中的具體例子與數字
+
+輸出格式：
+- 主標（15 字以內）
+- 三個小節，每節含小標 + 內文
+- 結尾一句收束，不要寫總結性的勵志句
+
+逐字稿如下：
+<span class="ph">[貼上逐字稿]</span></pre></div>
+      </div></details>
+
+      <!-- 02 Nano Banana -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">Nano Banana 2<span class="en"> · 圖片</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>gemini.google.com</span><span>ai.google.dev</span><span>aistudio.google.com</span></div>
+        <div class="pos"><b>定位：</b>Google 的圖像生成模型，技術名稱是 Gemini 3.1 Flash Image。2026 年 2 月推出，成為 Gemini app 各模式的預設圖像模型。解析度可從 512px 到 4K，支援多種長寬比。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span><b>文字渲染：</b>含中文字的圖卡、資訊圖表比多數模型穩／<b>角色一致性：</b>單一流程可維持最多五個角色與十四個物件的還原度／<b>對話式修圖：</b>「把背景換成夜晚」不用重寫整段 prompt</div>
+          <div class="fn"><span class="fl">不適合</span>真人肖像的精準還原／需要極高藝術風格控制的商業插畫</div>
+        </div>
+        <div class="blk-h">上手三步驟</div>
+        <div class="steps">
+          <div class="st">進 Gemini app，直接用中文描述你要的圖</div>
+          <div class="st">不滿意就用對話修，說「文字再大一點」「換成暖色調」</div>
+          <div class="st">做系列圖時，把完整風格參數（底色 hex、字體感覺、構圖比例）全部寫進每一次的 prompt，不要靠它記憶</div>
+        </div>
+        <div class="blk-h">可複製 Prompt · IG 圖卡模板</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">IG 圖卡模板</div><pre>A 1080x1350px vertical Instagram post.
+Background: warm cream #F5EDE0, subtle paper texture.
+Main text color: deep charcoal #232323.
+Accent color: brick orange #C85A2A.
+
+Layout:
+- Top 20%: large headline in Traditional Chinese (Taiwan orthography):
+  "<span class="ph">[你的標題]</span>"
+- Middle 60%: three numbered points, each in a rounded rectangle box
+  with brick orange left border:
+  1. <span class="ph">[第一點]</span>
+  2. <span class="ph">[第二點]</span>
+  3. <span class="ph">[第三點]</span>
+- Bottom: full-width charcoal bar with white text "@你的帳號"
+
+Style: clean editorial layout, high readability, generous white space.
+All Chinese text must be Traditional Chinese, no simplified characters.
+Keep at least 60px margin from all four edges.
+No photography, no gradients.</pre></div>
+        <div class="tipline"><b>實測心得：</b>中文字數超過三十字的區塊仍有機率糊掉。做重要貼文時，我會先生底圖再用 Canva 補文字，成功率接近百分之百。</div>
+      </div></details>
+
+      <!-- 03 Perplexity -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">Perplexity<span class="en"> · 搜尋</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>perplexity.ai</span><span>perplexity.ai/pro</span></div>
+        <div class="pos"><b>定位：</b>答案引擎。回答附上來源連結，可以逐條點進去驗證。做內容、寫報告、查數據時用它取代 Google 搜尋。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>查證某個數字或說法的原始出處／快速理解一個陌生領域的全貌／找特定時間範圍內的產業變化</div>
+          <div class="fn"><span class="fl">不適合</span>需要創意發想的任務／需要長篇寫作的任務（把查到的資料丟給 Claude 寫）</div>
+        </div>
+        <div class="blk-h">上手三步驟</div>
+        <div class="steps">
+          <div class="st">用 Focus 功能限定搜尋範圍（Academic、Social、YouTube）</div>
+          <div class="st">建立 Space，把同一個主題的所有查詢放在一起累積上下文</div>
+          <div class="st">查完之後點開來源，確認引用是否真的支持那句話</div>
+        </div>
+        <div class="blk-h">實際用法 · 三層查證法</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">三層查證法</div><pre>【第一層（廣度）】
+「2026 年 <span class="ph">[你的主題]</span> 有哪些主要變化？請列出時間點與來源。」
+
+【第二層（深度）】
+針對第一層回答中最關鍵的那一項，追問：
+「<span class="ph">[某項變化]</span> 的原始資料出處是什麼？請給我官方文件或第一手來源。」
+
+【第三層（反面）】
+「有哪些資料或觀點反對上述說法？請列出。」</pre></div>
+        <div class="warn">⚠️ 第三層最多人跳過。跳過的結果是內容只呈現單邊觀點，<b>被留言區打臉</b>。</div>
+      </div></details>
+
+      <!-- 04 Manus -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">Manus<span class="en"> · 跑任務</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>manus.im</span><span>manus.im/pricing</span></div>
+        <div class="pos"><b>定位：</b>Agent 型工具。你描述目標，它自己拆解步驟、上網查資料、產出檔案。適合「需要跑一段時間才有結果」的任務。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>競品調查（給十個對手名字，整理成對照表）／市場研究報告／大量資料的蒐集與初步整理</div>
+          <div class="fn"><span class="fl">不適合</span>你自己五分鐘能做完的事／需要精準控制每一步的任務</div>
+        </div>
+        <div class="warn">⚠️ <b>成本注意：</b>Manus 採 credit 制，不是吃到飽。複雜任務單次可能消耗數百點以上的 credit，任務描述越模糊，它繞的路越多，燒得越快。</div>
+        <div class="blk-h">省 credit 的三個做法</div>
+        <ul class="bul">
+          <li>任務描述要明確到「輸出格式、欄位、數量」都寫死</li>
+          <li>先用小範圍測試（例如先跑三個競品），確認方向對再放大</li>
+          <li>能自己做的前置整理先做完再丟給它</li>
+        </ul>
+        <div class="blk-h">可複製 Prompt · 競品調查</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">競品調查</div><pre>任務：調查以下 <span class="ph">[N]</span> 個帳號的內容策略。
+
+調查對象：
+1. <span class="ph">[帳號一]</span>
+2. <span class="ph">[帳號二]</span>
+3. <span class="ph">[帳號三]</span>
+
+針對每一個帳號，蒐集並整理：
+- 主要內容主題（最多列 3 個）
+- 貼文形式分布（輪播／單圖／影片，各佔幾成）
+- 發文頻率
+- 互動率最高的 3 篇貼文，各附連結與一句話說明它為什麼有效
+- CTA 的寫法
+
+輸出格式：Markdown 表格，一個帳號一列。
+表格後面加一段 300 字以內的觀察總結，指出這幾個帳號的共同做法。
+
+限制：只使用公開可見的資訊，不要推測數據。
+找不到的欄位標「無法取得」，不要自己補。</pre></div>
+        <div class="tipline">最後那句「找不到就標無法取得」很重要。少了它，agent 會為了填滿表格開始編數字。</div>
+      </div></details>
+
+      <!-- 05 Lovable -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">Lovable<span class="en"> · 做網站</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>lovable.dev</span><span>lovable.dev/pricing</span></div>
+        <div class="pos"><b>定位：</b>用自然語言描述，它產出可運行的網頁應用。前端強、上手快，做落地頁、小工具、內部表單特別有效率。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>課程或產品的銷售頁／一頁式的小工具（計算機、測驗、報名表）／想法驗證用的 MVP</div>
+          <div class="fn"><span class="fl">不適合</span>複雜的後端邏輯／需要嚴格資安控管的正式產品</div>
+        </div>
+        <div class="warn">⚠️ <b>成本注意：</b>2026 年 7 月官方定價頁的公開方案為 Free、Pro、Business 與 Enterprise，同樣採 credit 制。免費方案有每日與每月的 credit 上限，適合驗證想法，不足以支撐持續開發。</div>
+        <div class="insight"><div class="il">省 credit 的關鍵：一次講完</div><div class="it">多數人的用法是「先做個首頁」，然後一句一句改，改二十次燒掉一半額度。改成一次講完，通常五到八次就能定案。</div></div>
+        <div class="blk-h">可複製 Prompt · 銷售頁一次講完</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">銷售頁一次講完</div><pre>幫我做一個單頁式的線上課程銷售頁。
+
+【區塊結構，由上到下】
+1. Hero 區：大標、副標、CTA 按鈕（文字「立即報名」）
+2. 痛點區：三個痛點，each 用 icon + 標題 + 兩行說明
+3. 課程內容區：六個單元，卡片式排列，每張含單元名稱與 3 個重點
+4. 講師介紹區：左圖右文
+5. 常見問題區：五題，可展開收合
+6. 最終 CTA 區：重複 Hero 的按鈕，加上限時說明文字
+
+【設計規格】
+- 主色 #C85A2A，背景 #F5EDE0，文字 #232323
+- 字體：無襯線，標題粗體
+- 圓角 8px，卡片有輕微陰影
+- 手機優先，桌機版最大寬度 1200px 置中
+
+【互動】
+- 所有 CTA 按鈕 anchor 到頁面底部的報名表單
+- 常見問題用 accordion
+
+先把完整結構做出來，不要用 lorem ipsum，用我上面寫的中文內容。</pre></div>
+      </div></details>
+
+      <!-- 06 Kling -->
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">Kling<span class="en"> · 影片</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>klingai.com</span><span>kling.ai/blog</span></div>
+        <div class="pos"><b>定位：</b>影片生成模型。2024 年 6 月推出 beta，經過三十多次模型迭代，Kling 3.0 於 2026 年 2 月進入穩定版，2026 年 6 月 17 日再推出 Kling 3.0 Turbo 與 Omni，加入 4K 編輯與更長的片段。</div>
+        <div class="blk-h">版本怎麼選</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>用途</th><th>選擇</th></tr></thead><tbody>
+          <tr><td>社群短片、需要快速試方向</td><td>Turbo 版本</td></tr>
+          <tr><td>需要同步音訊</td><td>2.6 以上（2.6 開始加入原生音訊同步）</td></tr>
+          <tr><td>成品級、要進剪輯軟體的素材</td><td>當前旗艦版本</td></tr>
+        </tbody></table></div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>圖生影片（把靜態圖卡變成有運鏡的短片）／產品情境影片／短影音的 B-roll 素材</div>
+          <div class="fn"><span class="fl">不適合</span>長片段（原生片段長度有限，需要靠首尾幀串接）／需要精準對嘴的人物口播</div>
+        </div>
+        <div class="blk-h">Prompt 寫法：像分鏡表，不像詩</div>
+        <p style="font-size:13.5px;">多數人失敗的原因是形容詞堆太多。有效的寫法是把它當成給攝影師的指令。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">分鏡表式 Prompt</div><pre>【主體】一杯冰美式放在木質桌面上，杯壁有水珠緩緩滑落
+【動作】水珠滑到杯底，桌面上暈開一小圈水痕
+【運鏡】緩慢推近（slow dolly-in），從中景推到特寫
+【光線】側面自然光，來自畫面左側窗戶，暖色調
+【氛圍】安靜的午後咖啡廳，背景輕微散景
+【時長】5 秒</pre></div>
+        <div class="tipline">一句明確的運鏡指令（slow dolly-in、pan right、static shot），對成品質感的提升幅度，<b>大過堆十個形容詞</b>。</div>
+      </div></details>
+
+      <!-- 07 Comet -->
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">Comet<span class="en"> · 瀏覽器</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>perplexity.ai/comet</span></div>
+        <div class="pos"><b>定位：</b>Perplexity 做的 AI 原生瀏覽器。基於 Blink 引擎，介面跟一般瀏覽器一樣有分頁、書籤、擴充功能，差別在於 AI 助理直接嵌在每一個頁面裡。</div>
+        <div class="tipline"><b>可用性：</b>2025 年 7 月先在 macOS 與 Windows 推出，2025 年 11 月上 Android，2026 年 3 月 18 日上 iOS。<b>2026 年 3 月 18 日起免費開放。</b></div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>讀長文時直接在頁面上問問題，不用複製貼上／跨分頁彙整資訊（開了十篇文章，請它整理共同觀點）／重複性的網頁操作</div>
+          <div class="fn"><span class="fl">不適合</span>開發工作（Chrome 的 DevTools 與擴充生態仍然完整得多）／對隱私要求極高的操作</div>
+        </div>
+        <div class="blk-h">實際用法</div>
+        <p style="font-size:13.5px;">進到任何一篇長文，按 Assistant，然後問：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">拆解一篇長文</div><pre>這篇文章的核心主張是什麼？用三句話說。
+接著列出作者用來支持這個主張的具體證據，
+每一條標註在原文的哪一段。
+如果某個主張沒有證據支撐，直接指出來。</pre></div>
+        <div class="tipline">最後一句是重點。它會幫你抓出<b>「聽起來很有道理但其實沒根據」</b>的段落。</div>
+      </div></details>
+
+      <!-- 08 NotebookLM -->
+      <details class="ch"><summary><span class="ch-n">08</span><span class="ch-t">NotebookLM<span class="en"> · 讀資料</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>notebooklm.google.com</span></div>
+        <div class="pos"><b>定位：</b>以你上傳的資料為唯一來源的研究工具。它只根據你給的文件回答，不會自己去網路上找，回答都附上原文出處。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>讀完一本 PDF 或一份長報告／把十篇文章整合成一份主題筆記／為一個專題建立可長期累積的資料庫</div>
+          <div class="fn"><span class="fl">不適合</span>需要外部即時資訊（它刻意不做這件事）／創意發想</div>
+        </div>
+        <div class="blk-h">上手三步驟</div>
+        <div class="steps">
+          <div class="st">建立一個 Notebook，主題越窄越好（「2026 AI 工具」比「AI」有用十倍）</div>
+          <div class="st">上傳來源：PDF、Google Docs、網址、貼上的純文字都可以</div>
+          <div class="st">先讓它產出 Briefing Doc，再針對其中一段追問</div>
+        </div>
+        <div class="blk-h">可複製提問模板</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">矛盾與空缺提問模板</div><pre>根據我上傳的所有來源，回答以下問題：
+1. 這些來源在哪些說法上是一致的？
+2. 這些來源在哪些說法上互相矛盾？請具體指出是哪兩份文件、哪兩段話。
+3. 有哪些重要問題，是這些來源都沒有回答的？
+
+每一條回答都要標註來源檔名。
+沒有依據的推論不要寫。</pre></div>
+        <div class="insight"><div class="il">真正的價值在這裡</div><div class="it">第二題和第三題是這個工具真正的價值。矛盾點和空缺點，通常就是你的內容切入角度。</div></div>
+      </div></details>
+
+      <!-- 09 tl;dv -->
+      <details class="ch"><summary><span class="ch-n">09</span><span class="ch-t">tl;dv<span class="en"> · 開會</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>tldv.io</span><span>tldv.io/pricing</span></div>
+        <div class="pos"><b>定位：</b>AI 會議記錄工具，支援 Zoom、Google Meet 與 Microsoft Teams 的錄製、逐字稿與摘要，支援三十種以上語言。</div>
+        <div class="tipline"><b>免費方案：</b>提供不限次數的錄製與逐字稿，AI 摘要次數有月額度上限。個人使用者通常夠用。</div>
+        <div class="warn">⚠️ Google 在 2026 年 3 月更新後，會將第三方記錄機器人標記為潛在風險並預設拒絕加入，因此 <b>Meet 使用者建議改用 tl;dv 的桌面版應用程式</b>，直接從裝置端擷取音訊。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>客戶訪談的逐字稿（拿來當內容素材金礦）／課程或線上講座的重點整理／多語言會議的翻譯逐字稿</div>
+        </div>
+        <div class="blk-h">內容創作者的隱藏用法</div>
+        <p style="font-size:13.5px;">把你跟客戶、學員的對話逐字稿匯出，丟給 Claude：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">客戶語言清單</div><pre>以下是我和客戶的訪談逐字稿。
+
+請找出：
+1. 客戶用來描述自己問題的原話（不要改寫，逐字引用）
+2. 客戶重複提到超過兩次的詞
+3. 客戶表達情緒最強烈的三個段落
+
+輸出成一份「客戶語言清單」，我要拿來寫文案。
+不要幫我美化用詞，我要的就是他們原本的講法。
+
+逐字稿：
+<span class="ph">[貼上]</span></pre></div>
+        <div class="tipline"><b>客戶的原話就是最好的標題。</b>這個做法比自己憑空想 hook 有效得多。</div>
+      </div></details>
+
+      <!-- 10 Gemini -->
+      <details class="ch"><summary><span class="ch-n">10</span><span class="ch-t">Gemini<span class="en"> · Google 生態</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>gemini.google.com</span><span>ai.google.dev</span></div>
+        <div class="pos"><b>定位：</b>如果你的工作大量依賴 Gmail、Google Docs、Sheets、Drive、Calendar，Gemini 的優勢在於它直接接得到這些資料。</div>
+        <div class="fitchip">
+          <div class="fy"><span class="fl">最強場景</span>在 Google Docs 裡直接改寫段落／在 Sheets 裡用自然語言產生公式／讓它讀你的 Gmail 找出某封信的脈絡／圖像生成（Nano Banana 2 已是 Gemini app 中的預設圖像模型）</div>
+          <div class="fn"><span class="fl">不適合</span>不在 Google 生態內的工作流／需要極細緻語氣控制的長文寫作</div>
+        </div>
+        <div class="blk-h">一個立刻能用的做法</div>
+        <p style="font-size:13.5px;">在 Google Sheets 裡，選取資料範圍後開啟側邊的 Gemini，輸入：</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Sheets 資料分析</div><pre>幫我分析這份資料，找出：
+1. 數值變化最劇烈的前三列
+2. 任何明顯的異常值
+3. 一個我可能沒注意到的趨勢
+
+用表格回答，並附上你判斷的依據（引用具體儲存格）。</pre></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">十個工具講完了</div>
+      <h3>配對對是基本<br><span class="g">串成產線才是重點</span></h3>
+      <p>單一工具的效益有限，串起來才會產生倍數。想把它們接成一條能省時間、能變現的產線——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 三套組合工作流 -->
+  <div class="sec fade">
+    <span class="sec-tag">三套實際跑得通的組合工作流</span>
+    <h2>串起來<br><span class="g">才會產生倍數</span></h2>
+    <p>單一工具的效益有限，串起來才會產生倍數。以下三套是我自己每週在跑的。</p>
+
+    <div class="sub-h">工作流 A · 一篇貼文的完整產線</div>
+    <div class="flow">
+      <div class="fnode"><span class="fname">Perplexity</span><span class="fdo">查證主題現況，蒐集三到五個來源</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">NotebookLM</span><span class="fdo">上傳來源，找出矛盾點與資訊空缺</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Claude</span><span class="fdo">用語氣規則書寫成貼文文案</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Nano Banana 2</span><span class="fdo">生成輪播圖卡</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Canva</span><span class="fdo">補上密集中文字（如果有需要）</span></div>
+    </div>
+    <div class="tipline"><b>時間對照：</b>全手動約 4 小時，這條流程約 50 分鐘。省下的時間主要來自查證與初稿。</div>
+
+    <div class="sub-h">工作流 B · 從訪談到產品</div>
+    <div class="flow">
+      <div class="fnode"><span class="fname">tl;dv</span><span class="fdo">錄下客戶訪談，匯出逐字稿</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Claude</span><span class="fdo">抽出客戶原話，建立「客戶語言清單」</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Claude</span><span class="fdo">用客戶原話寫銷售頁文案</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Lovable</span><span class="fdo">一次講完，生成銷售頁</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Perplexity</span><span class="fdo">查競品定價，回頭調整方案設計</span></div>
+    </div>
+    <div class="tipline"><b>關鍵點：</b>文案的每一句都來自客戶說過的話，轉換率會明顯不同。</div>
+
+    <div class="sub-h">工作流 C · 短影音批量產出</div>
+    <div class="flow">
+      <div class="fnode"><span class="fname">Claude</span><span class="fdo">一次寫十支腳本，共用同一份語氣規則</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Nano Banana 2</span><span class="fdo">為每支腳本生成首幀圖</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">Kling</span><span class="fdo">圖生影片，加上運鏡指令</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">tl;dv / 剪輯軟體</span><span class="fdo">加字幕與配音</span></div>
+    </div>
+    <div class="tipline"><b>關鍵點：</b>十支一起做，不要一支一支做。批量的效率差距約三到四倍，因為省下的是每次重新進入狀態的時間。</div>
+  </div>
+
+  <!-- 五個常見錯誤 -->
+  <div class="sec fade">
+    <span class="sec-tag">五個最常見的錯誤</span>
+    <h2>踩過的坑<br><span class="g">先幫你標好</span></h2>
+    <div class="err">
+      <div class="eq">一次換十個工具</div>
+      <div class="ea">兩週後全部退回原本的用法。<b>一次換一個</b>，跑順了再換下一個。</div>
+      <div class="eq">Prompt 寫得太短</div>
+      <div class="ea">「幫我寫一篇貼文」得到的是通用內容。把角色、任務、格式、限制、範例都寫進去，輸出品質是兩個世界。</div>
+      <div class="eq">沒有建立可重複的資產</div>
+      <div class="ea">每次都從零開始寫 Prompt，等於每次都在重做同一件事。<b>把跑得好的 Prompt 存成模板，這才是會累積的東西。</b></div>
+      <div class="eq">忘記查證</div>
+      <div class="ea">AI 產出的數字、引用、連結，發布前都要點開確認。一次錯誤引用造成的信任損失，遠大於十篇正確內容累積的信任。</div>
+      <div class="eq">用 agent 做五分鐘能做完的事</div>
+      <div class="ea">Manus 這類 credit 制工具，適合處理你不想花兩小時做的任務。查一個定義、寫一封信，直接自己做更快也更省。</div>
+    </div>
+  </div>
+
+  <!-- 30天導入節奏 -->
+  <div class="sec fade">
+    <span class="sec-tag">三十天導入節奏</span>
+    <h2>照這個節奏<br><span class="g">一個月後你會有四樣資產</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>週次</th><th>做什麼</th></tr></thead><tbody>
+      <tr><td>第 1 週</td><td>只換「寫作」這一項。把 Claude 的語氣規則書建立起來，寫五篇貼文驗證</td></tr>
+      <tr><td>第 2 週</td><td>加入「搜尋」。所有查證改用 Perplexity，開始建立三層查證的習慣</td></tr>
+      <tr><td>第 3 週</td><td>加入「圖片」。用 Nano Banana 2 做一組系列圖卡，確認風格參數可以複現</td></tr>
+      <tr><td>第 4 週</td><td>串成工作流 A，完整跑三篇貼文，記錄每一篇花的時間</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">一個月後，你手上會有</div><div class="it">一份語氣規則書、一套查證流程、一組可複現的視覺參數、一條跑過三次的產線。這四樣東西不會因為換工具而失效。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工具你配對好了，<span class="g">接下來換我陪你把它跑成產線</span></h2>
+      <div class="cta-lead">這份清單讓你把任務拆開、配對到對的工具。但要把十個工具接成一條「內容 → 流量 → 收入」的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具會用、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆清單，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">工具會過時，判斷力不會</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——怎麼用 AI 把一個人的產能拉到一個團隊<br>※ 各工具方案內容與價格變動頻繁，付費前請以官方定價頁為準；文件內容整理日期 2026 年 8 月</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：2026 AI 工具汰換清單——輪播 DM 承接頁／lead magnet（定位：十場景×十工具配對表＋可複製 Prompt＋組合工作流）
+· 內容：怎麼用清單（3步＋心態設定）+ 十場景對照表 + 10 工具摺疊卡（各含官方連結膠囊／定位／最強場景與不適合場景 fitchip 綠紅對照／上手步驟／可複製 Prompt）+ 中段 CTA + 三套組合工作流（.flow 視覺化：貼文產線／訪談到產品／短影音批量）+ 五個常見錯誤 + 30 天導入節奏
+· 10 工具：Claude／Nano Banana 2／Perplexity／Manus／Lovable／Kling／Comet／NotebookLM／tl;dv／Gemini
+· 版型決策：
+  - 新增 .fitchip 綠框（最強場景）／紅框（不適合）並排，取代單純條列，強化「這個場景才用這個工具」的判斷感
+  - 官方連結做成 .links-row 膠囊列，不佔內文篇幅
+  - 三套工作流沿用既有 .flow 元件（節點卡＋箭頭），與之前 writing-skills 頁一致
+· 可複製區塊：13 個 .cp（Claude 2、Nano Banana 1、Perplexity 1、Manus 1、Lovable 1、Kling 1、Comet 1、NotebookLM 1、tl;dv 1、Gemini 1）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，10 工具卡與工作流之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「2026 AI工具汰換清單」文件
+· 命名：日期前綴（2026-08-06-ai-tools-2026.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
