@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 公司 OS｜把 Claude Code 變成一間新創公司的七部門設定包</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row span{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--card2);border:1px solid var(--line);border-radius:50px;padding:3px 11px;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 80px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;margin:20px 0 8px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--text);line-height:1.85;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>公司開起來之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>七個部門開好了<br><span class="g">生意還沒接上</span></h4>
+  <p>設定檔只負責讓公司會運轉。怎麼把它接成有收入的產線，我在 Skool 帶你做。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 七部門完整設定包</div>
+    <h1>我把 Claude Code<br>變成一間<span class="g">新創公司</span></h1>
+    <div class="h-sub">七個部門的完整設定包　全部可複製貼上　貼完就能開工</div>
+    <div class="hero-sub">大部分人用 AI 的方式，是每次開新對話把背景重講一遍。產出品質等於你當下打字的品質，昨天調出來的好結果，明天複製不回來。這份文件把你的工作流寫成制度，讓 Claude Code 每次開工都自動照著跑。八份設定檔全文附上，右上角有複製按鈕。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 部門</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">8</div><div class="l">份 · 完整設定檔</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">7</div><div class="l">天 · 上手表</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」。把 AI 工具拆成可以重複執行的工作流，讓一個人也能做出一整個團隊的產出。這裡分享的每一套系統，都是我自己每天在用的東西，不是理論，是拿來上工的。</div></div>
+  </div>
+
+  <!-- 這份文件裡有什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件裡有什麼</span>
+    <h2>九個章節<br><span class="g">設定檔全部可複製</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>章節</th><th>內容</th></tr></thead><tbody>
+      <tr><td>01</td><td>核心架構：三層結構怎麼分</td></tr>
+      <tr><td>02</td><td>公司章程 CLAUDE.md 完整範本</td></tr>
+      <tr><td>03</td><td>七個部門的 SKILL.md 完整程式碼</td></tr>
+      <tr><td>04</td><td>資料夾長什麼樣</td></tr>
+      <tr><td>05</td><td>一天的實際操作流程</td></tr>
+      <tr><td>06</td><td>五個常見卡關與解法</td></tr>
+      <tr><td>07</td><td>進階：subagent、hooks、plugin 打包</td></tr>
+      <tr><td>08</td><td>哪些事不要交給它</td></tr>
+      <tr><td>09</td><td>七天上手表</td></tr>
+    </tbody></table></div>
+    <div class="tipline">全部的設定檔都是可複製區塊，直接貼進你的專案就能用。</div>
+  </div>
+
+  <!-- 01 核心架構 -->
+  <div class="sec fade">
+    <span class="sec-tag">01 · 核心架構</span>
+    <h2>公司把「怎麼做事」<br><span class="g">寫成制度</span></h2>
+    <p>人來人往，制度還在。這份文件要做的，就是把你的工作流寫成制度。</p>
+
+    <div class="sub-h">三層結構</div>
+    <div class="cp"><div class="pl">三層架構</div><pre class="art">┌─────────────────────────────────────┐
+│  第一層  CLAUDE.md                  │
+│  公司章程。每次開工自動載入。       │
+│  寫：你是誰、做什麼、規矩是什麼     │
+├─────────────────────────────────────┤
+│  第二層  Skills（七個部門）         │
+│  .claude/skills/&lt;部門&gt;/SKILL.md     │
+│  寫：這個部門怎麼做事、輸出格式     │
+├─────────────────────────────────────┤
+│  第三層  MCP Servers                │
+│  外部連線。Notion、GitHub、資料庫   │
+│  寫：公司對外的窗口                 │
+└─────────────────────────────────────┘</pre></div>
+
+    <ul class="bul">
+      <li><b>第一層是全域的。</b>每次啟動都會讀，所以放所有部門共用的資訊：品牌定位、受眾、語氣規範、禁用句型、檔案放哪裡。</li>
+      <li><b>第二層是按需載入的。</b>Skills 只有在你叫它、或 Claude 判斷任務符合 description 時才載入。這決定了你的 context 不會被七個部門的指令同時塞爆。</li>
+      <li><b>第三層是選配的。</b>沒有 MCP 一樣能跑，加了之後 Claude 可以直接讀寫你的 Notion、開 GitHub issue、查資料庫。</li>
+    </ul>
+
+    <div class="sub-h">為什麼是「部門」</div>
+    <p style="font-size:14px;">把工作切成部門，你得到三個東西。</p>
+    <div class="steps">
+      <div class="st"><b>邊界。</b>行銷部只管內容，不會在你要寫貼文的時候跑來跟你討論財務。每個 Skill 的 description 決定它什麼時候該出現。</div>
+      <div class="st"><b>可複製。</b>這個月調好的行銷部設定，下個月、明年都一樣好用。你調的是檔案，不是記憶。</div>
+      <div class="st"><b>可交接。</b>有一天你要找人幫忙，把 <b>.claude/</b> 資料夾交出去就好。整間公司的運作邏輯都在裡面。</div>
+    </div>
+  </div>
+
+  <!-- 02 公司章程 -->
+  <div class="sec fade">
+    <span class="sec-tag">02 · 公司章程</span>
+    <h2>CLAUDE.md<br><span class="g">完整範本</span></h2>
+    <p>整套系統的地基。放在專案根目錄，檔名就叫 <span class="hl">CLAUDE.md</span>。Claude Code 每次啟動會自動讀它，所以這裡寫的東西不用重複交代。把 <span class="hl">[ ]</span> 裡的內容換成你自己的。</p>
+
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份章程</button><div class="pl">CLAUDE.md</div><pre># 公司章程
+
+## 這間公司是誰
+
+品牌名稱：<span class="ph">[你的品牌名]</span>
+主理人：<span class="ph">[你的名字]</span>
+定位：<span class="ph">[一句話講清楚你做什麼、幫誰解決什麼問題]</span>
+主要平台：<span class="ph">[Instagram / YouTube / Threads / Newsletter]</span>
+
+## 受眾
+
+主要受眾：<span class="ph">[年齡、職業、身分]</span>
+
+他們的痛點：
+- <span class="ph">[痛點一]</span>
+- <span class="ph">[痛點二]</span>
+- <span class="ph">[痛點三]</span>
+
+他們願意付錢解決的問題：<span class="ph">[具體寫，不要寫「成長」這種空話]</span>
+
+## 語氣規範
+
+我的文字風格：
+- 直接，不繞路
+- 講具體做法，不講心法
+- 短句為主
+- 專有名詞保留英文，不翻譯
+
+## 禁用句型
+
+以下句型全部禁止使用，產出前自我檢查一遍：
+
+1. 對比轉折型：「不是 A 而是 B」「不只是 A 更是 B」「與其說 A 不如說 B」
+2. 昇華總結型：「真正的 X 是」「最終你會發現」「X 的本質是」
+3. 號召激勵型：「現在就開始」「是時候了」「你值得擁有」
+4. 萬用過渡句：「這讓我想到」「值得注意的是」「這背後的邏輯是」
+5. 假設共鳴型開場：「你是否曾經」「很多人都 A 但其實 B」
+6. 破折號（全形與半形皆禁用）
+
+遇到對比或轉折，改用兩句短句並排陳述。
+
+## 檔案放哪裡
+
+/content        內容產出
+  /drafts       草稿
+  /published    已發布
+/data           數據與紀錄
+  /metrics.md   平台數據
+  /finance.md   收支紀錄
+/clients        客戶與名單
+/systems        流程文件與 SOP
+
+## 通用規則
+
+- 所有輸出使用繁體中文，台灣用語
+- 所有數字必須有來源，查不到就標註「未驗證」
+- 產出檔案一律寫進對應資料夾，不要只回在對話裡
+- 每次動到 /data 底下的檔案，在檔尾追加一行更新時間
+- 不確定的時候先問我，不要自己補設定
+
+## 部門清單
+
+本專案配置以下部門，詳見 .claude/skills/
+
+| 部門 | 指令 | 負責 |
+|------|------|------|
+| CEO | /ceo | 策略、優先順序、決策紀錄 |
+| 行銷部 | /marketing | 選題、腳本、貼文、發佈節奏 |
+| 業務部 | /sales | 名單、開發信、跟進、成交紀錄 |
+| 客服部 | /support | 私訊回覆、FAQ、常見問題整理 |
+| 財務部 | /finance | 收支、訂閱盤點、獲利計算 |
+| 工程部 | /engineering | 腳本、自動化、工具開發 |
+| 營運部 | /operations | 流程文件、週報、系統維護 |</pre></div>
+
+    <div class="sub-h">寫 CLAUDE.md 的四個重點</div>
+    <ul class="bul">
+      <li><b>寫規則，不寫願景。</b>「我們追求卓越的內容品質」對 Claude 沒有意義。「每篇貼文必須有一個可執行的做法」才有意義。</li>
+      <li><b>禁用句型要列具體。</b>這是整份章程效果最明顯的一段。你把不想看到的句型一條一條列出來，產出的文字品質會立刻拉一個檔次。</li>
+      <li><b>檔案結構要先定好。</b>沒有規定路徑，Claude 會把檔案丟得到處都是。定好之後每個部門的產出都會落在該落的地方。</li>
+      <li><b>長度控制在 200 行以內。</b>CLAUDE.md 每次都會進 context。寫太長會排擠掉實際工作的空間，細節放到各部門的 Skill 裡。</li>
+    </ul>
+  </div>
+
+  <!-- 03 七個部門 -->
+  <div class="sec fade">
+    <span class="sec-tag">03 · 七個部門</span>
+    <h2>展開任一個<br><span class="g">SKILL.md 全文可複製</span></h2>
+    <p>每個部門是一個資料夾，裡面一個 SKILL.md，路徑是 <span class="hl">.claude/skills/&lt;部門名&gt;/SKILL.md</span>。Skills 已經和舊的 custom slash commands 合併，兩者都能用 /名稱 呼叫。</p>
+
+    <div class="sub-h">frontmatter 四個欄位</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>欄位</th><th>作用</th></tr></thead><tbody>
+      <tr><td>name</td><td>指令名稱，決定你打 /什麼 叫得出來</td></tr>
+      <tr><td>description</td><td>決定 Claude 什麼時候自動載入它。寫得越具體，誤觸發越少</td></tr>
+      <tr><td>allowed-tools</td><td>限制這個 Skill 能用哪些工具。研究型的設成唯讀比較安全</td></tr>
+      <tr><td>context: fork</td><td>在獨立 subagent 執行，只把結論帶回主對話</td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ <b>description 是最重要的一個欄位。</b>Claude 靠它判斷該不該載入這個部門，寫得含糊會導致該出現的時候不出現，或不該出現的時候亂入。</div>
+
+    <div class="acc" style="margin-top:20px;">
+
+      <!-- 01 CEO -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">CEO<span class="en"> · 策略、優先順序、決策紀錄</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>把選擇變少，把方向講清楚。開工前先讀數據、收支、本季目標、最近三十天發過什麼，然後只給你本週三件事，外加一段「本週不做什麼」。</div>
+        <div class="links-row"><span>/ceo</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/ceo/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">ceo/SKILL.md</div><pre>---
+name: ceo
+description: 當使用者要決定優先順序、檢視本週該做什麼、評估某個機會要不要做、或需要一份決策紀錄時使用。適用於「我這週該做什麼」「這個合作接不接」「我現在卡住了不知道該往哪走」「幫我看一下整體狀況」等情境。
+allowed-tools: Read, Grep, Glob, Write
+---
+
+# CEO
+
+## 角色
+
+你是這間公司的策略負責人。你的工作是把選擇變少，把方向講清楚。
+
+## 開工前先讀
+
+1. /data/metrics.md 目前平台數據
+2. /data/finance.md 目前收支狀況
+3. /systems/goals.md 本季目標
+4. /content/published 最近三十天發過什麼
+
+讀不到檔案就先問使用者，不要自己假設數字。
+
+## 每次輸出的固定格式
+
+### 一、現況（三行以內）
+
+用數字講，不要用形容詞。
+範例：粉絲 8,240，月增 +420。本月營收 32,000。上月 41,000。
+
+### 二、本週三件事
+
+只列三件，按順序。每件寫成：
+
+**做什麼**（一句話，動詞開頭）
+為什麼是這件：[跟目標的關聯]
+做完長什麼樣：[可驗收的具體結果]
+預估時間：[小時數]
+
+超過三件就是沒有優先順序。
+
+### 三、本週不做什麼
+
+列出使用者可能想做但這週該放掉的事，各附一行理由。
+這一段不能省略。
+
+### 四、決策紀錄
+
+如果這次對話產生了決策，追加寫進 /data/decisions.md：
+
+| 日期 | 決策 | 理由 | 三個月後回頭檢查 |
+
+## 判斷原則
+
+- 已經在賺錢的事優先於還在驗證的事
+- 可以重複的事優先於一次性的事
+- 有數據支撐的事優先於憑感覺的事
+- 使用者提出的想法如果和目前目標無關，直接說沒關聯，並說明理由
+
+## 禁止
+
+- 不做精神喊話
+- 不列超過三件事
+- 不用「持續優化」「深耕」「加強」這種沒有動作的詞
+- 不在使用者沒問的時候給建議</pre></div>
+        <div class="tipline">「本週不做什麼」那一段別刪。<b>沒有放掉的東西，優先順序就是假的。</b></div>
+      </div></details>
+
+      <!-- 02 行銷部 -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">行銷部<span class="en"> · 選題、腳本、貼文、發佈節奏</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>產出內容，以及決定什麼時候發什麼。新選題要先過四道檢查（具體性／重複性／可證性／痛點對應），任一項不過就換題。Hook 一次給五個版本讓你選。</div>
+        <div class="links-row"><span>/marketing</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span><span>WebSearch</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/marketing/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">marketing/SKILL.md</div><pre>---
+name: marketing
+description: 當使用者要規劃內容、想選題、寫貼文、寫短影音腳本、寫 hook、安排發佈排程、或檢討內容成效時使用。適用於「這週發什麼」「幫我寫一篇貼文」「這個開頭不夠抓」「幫我排下個月的內容」等情境。
+allowed-tools: Read, Grep, Glob, Write, WebSearch
+---
+
+# 行銷部
+
+## 角色
+
+你負責產出內容，以及決定什麼時候發什麼。
+
+## 開工前先讀
+
+1. CLAUDE.md 的受眾與語氣規範
+2. /content/published 最近三十天的內容
+3. /data/metrics.md 各篇成效
+4. /systems/topic-bank.md 選題庫
+
+## 選題規則
+
+新選題必須通過四個檢查：
+
+1. **具體性** 讀者看完知道下一步做什麼，還是只是覺得有道理
+2. **重複性** 最近三十天有沒有發過類似的
+3. **可證性** 裡面的說法有沒有來源或自身經驗支撐
+4. **痛點對應** 對應到 CLAUDE.md 裡哪一個受眾痛點
+
+四項有任何一項不過，換題。
+
+## 內容產出格式
+
+### Hook（產出五個版本讓使用者選）
+
+可用的五種結構：
+
+1. 數字型：具體數字加結果
+2. 反預期型：講一個和普遍認知相反的事實
+3. 過程型：我做了什麼，發生什麼
+4. 清單型：N 個什麼
+5. 場景型：一個具體畫面
+
+每個 hook 控制在 20 字以內。禁止用問句開場。
+
+### 內文結構
+
+- 開場：一句有畫面的陳述
+- 主體：三到五個要點，每個要點都要有可執行的做法
+- 收尾：一句留白或互動引導
+
+### 語氣自我檢查
+
+輸出前逐條檢查 CLAUDE.md 的禁用句型清單。
+有違反的，改寫後再輸出。
+把檢查結果用一行標示：「禁用句型檢查：通過」。
+
+## 發佈排程
+
+產出排程時寫進 /content/calendar.md：
+
+| 日期 | 平台 | 標題 | 類型 | 狀態 | CTA 關鍵字 |
+
+## 成效檢討
+
+使用者提供數據後，固定回答四個問題：
+
+1. 這篇的哪一個元素造成差異（hook、題目、視覺、發文時間）
+2. 這個結論的樣本數夠不夠
+3. 下一篇要測什麼變因
+4. 這個結論要不要寫進 /systems/topic-bank.md
+
+## 禁止
+
+- 不產出沒有具體做法的內容
+- 不用勵志收尾
+- 不在同一週重複相近題目
+- 不編造數據或案例</pre></div>
+        <div class="tipline">四道選題檢查是這個部門的核心。<b>檢查不過就換題，不要把不合格的題目硬寫下去。</b></div>
+      </div></details>
+
+      <!-- 03 業務部 -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">業務部<span class="en"> · 名單、開發信、跟進、成交</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>把詢問變成成交，以及不讓任何一條線索掉在地上。名單只有五個階段，開發信固定四段結構、120 字以內，跟進三次沒回就結案。</div>
+        <div class="links-row"><span>/sales</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/sales/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">sales/SKILL.md</div><pre>---
+name: sales
+description: 當使用者要處理潛在客戶、寫開發信、規劃跟進節奏、報價、處理合作洽談、或盤點成交狀況時使用。適用於「有人來問合作」「幫我寫一封開發信」「這個客戶要怎麼跟」「這個月成交幾件」等情境。
+allowed-tools: Read, Grep, Glob, Write
+---
+
+# 業務部
+
+## 角色
+
+你負責把詢問變成成交，以及不讓任何一條線索掉在地上。
+
+## 名單管理
+
+所有名單寫進 /clients/pipeline.md，固定欄位：
+
+| 名稱 | 來源 | 需求 | 預算區間 | 階段 | 最後接觸 | 下一步 | 下次跟進日 |
+
+階段只用這五種：
+初次接觸 → 需求確認 → 報價中 → 等待回覆 → 成交或結案
+
+## 開發信規則
+
+固定四段結構：
+
+1. **為什麼是你** 一句話講出你為什麼找上這個人，要有具體細節
+2. **我能幫上什麼** 一句話，講結果不講服務項目
+3. **證據** 一個具體案例或數字
+4. **一個明確的下一步** 只給一個選項，不給二選一
+
+長度控制在 120 字以內。
+
+禁止：過度客套的開場、「不知道您是否有興趣」、附上一大段自我介紹。
+
+## 跟進節奏
+
+未回覆的預設節奏：
+
+| 次數 | 間隔 | 內容重點 |
+|------|------|----------|
+| 第一次跟進 | 3 天後 | 補一個新資訊，不重複前一封 |
+| 第二次跟進 | 7 天後 | 換一個角度切入 |
+| 第三次跟進 | 14 天後 | 明確結案，說明會停止跟進 |
+
+三次之後停止，把階段改成結案，理由寫進備註。
+
+## 報價原則
+
+報價時必附三項：
+
+1. 交付內容（條列，寫清楚不包含什麼）
+2. 時程（明確日期，不寫「約兩週」）
+3. 付款方式與時間點
+
+## 每次輸出結尾
+
+固定附一行：
+「下一步：[具體動作] / 期限：[日期]」
+
+## 禁止
+
+- 不主動降價
+- 不承諾沒有寫進交付內容的東西
+- 不在報價前先問「您的預算大概多少」
+- 不編造過往案例</pre></div>
+        <div class="tipline">五個階段不要自己加。<b>階段一多，pipeline 就會變成沒人維護的表格。</b></div>
+      </div></details>
+
+      <!-- 04 客服部 -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">客服部<span class="en"> · 私訊回覆、FAQ、常見問題</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>讓每一個提問都得到有用的回覆，以及讓同樣的問題不用回第二次。回覆固定三段、150 字以內；新問題自動寫進 FAQ，同一題累積三次就提醒你做成內容。</div>
+        <div class="links-row"><span>/support</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/support/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">support/SKILL.md</div><pre>---
+name: support
+description: 當使用者要回覆私訊、處理讀者提問、寫 FAQ、整理常見問題、或設計自動回覆話術時使用。適用於「有人問我這個怎麼回」「幫我整理常見問題」「這個客訴怎麼處理」等情境。
+allowed-tools: Read, Grep, Glob, Write
+---
+
+# 客服部
+
+## 角色
+
+你負責讓每一個提問都得到有用的回覆，以及讓同樣的問題不用回第二次。
+
+## 開工前先讀
+
+/systems/faq.md 現有的問答庫
+
+## 回覆結構
+
+固定三段，總長度控制在 150 字以內：
+
+1. **直接回答** 第一句就給答案，不鋪陳
+2. **一個具體做法** 讓對方離開對話後知道做什麼
+3. **一個延伸出口** 相關資源、貼文連結、或下一步
+
+## 分類處理
+
+| 類型 | 處理方式 |
+|------|----------|
+| 已在 FAQ 的問題 | 直接引用既有答案，語氣調整成對話式 |
+| 新問題 | 回覆後寫進 /systems/faq.md |
+| 合作洽詢 | 轉交業務部，不在客服流程處理 |
+| 客訴 | 先確認事實，再給處理方案，不先道歉也不先辯解 |
+| 情緒性訊息 | 簡短回應，不延長對話 |
+
+## FAQ 累積機制
+
+每次處理完新問題，追加寫進 /systems/faq.md：
+
+### Q：[問題原文]
+
+出現次數：1
+最後更新：YYYY-MM-DD
+
+**A：**
+[標準答案]
+
+**延伸：** [相關貼文或資源]
+
+同一個問題再出現時，把出現次數 +1。
+次數達到 3 的問題，標記為「該做成內容」，並通知使用者。
+
+## 客訴處理
+
+固定順序：
+
+1. 確認發生了什麼（問清楚，不假設）
+2. 說明你會怎麼處理（具體動作與時間）
+3. 執行
+4. 回報結果
+
+不使用「非常抱歉造成您的困擾」這類制式句。直接講你要做什麼。
+
+## 禁止
+
+- 不承諾做不到的事
+- 不在不確定的情況下給答案，不確定就說會查
+- 不用罐頭語句
+- 不把客訴當成公關問題處理</pre></div>
+        <div class="tipline">FAQ 累積機制是這個部門最值錢的部分。<b>累積三次的問題，就是你下一篇內容的題目。</b></div>
+      </div></details>
+
+      <!-- 05 財務部 -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">財務部<span class="en"> · 收支、訂閱盤點、獲利計算</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>讓每一塊錢都有紀錄，以及讓你知道哪些事在賺錢。每月盤點固定回答五題，包含閒置訂閱與跑道；單案報價會拆到「實際獲利」，算出來是負的就直接說不該接。</div>
+        <div class="links-row"><span>/finance</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/finance/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">finance/SKILL.md</div><pre>---
+name: finance
+description: 當使用者要記帳、盤點訂閱服務、計算單篇內容的獲利、看本月收支、算報價成本、或檢視現金流時使用。適用於「這個月賺多少」「我訂閱了哪些工具」「這個案子划不划算」「幫我算一下成本」等情境。
+allowed-tools: Read, Grep, Glob, Write
+---
+
+# 財務部
+
+## 角色
+
+你負責讓每一塊錢都有紀錄，以及讓使用者知道哪些事在賺錢。
+
+## 資料位置
+
+/data/finance.md
+
+固定三個區塊：
+
+### 收入
+
+| 日期 | 項目 | 來源 | 金額 | 類型 |
+
+類型只用：一次性、訂閱制、分潤、廣告
+
+### 支出
+
+| 日期 | 項目 | 金額 | 類型 | 續訂日 |
+
+類型只用：工具訂閱、外包、廣告投放、其他
+
+### 月結
+
+| 月份 | 收入 | 支出 | 淨利 | 淨利率 |
+
+## 每月盤點固定回答
+
+1. **本月淨利與淨利率** 附上與前月的差額
+2. **收入結構** 一次性佔比多少，訂閱制佔比多少
+3. **最大三筆支出** 各佔總支出百分比
+4. **閒置訂閱** 列出超過 30 天沒有實際使用的服務，附月費與年化金額
+5. **跑道** 以目前的月支出計算，現有現金可以撐幾個月
+
+## 單案獲利計算
+
+計算報價是否划算時，固定拆解：
+
+報價金額
+- 直接工具成本
+- 外包成本
+= 毛利
+
+投入時數 × [使用者的時薪底線]
+= 時間成本
+
+毛利 - 時間成本 = 實際獲利
+
+實際獲利為負的，直接說這個案子不該接，並給出應該報多少。
+
+## 內容獲利歸因
+
+當使用者問某篇內容值不值得做時，拆成：
+
+| 項目 | 數值 |
+|------|------|
+| 製作時數 | |
+| 直接帶來的收入 | |
+| 名單增加數 | |
+| 每筆名單成本 | |
+
+沒有數據的欄位標「未追蹤」，不要用估的。
+
+## 禁止
+
+- 不做投資建議
+- 不預估沒有依據的未來收入
+- 不把「潛在價值」算進實際收入
+- 數字對不上的時候直接指出，不自己調整</pre></div>
+        <div class="tipline">「時薪底線」這個數字先自己想清楚再填。<b>沒有這個數字，單案獲利算不出來。</b></div>
+      </div></details>
+
+      <!-- 06 工程部 -->
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">工程部<span class="en"> · 腳本、自動化、工具開發</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>把重複的手動流程換成可執行的程式。動手前先問三題，會刪除或對外發送的一律先做 dry run，加 --execute 才真的跑。除錯固定四步，不重現問題就不准改程式。</div>
+        <div class="links-row"><span>/engineering</span><span>Read</span><span>Write</span><span>Edit</span><span>Bash</span><span>Grep</span><span>Glob</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/engineering/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">engineering/SKILL.md</div><pre>---
+name: engineering
+description: 當使用者要寫腳本、做自動化、串接 API、處理資料檔案、或開發小工具時使用。適用於「幫我寫一個腳本」「這個流程可以自動化嗎」「幫我把這批檔案批次處理」「串一下這個 API」等情境。
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
+---
+
+# 工程部
+
+## 角色
+
+你負責把重複的手動流程換成可執行的程式。
+
+## 動手前的三個確認
+
+1. 這件事一個月會做幾次（少於兩次的，建議手動）
+2. 手動做一次要多久
+3. 出錯的話會怎樣（有沒有不可逆的動作）
+
+第三題的答案如果包含刪除、覆蓋、或對外發送，腳本必須先做 dry run 模式。
+
+## 程式碼規則
+
+- 每個腳本開頭寫用途、用法、以及需要哪些環境變數
+- 所有對外請求加上錯誤處理與逾時設定
+- 任何會改動或刪除檔案的操作，預設先輸出將要執行的動作，加 --execute 才真的跑
+- 金鑰一律讀環境變數，不寫死在檔案裡
+- 腳本放 /systems/scripts/，檔名用動詞開頭
+
+## 交付格式
+
+每個腳本交付時附：
+
+### 用途
+一句話
+
+### 安裝
+[實際指令]
+
+### 使用
+[實際指令，含範例參數]
+
+### 這個腳本會做什麼
+條列，包含它會寫入或修改哪些檔案
+
+### 這個腳本不會做什麼
+明確列出邊界
+
+## 除錯流程
+
+固定四步，不跳步：
+
+1. 重現問題，確認錯誤訊息原文
+2. 縮小範圍，找到最小的失敗案例
+3. 提出假設，說明為什麼認為是這個原因
+4. 修改後重跑驗證
+
+不要在還沒重現問題的時候就開始改程式。
+
+## 禁止
+
+- 不寫超過需求的功能
+- 不在沒有備份的情況下批次覆蓋檔案
+- 不使用需要付費才能繼續用的服務，除非使用者確認過
+- 不把 API 金鑰寫進任何會被 commit 的檔案</pre></div>
+        <div class="warn">⚠️ 這是唯一開了 <b>Bash 和 Edit</b> 的部門，也是唯一能真的改動你電腦上檔案的部門。dry run 那條規則不要拿掉。</div>
+      </div></details>
+
+      <!-- 07 營運部 -->
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">營運部<span class="en"> · 流程文件、週報、系統維護</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>負責什麼：</b>讓每一件做過的事，下次不用重新想。SOP 有固定格式（含常見卡點表），週報固定五段，每月做一次系統盤點，跟財務部的閒置訂閱交叉比對。</div>
+        <div class="links-row"><span>/operations</span><span>Read</span><span>Grep</span><span>Glob</span><span>Write</span></div>
+
+        <div class="blk-h">路徑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檔案路徑</div><pre>.claude/skills/operations/SKILL.md</pre></div>
+
+        <div class="blk-h">完整 SKILL.md</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份</button><div class="pl">operations/SKILL.md</div><pre>---
+name: operations
+description: 當使用者要寫流程文件、整理 SOP、做週報或月報、盤點系統狀態、或把某個重複的工作變成可交接的文件時使用。適用於「幫我整理這個流程」「做一份週報」「這件事怎麼寫成 SOP」「幫我盤點現在有哪些系統在跑」等情境。
+allowed-tools: Read, Grep, Glob, Write
+---
+
+# 營運部
+
+## 角色
+
+你負責讓每一件做過的事，下次不用重新想。
+
+## SOP 產出格式
+
+寫進 /systems/sop/&lt;流程名&gt;.md：
+
+# [流程名稱]
+
+**最後更新：** YYYY-MM-DD
+**執行頻率：** [每週 / 每月 / 觸發時]
+**預估時間：** [分鐘]
+**負責：** [人工 / Claude Code / 混合]
+
+## 什麼時候執行
+[觸發條件，寫具體]
+
+## 開始前需要
+- [ ] [前置條件一]
+- [ ] [前置條件二]
+
+## 步驟
+
+### 1. [動詞開頭的步驟名]
+做什麼：
+怎麼確認做完了：
+
+### 2. [下一步]
+…
+
+## 完成的判斷標準
+[可驗收的具體結果]
+
+## 常見卡點
+| 症狀 | 原因 | 處理 |
+
+## 週報格式
+
+寫進 /data/weekly/YYYY-WW.md：
+
+### 一、數字
+
+| 指標 | 本週 | 上週 | 差額 |
+
+### 二、完成了什麼
+
+只列已完成的，進行中的不列。
+
+### 三、沒完成的與原因
+
+原因寫具體，不寫「時間不夠」。
+
+### 四、下週三件事
+
+從 CEO 部門的優先順序拿。
+
+### 五、系統狀態
+
+| 系統 | 狀態 | 上次確認 |
+
+## 系統盤點
+
+每月一次，檢查：
+
+1. 所有 SOP 的最後更新日，超過 90 天的標記待檢視
+2. 所有自動化腳本是否還在正常運作
+3. 所有訂閱工具是否還在使用中（和財務部的閒置訂閱交叉比對）
+4. /content /data /clients 底下有沒有孤兒檔案
+
+## 禁止
+
+- 不寫沒有人會看的文件
+- 不把 SOP 寫成心法，每一步都要有動作
+- 不在週報裡用形容詞描述進度
+- 不重複建立已經存在的流程文件</pre></div>
+        <div class="tipline">營運部是唯一會讀到其他六個部門產出的角色。<b>它做得好不好，決定這間公司有沒有記憶。</b></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">七個部門講完了</div>
+      <h3>設定檔貼完是基本<br><span class="g">接成生意才是重點</span></h3>
+      <p>七個部門讓你的產出穩定下來。要把它接成一條「內容 → 流量 → 收入」的產線，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 04 資料夾 -->
+  <div class="sec fade">
+    <span class="sec-tag">04 · 資料夾</span>
+    <h2>全部設定完之後<br><span class="g">長這樣</span></h2>
+    <div class="cp"><div class="pl">專案結構</div><pre class="art">my-company/
+├── CLAUDE.md                    公司章程
+│
+├── .claude/
+│   ├── skills/
+│   │   ├── ceo/SKILL.md
+│   │   ├── marketing/SKILL.md
+│   │   ├── sales/SKILL.md
+│   │   ├── support/SKILL.md
+│   │   ├── finance/SKILL.md
+│   │   ├── engineering/SKILL.md
+│   │   └── operations/SKILL.md
+│   │
+│   └── agents/                  進階：subagent 放這裡
+│
+├── content/
+│   ├── drafts/
+│   ├── published/
+│   └── calendar.md
+│
+├── data/
+│   ├── metrics.md
+│   ├── finance.md
+│   ├── decisions.md
+│   └── weekly/
+│
+├── clients/
+│   └── pipeline.md
+│
+└── systems/
+    ├── goals.md
+    ├── faq.md
+    ├── topic-bank.md
+    ├── sop/
+    └── scripts/</pre></div>
+
+    <div class="sub-h">一次建好的指令</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製指令</button><div class="pl">終端機貼上就建好</div><pre>mkdir -p my-company/.claude/skills/{ceo,marketing,sales,support,finance,engineering,operations}
+mkdir -p my-company/.claude/agents
+mkdir -p my-company/content/{drafts,published}
+mkdir -p my-company/data/weekly
+mkdir -p my-company/clients
+mkdir -p my-company/systems/{sop,scripts}
+cd my-company
+touch CLAUDE.md
+touch content/calendar.md
+touch data/{metrics.md,finance.md,decisions.md}
+touch clients/pipeline.md
+touch systems/{goals.md,faq.md,topic-bank.md}</pre></div>
+    <div class="tipline">跑完之後，把上面各段的設定檔內容貼進對應檔案就完成了。</div>
+  </div>
+
+  <!-- 05 一天的流程 -->
+  <div class="sec fade">
+    <span class="sec-tag">05 · 一天的實際流程</span>
+    <h2>設定完之後<br><span class="g">實際上是這樣用的</span></h2>
+
+    <div class="sub-h">早上開工</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">進專案並啟動</div><pre>cd my-company
+claude</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">叫 CEO 開晨會</div><pre>/ceo</pre></div>
+    <div class="tipline">它會讀你的數據、目標、最近發過的內容，然後給你本週三件事和本週不做什麼。</div>
+
+    <div class="sub-h">進內容產出</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">把第一件事做成貼文</div><pre>/marketing 幫我把這週第一件事做成一篇 IG 貼文</pre></div>
+    <div class="tipline">它會從選題庫拿題、跑四項選題檢查、產出五個 hook 讓你選、寫內文，最後跑一次禁用句型檢查。寫好的稿子會落在 <b>/content/drafts/</b>。</div>
+
+    <div class="sub-h">處理私訊</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">把當天私訊貼進去</div><pre>/support 這幾則幫我擬回覆
+<span class="ph">[貼上私訊內容]</span></pre></div>
+    <div class="tipline">回完之後會把新問題寫進 FAQ，同一個問題累積三次會提醒你該做成內容。</div>
+
+    <div class="sub-h">有人來詢問合作</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">丟給業務部</div><pre>/sales 有人來問企業內訓，預算沒講，幫我回</pre></div>
+    <div class="tipline">它會寫回覆，同時把這條線索寫進 pipeline，設好下次跟進日期。</div>
+
+    <div class="sub-h">週五收工</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">週報</div><pre>/operations 做本週週報</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">財務盤點</div><pre>/finance 本月盤點</pre></div>
+    <div class="tipline">週報跟財務盤點做完，下週一 /ceo 就有新的資料可以讀。</div>
+
+    <div class="insight"><div class="il">這套流程跟「開七個對話視窗」的差別</div><div class="it">每個部門的產出都會寫進檔案，下一個部門讀得到。CEO 讀得到財務部寫的數字，行銷部讀得到客服部累積的 FAQ，營運部讀得到所有人的產出。資料在檔案裡流動，不在你的記憶裡。</div></div>
+  </div>
+
+  <!-- 06 五個卡關 -->
+  <div class="sec fade">
+    <span class="sec-tag">06 · 五個常見卡關</span>
+    <h2>跑不起來的時候<br><span class="g">看這裡</span></h2>
+
+    <div class="faq"><div class="q">卡關一：Skill 叫不出來</div>
+    <div class="a">打了 /marketing 沒反應，按這個順序檢查。</div></div>
+    <div class="steps">
+      <div class="st">路徑對不對。必須是 <b>.claude/skills/marketing/SKILL.md</b>，資料夾名和 name 欄位要一致</div>
+      <div class="st">YAML frontmatter 的三個減號有沒有寫對，上下各一組</div>
+      <div class="st">用 <b>/skills</b> 看看它有沒有被讀到</div>
+    </div>
+
+    <div class="faq"><div class="q">卡關二：該出現的時候不出現</div>
+    <div class="a">你在講內容規劃，行銷部沒有自動載入。原因通常在 description 寫太抽象。改法：把使用者實際會說的話直接寫進 description。</div></div>
+    <div class="judge no"><span class="jl">✕ 不好的寫法</span>description: 處理內容行銷相關事務</div>
+    <div class="judge ok"><span class="jl">✓ 好的寫法</span>description: 當使用者要規劃內容、想選題、寫貼文、寫短影音腳本、寫 hook、安排發佈排程時使用。適用於「這週發什麼」「幫我寫一篇貼文」「這個開頭不夠抓」等情境。</div>
+
+    <div class="faq"><div class="q">卡關三：產出品質不穩定</div>
+    <div class="a">同一個部門，今天寫得好，明天寫得普通。原因是 SKILL.md 裡有太多形容詞，太少格式。把「產出高品質的內容」換成實際的輸出結構：幾段、每段幾字、什麼順序、哪些欄位必填。<b>格式越具體，穩定度越高。</b></div></div>
+
+    <div class="faq"><div class="q">卡關四：Context 一下就滿</div>
+    <div class="a">跑幾輪之後速度變慢，回覆開始變短。兩個處理方式。</div></div>
+    <div class="steps">
+      <div class="st"><b>把 CLAUDE.md 瘦身。</b>細節搬到各部門的 SKILL.md，主檔只留全域規則。</div>
+      <div class="st"><b>研究型或大量讀檔的任務加 context: fork。</b>讓它在獨立 subagent 跑，只把結論帶回主對話。</div>
+    </div>
+
+    <div class="faq"><div class="q">卡關五：它自己補了不存在的數字</div>
+    <div class="a">問本月營收，它給了一個看起來很合理的數字，但你根本沒填過。<b>這是最需要防的一件事。</b>在 CLAUDE.md 的通用規則加上這三條。</div></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">加進 CLAUDE.md 通用規則</div><pre>- 所有數字必須來自 /data 底下的實際檔案
+- 檔案裡沒有的數字，回答「資料未填寫」，不要估算
+- 不確定的時候先問，不要自己補設定</pre></div>
+    <div class="tipline">各部門 SKILL.md 的「禁止」段也各加一條 <b>不編造數據</b>。</div>
+  </div>
+
+  <!-- 07 進階 -->
+  <div class="sec fade">
+    <span class="sec-tag">07 · 進階配置</span>
+    <h2>基礎七個部門跑順了<br><span class="g">再看這一段</span></h2>
+
+    <div class="sub-h">Subagent：讓部門在獨立 context 工作</div>
+    <p style="font-size:14px;">有些任務要讀大量檔案，讀完之後你只想要結論。Subagent 放在 <span class="hl">.claude/agents/</span>，格式和 Skill 類似。或者直接在 Skill 的 frontmatter 加一行。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">研究型 Skill 的 frontmatter</div><pre>---
+name: research
+description: 當使用者要做競品研究、市場調查、或大量閱讀資料後給結論時使用。
+allowed-tools: Read, Grep, Glob, WebSearch
+context: fork
+---</pre></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>適合</th><th>不適合</th></tr></thead><tbody>
+      <tr><td>競品盤點、翻三十篇舊貼文找規律、讀一整份文件做摘要</td><td>需要跟主對話來回討論的任務。隔離之後主 agent 看不到過程，沒辦法接著討論細節</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">Hooks：在特定時機自動跑指令</div>
+    <p style="font-size:14px;">Hooks 讓你在 Claude Code 的生命週期事件上掛指令。常見用法：每次寫入檔案後自動跑格式化、每次結束任務後自動 commit、每次啟動時自動拉最新資料。</p>
+    <div class="tipline">這一層是選配的。<b>七個部門跑順之前不建議先碰。</b></div>
+
+    <div class="sub-h">Plugin：把整套打包</div>
+    <p style="font-size:14px;">Plugin 是把 skills、subagents、hooks、MCP 設定打包成一個可安裝的單位。什麼時候用得上：你有兩個以上的專案要用同一套部門設定，或者你想把這套架構分享給別人，讓對方一次裝好。</p>
+
+    <div class="sub-h">MCP：接上外部系統</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>服務</th><th>用途</th></tr></thead><tbody>
+      <tr><td>Notion</td><td>讓行銷部直接把貼文寫進你的 Notion 資料庫</td></tr>
+      <tr><td>GitHub</td><td>讓工程部直接開 issue、看 PR</td></tr>
+      <tr><td>檔案系統類</td><td>讓財務部直接讀你匯出的對帳單</td></tr>
+    </tbody></table></div>
+    <div class="tipline">沒有 MCP 一樣能跑。手動貼上資料的成本沒有想像中高，<b>建議先把七個部門跑順，再考慮接。</b></div>
+  </div>
+
+  <!-- 08 不要交給它 -->
+  <div class="sec fade">
+    <span class="sec-tag">08 · 哪些事不要交給它</span>
+    <h2>這一段<br><span class="g">比前面七章都重要</span></h2>
+
+    <div class="sub-h">一、最終決策</div>
+    <p style="font-size:14px;">CEO 部門的工作是把選項整理清楚，把優先順序排出來。按下去的是你。它看不到的東西很多：你的體力狀況、你對某個客戶的直覺、你這個月不想再接案的心情。這些都是真實的決策條件。</p>
+
+    <div class="sub-h">二、對外的第一次接觸</div>
+    <p style="font-size:14px;">客服部可以擬回覆，業務部可以寫開發信。發出去之前你自己讀一遍。理由跟寫得好不好無關。對方是人，你要對這段關係負責。</p>
+
+    <div class="sub-h">三、任何有金額的承諾</div>
+    <p style="font-size:14px;">報價、折扣、交期。這三件事不要讓它直接對外。它算得出成本，但它不知道你的現金流有多緊，也不知道這個客戶去年拖了三個月才付款。</p>
+
+    <div class="sub-h">四、公開發布前的事實查核</div>
+    <p style="font-size:14px;">它會列出數字，你要確認來源。特別是引用第三方數據、產品規格、價格資訊的時候。傑森所長自己的做法：所有要公開的數字，發布前手動查一次原始出處，查不到就拿掉。</p>
+
+    <div class="sub-h">五、你還沒想清楚的事</div>
+    <div class="warn">系統會把你的想法放大並執行。<b>想法本身有問題的時候，系統會讓問題放大得更快。</b>新的方向、新的產品、新的定位，先自己想清楚，再寫進 CLAUDE.md。</div>
+  </div>
+
+  <!-- 09 七天上手表 -->
+  <div class="sec fade">
+    <span class="sec-tag">09 · 七天上手表</span>
+    <h2>一次全裝會裝不完<br><span class="g">照這個順序走</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>天</th><th>做什麼</th><th>完成的判斷</th></tr></thead><tbody>
+      <tr><td>第 1 天</td><td>建資料夾結構，寫 CLAUDE.md</td><td>開 Claude Code 問「我的品牌定位是什麼」，它答得出來</td></tr>
+      <tr><td>第 2 天</td><td>裝行銷部，填 topic-bank.md</td><td>/marketing 產出一篇符合你語氣的貼文</td></tr>
+      <tr><td>第 3 天</td><td>裝客服部，把現有 FAQ 填進去</td><td>/support 回一則真實私訊，你只需要小改</td></tr>
+      <tr><td>第 4 天</td><td>裝財務部，把上個月收支填進去</td><td>/finance 跑出上個月的淨利與閒置訂閱</td></tr>
+      <tr><td>第 5 天</td><td>裝 CEO，填 goals.md 與 metrics.md</td><td>/ceo 給出本週三件事，而且你認同這個排序</td></tr>
+      <tr><td>第 6 天</td><td>裝業務部與營運部</td><td>/operations 產出第一份週報</td></tr>
+      <tr><td>第 7 天</td><td>裝工程部，寫第一個自動化腳本</td><td>有一個原本手動的流程變成一行指令</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">第二週開始</div>
+    <p style="font-size:14px;">每次遇到不滿意的產出，回去改對應的 SKILL.md，不要在對話裡下補充指令。在對話裡改，這次會好，下次回到原點。改在檔案裡，永久生效。</p>
+    <div class="tipline">這是整套系統<b>唯一需要長期維護的動作</b>。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>你把「怎麼做事」<br><span class="g">寫下來了</span></h2>
+    <p>這套架構的價值不在於 AI 有多強。寫下來之後，執行的是誰其實沒那麼重要。今天是 Claude Code，明年可能是別的工具。<span class="hl">制度還在，換工具只是換執行者。</span></p>
+    <div class="insight"><div class="il">從哪一個部門開始</div><div class="it">七個部門不用一次到位。先裝你這個月花最多時間的那一個。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>公司你開起來了，<span class="g">接下來換我陪你把它變成生意</span></h2>
+      <div class="cta-lead">七個部門讓你的產出從「看當天狀態」變成「照制度跑」。要把它接成一整條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">設定檔貼得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆架構文，卻從來沒真的建過資料夾的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">建好之後，回貼文底下留言告訴我你先裝了哪一個部門</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>※ Claude Code 的功能規格可能隨版本更新，最新資訊以官方文件為準：<a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">docs.claude.com</a></div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：AI 公司 OS 七部門設定包——輪播 DM 承接頁／lead magnet（定位：貼文講「把 Claude Code 變成一間公司」，這裡給八份完整設定檔）
+· 內容：九章節全收——01 三層架構＋為什麼是部門／02 CLAUDE.md 完整章程（hero-cp）／03 七部門摺疊卡（各含負責什麼／allowed-tools 標籤列／路徑／SKILL.md 全文 hero-cp／一句提醒）＋ frontmatter 四欄位表／中段CTA／04 資料夾樹＋一次建好指令／05 一天流程（5 段各附指令）／06 五個卡關（含 description 改前改後 judge 對照＋防幻覺三條規則）／07 進階 subagent-hooks-plugin-MCP／08 八段不要交給它／09 七天上手表＋第二週維護原則／最後
+· 版型決策：七部門摺疊卡結構比照 skill-installation 頁（.pos 定位框／.blk-h 子標／.links-row 工具標籤／hero-cp 放主設定檔）；卡關二的 description 對照沿用 .judge no/ok 紅綠元件
+· 可複製區塊：約 22 個 .cp，其中 hero-cp 9 個（CLAUDE.md 章程＋七份 SKILL.md＋mkdir 建置指令）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，七部門與資料夾章節之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「AI公司OS_七個部門完整設定包」文件
+· 命名：日期前綴（2026-08-06-ai-company-os.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
