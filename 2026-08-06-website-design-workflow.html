@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓 Claude Code 做出有品味的網站｜完整三步驟工作流</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:34px;line-height:1.4;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+/* slop 特徵清單（警示色編號） */
+.slops{display:flex;flex-direction:column;gap:9px;margin:14px 0 4px;}
+.slop{display:flex;align-items:center;gap:13px;background:var(--no-bg);border:1px solid var(--no-line);border-radius:var(--r-md);padding:13px 16px;}
+.slop .sn{flex-shrink:0;font-family:"Inter";font-weight:800;font-size:12.5px;color:var(--no);background:rgba(200,70,40,0.12);border:1px solid var(--no-line);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.slop .st2{font-size:13.8px;line-height:1.6;color:#7a3320;}
+
+/* judge 對照（不要說/換成這樣） */
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+/* 工具卡片摺疊 */
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row span{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--card2);border:1px solid var(--line);border-radius:50px;padding:3px 11px;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 80px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+/* 收斂四階段 flow */
+.flow{margin:16px 0 4px;}
+.flow .fnode{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:13px 16px;}
+.flow .fname{font-family:var(--mono);font-size:12.5px;font-weight:500;color:var(--gold);min-width:110px;}
+.flow .fdo{font-size:13.5px;color:var(--text);line-height:1.6;}
+.flow .farrow{text-align:center;color:var(--gold-dim);font-size:16px;line-height:1;margin:5px 0;}
+
+/* 可勾選自檢清單（無持久化，每次重載乾淨） */
+.ck-bar{display:flex;align-items:center;gap:12px;margin:6px 0 16px;}
+.ck-track{flex:1;height:7px;background:rgba(0,0,0,0.08);border-radius:50px;overflow:hidden;}
+.ck-fill{height:100%;width:0;background:var(--gold);border-radius:50px;transition:width .35s cubic-bezier(0.34,1.56,0.64,1);}
+.ck-num{font-family:"Inter";font-weight:800;font-size:13px;color:var(--gold);white-space:nowrap;}
+.ckl{margin:0;list-style:none;}
+.ckl li{margin-bottom:8px;}
+.ckl label{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 15px;cursor:pointer;transition:border-color .2s ease;user-select:none;}
+.ckl label:hover{border-color:var(--gold-dim);}
+.ckl input{position:absolute;opacity:0;width:0;height:0;}
+.ckl .box{flex-shrink:0;width:19px;height:19px;border:2px solid var(--gold-dim);border-radius:5px;background:var(--bg2);margin-top:1px;position:relative;transition:background .2s ease,border-color .2s ease;}
+.ckl .box::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #1a1406;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:transform .2s cubic-bezier(0.34,1.56,0.64,1);}
+.ckl .txt{font-size:13.6px;line-height:1.65;color:var(--text);}
+.ckl input:checked ~ .box{background:var(--gold);border-color:var(--gold);}
+.ckl input:checked ~ .box::after{transform:rotate(45deg) scale(1);}
+.ckl input:checked ~ .txt{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--gold-dim);}
+.ckgroup-h{font-family:var(--serif);font-weight:700;font-size:14.5px;color:var(--gold);margin:22px 0 8px;}
+.ckgroup-h:first-of-type{margin-top:6px;}
+
+/* 詞彙表 */
+.vocab-cat{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 7px;}
+.vocab-cat:first-of-type{margin-top:10px;}
+.vocab{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;}
+.vocab span{font-family:var(--mono);font-size:12px;color:var(--gold);background:rgba(212,144,42,0.09);border:1px solid var(--gold-dim);border-radius:50px;padding:4px 12px;}
+
+.err{margin:6px 0;}
+.err .eq{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin:18px 0 6px;}
+.err .eq::before{content:"\2717";color:var(--no);font-weight:800;margin-right:8px;}
+.err .ea{font-size:13.8px;color:var(--dim);line-height:1.8;}
+.err .ea b{color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:27px;}
+  .sec h2{font-size:21px;}
+  .flow .fnode{flex-direction:column;align-items:flex-start;gap:4px;}
+  .flow .fname{min-width:0;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>品味庫建好之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>網站做出品味了<br><span class="g">還要接成生意</span></h4>
+  <p>做得出有品味的網站只是開始。怎麼把 AI 工具接成能變現的系統——我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 網站設計工作流</div>
+    <h1>讓 Claude Code<br><span class="g">做出有品味的網站</span></h1>
+    <div class="h-sub">完整三步驟工作流 ＋ 可複製 Prompt 模板</div>
+    <div class="hero-sub">模型不缺能力，缺的是詞彙。這份文件把「我喜歡這個」轉換成「這個由這些元素構成」——建立品味庫、武裝 Claude、一次生五版，取代猜測。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · 主要 Part</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">9</div><div class="l">個 · AI Slop 特徵</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30</div><div class="l">個 · 可用風格詞彙</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在 AI × 自媒體變現。把 AI 工具實際跑過、踩過坑、確認真的能用之後，才整理成可以直接套用的工作流分享出來。不講理論，不講願景。</div></div>
+  </div>
+
+  <!-- 這份文件會給你什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件會給你什麼</span>
+    <h2>Part 0 到 Part 5<br><span class="g">加三份附錄</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>章節</th><th>內容</th></tr></thead><tbody>
+      <tr><td>Part 0</td><td>AI 網站長得都一樣的技術原因</td></tr>
+      <tr><td>Part 1</td><td>建立品味庫的完整方法 ＋ 3 組 Prompt</td></tr>
+      <tr><td>Part 2</td><td>該裝哪些 Skills 與 MCP，怎麼裝</td></tr>
+      <tr><td>Part 3</td><td>五風格橫向比較法 ＋ 主控 Prompt</td></tr>
+      <tr><td>Part 4</td><td>四段式 Prompt 模板（可直接複製）</td></tr>
+      <tr><td>Part 5</td><td>迭代順序：哪些先改，哪些最後改</td></tr>
+      <tr><td>附錄 A</td><td>反 slop 自檢清單</td></tr>
+      <tr><td>附錄 B</td><td>風格詞彙表（30 個可直接用的形容詞）</td></tr>
+      <tr><td>附錄 C</td><td>常見錯誤</td></tr>
+    </tbody></table></div>
+    <div class="tipline">建議閱讀方式：Part 0 到 Part 3 照順序看完一次，之後把 <b>Part 4 的模板存成書籤</b>，每個新專案回來複製一次。</div>
+  </div>
+
+  <!-- Part 0 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 0 · AI 網站長得都一樣</span>
+    <h2>原因在這裡<br><span class="g">這是統計行為，不是能力問題</span></h2>
+    <p>大型語言模型在生成前端的時候，會朝訓練資料裡最常見的模式收斂。網路上公開的 landing page 有幾百萬個，其中絕大多數是 2020 到 2024 年之間的 SaaS 模板。模型看到的「網站」平均長相就是那個樣子。<span class="hl">你不給它額外的方向，它就給你平均值。</span></p>
+    <div class="insight"><div class="il">換模型救不了</div><div class="it">換一個更新、更強的模型，得到的結果通常是「同樣的長相，但程式碼更乾淨」。平均值被拉高了，長相沒有改變。</div></div>
+
+    <div class="sub-h">AI Slop 的九個明顯特徵</div>
+    <p style="font-size:14px;">以下這些出現在你的頁面上，就代表模型在照著平均值做事：</p>
+    <div class="slops">
+      <div class="slop"><span class="sn">1</span><span class="st2">藍紫或紫粉的漸層標題文字</span></div>
+      <div class="slop"><span class="sn">2</span><span class="st2">全站只有一種字體，通常是 Inter 或系統預設</span></div>
+      <div class="slop"><span class="sn">3</span><span class="st2">卡片裡面包卡片，圓角一律 12px</span></div>
+      <div class="slop"><span class="sn">4</span><span class="st2">每個標題上面都有一個圓角方形的 icon 磚</span></div>
+      <div class="slop"><span class="sn">5</span><span class="st2">三欄等寬的功能區塊，每欄一個 icon 加兩行字</span></div>
+      <div class="slop"><span class="sn">6</span><span class="st2">彩色背景上放灰色小字</span></div>
+      <div class="slop"><span class="sn">7</span><span class="st2">玻璃擬態的半透明卡片</span></div>
+      <div class="slop"><span class="sn">8</span><span class="st2">Hero 區塊一定是「大標題 + 副標 + 兩顆按鈕」置中</span></div>
+      <div class="slop"><span class="sn">9</span><span class="st2">深色模式配霓虹強調色</span></div>
+    </div>
+
+    <div class="sub-h">解法的邏輯</div>
+    <p>模型缺的是<span class="hl">詞彙</span>。設計師在描述一個頁面的時候，腦中有一整套詞：視覺層級、留白節奏、字體對比、裝飾克制、動態的必要性。這些詞不在你的 prompt 裡，模型就只能用它自己的預設值。</p>
+    <div class="steps">
+      <div class="st"><b>建立品味庫：</b>把你喜歡的東西變成可以被描述的詞</div>
+      <div class="st"><b>武裝 Claude：</b>裝上讓它擁有設計詞彙的 Skills</div>
+      <div class="st"><b>一次生多版：</b>用比較取代猜測</div>
+    </div>
+  </div>
+
+  <!-- Part 1 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 建立品味庫</span>
+    <h2>投報率最高的一步<br><span class="g">而且只需要做一次</span></h2>
+    <p>你在下 prompt 的時候，如果只能寫「做得好看一點」「再高級一點」，那你其實沒有給模型任何資訊。「好看」對模型來說就是平均值。品味庫的作用是把<span class="hl">「我喜歡這個」</span>轉換成<span class="hl">「這個是 print-tech 風格，特徵是淺鼠尾草底色、等寬字座標標籤、地形線插畫」</span>。後者可以直接貼進 prompt，前者不行。</p>
+
+    <div class="sub-h">蒐集來源與搜尋方式</div>
+    <ul class="bul">
+      <li><b>Dribbble：</b>搜尋 web design、landing page、editorial website，排序改成 Popular。看排版與配色，不是那些永遠不會實作的動畫概念稿。</li>
+      <li><b>Pinterest：</b>搜尋 hero section design、web layout inspiration。價值在於你會看到自己絕對想不到的版面結構。</li>
+      <li><b>X / Twitter：</b>追蹤前端設計師，他們會直接貼正在做的 UI，包含靜態截圖看不到的互動細節。</li>
+      <li><b>Awwwards、Godly、Land-book：</b>三個專門收錄網站的目錄，可以直接看到實際運作的網站。</li>
+      <li><b>日常截圖（最重要的一項）：</b>任何時候滑手機或用電腦，只要有畫面讓你停下來，立刻截圖。不用當下判斷為什麼喜歡，先存下來。</li>
+    </ul>
+
+    <div class="sub-h">存連結，不只存圖</div>
+    <p style="font-size:14px;">靜態截圖會漏掉三件事：滾動時的動態、互動狀態、真實的字體渲染。養成習慣：喜歡的網站，截圖同時把 URL 存進同一筆記錄。之後直接把 URL 丟給 Claude，讓它自己去看。</p>
+
+    <div class="sub-h">按設計家族分類，不要按專案分類</div>
+    <p style="font-size:14px;">大部分人的第一直覺是按產業分：SaaS、電商、作品集、部落格。<span class="hl">這個分法沒有用</span>，因為產業跟長相沒有必然關係。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>家族名稱</th><th>特徵</th></tr></thead><tbody>
+      <tr><td>Print-Tech</td><td>印刷感、技術標記、座標與時間戳、等寬字</td></tr>
+      <tr><td>Dither Mono</td><td>單色、抖動網點、低解析度質感</td></tr>
+      <tr><td>Vast Quiet</td><td>大量留白、極小字、單一巨大影像</td></tr>
+      <tr><td>Classical Remix</td><td>古典繪畫或雕塑素材、襯線字、當代排版</td></tr>
+      <tr><td>Illustrated Storybook</td><td>手繪插畫、飽和色、圓潤字體</td></tr>
+      <tr><td>Data-as-Texture</td><td>把數據視覺化當成背景紋理</td></tr>
+      <tr><td>Editorial Serif</td><td>雜誌感、大襯線標題、多欄文字</td></tr>
+      <tr><td>Brutalist Grid</td><td>粗框線、高對比、刻意的不對稱</td></tr>
+    </tbody></table></div>
+    <div class="tipline">不需要一開始就有八個家族。<b>從三個開始</b>，每次存新東西的時候問自己「這個屬於現有的哪一個，還是要開新的」。</div>
+
+    <div class="sub-h">幫每個風格命名</div>
+    <p style="font-size:14px;">命名是這一步的核心。有名字的東西才能被叫出來。命名規則：<span class="hl">兩個詞，一個講質感，一個講技術或載體</span>。範例：Print-Tech、Dither Mono、Halftone Sail、Vast Quiet、Marble Cinematic。命名之後，幫每個家族寫三到五個特徵詞——這些詞就是你之後 prompt 裡的原料。</p>
+
+    <div class="sub-h">Prompt · 讓 Claude 幫你分析截圖</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">截圖分析 Prompt</div><pre>我要建立一個網頁設計的品味庫。以下是我蒐集的截圖。
+請你針對每一張，輸出以下六個欄位：
+
+1. 設計家族：用兩個英文詞命名這個風格（例如 Print-Tech、Vast Quiet）。
+   如果多張屬於同一家族，用同一個名字。
+2. 視覺詞彙：5 到 8 個具體的描述詞。
+   要描述可觀察的東西（配色、字體種類、間距密度、裝飾元素、影像處理方式），
+   不要用「現代」「乾淨」「專業」這類無法執行的形容詞。
+3. 字體策略：標題字體類型、內文字體類型、兩者的對比關係、
+   是否有等寬字或特殊字重的使用。
+4. 色彩策略：底色、主文字色、強調色，各給一個近似的 hex 值。
+   說明強調色被用在哪些地方。
+5. 版面骨架：Hero 區塊的結構、內容區塊的欄位數、
+   留白的比例、是否有明顯的網格系統。
+6. 可複製的關鍵字串：把上述整理成一段 30 到 60 字的英文描述，
+   格式為可以直接貼進設計 prompt 的一句話。
+
+輸出格式：每張截圖一個 Markdown 區塊，用二級標題分隔。
+最後補一張總表，列出所有出現的設計家族與各自的數量。</pre></div>
+
+    <div class="sub-h">Prompt · 讓 Claude 幫你做品味庫 App</div>
+    <p style="font-size:14px;">截圖散在資料夾裡很難用。讓 Claude 幫你做一個本地端的資料庫介面。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">品味庫 App Prompt</div><pre>幫我做一個本地端執行的網頁應用，用途是管理我的網頁設計品味庫。
+
+技術規格：
+- 單一 HTML 檔案，內嵌 CSS 與 JavaScript，不依賴後端
+- 資料存在同目錄的 data.json，我會手動編輯或用介面新增
+- 圖片檔放在 ./screenshots/ 資料夾，用檔名引用
+
+每一筆資料包含以下欄位：
+- id：流水號
+- name：這個網站或風格的名稱
+- family：設計家族（用來分組）
+- screenshot：圖片檔名
+- url：原始網址（可留空）
+- vocabulary：陣列，5 到 8 個視覺詞彙
+- typography：字體策略的文字說明
+- colors：陣列，每個元素是 { hex, role }
+- keywords：陣列，可直接丟進 prompt 的關鍵字
+- image_prompt：一段用來生成 hero 背景圖的英文 prompt
+- brief：一段 60 到 100 字的英文，描述如果要用這個風格做一個網站，
+  整體方向該怎麼定
+
+介面需求：
+- 主畫面是卡片瀑布流，每張卡片顯示截圖縮圖、名稱、家族標籤
+- 左側是設計家族的篩選器，點擊後只顯示該家族
+- 頂部有搜尋框，可以搜尋 name、vocabulary、keywords
+- 點擊卡片展開詳細頁，顯示所有欄位
+- 詳細頁的 keywords、image_prompt、brief 三個欄位各有一個複製按鈕
+- 有一個「組合 prompt」模式：可以勾選多筆資料，
+  系統把它們的 keywords 合併，輸出一段可複製的文字
+
+設計要求：
+- 介面本身要有設計感，不要用 Inter 或系統預設字體
+- 不要藍紫漸層，不要卡片裡包卡片
+- 底色用暖色系的淺色，強調色只用一種
+
+先做出可以跑的版本，我看過之後再調整。</pre></div>
+
+    <div class="sub-h">每一筆該記錄什麼</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>欄位</th><th>作用</th></tr></thead><tbody>
+      <tr><td>Design family</td><td>分組用。同家族的資料可以互相補強</td></tr>
+      <tr><td>Vocabulary</td><td>這個風格是由哪些詞組成的</td></tr>
+      <tr><td>Keywords</td><td>縮短版，直接丟進 prompt</td></tr>
+      <tr><td>Image prompt</td><td>給 hero 背景圖生成用</td></tr>
+      <tr><td>Brief</td><td>整個網站的方向設定，最重要的一欄</td></tr>
+    </tbody></table></div>
+    <div class="tipline">Brief 這一欄是很多人會省略的，但它決定了輸出的完整度。<b>Keywords 只能影響表面樣式，Brief 會影響版面決策。</b></div>
+  </div>
+
+  <!-- Part 2 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · 武裝 Claude</span>
+    <h2>Claude Code 原生<br><span class="g">沒有設計詞彙</span></h2>
+    <p>以下這些工具的作用是把詞彙補上去。</p>
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">impeccable<span class="en"> · 規則與檢查</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="links-row"><span>Paul Bakaus 開發</span><span>Apache 2.0</span><span>impeccable.style</span></div>
+        <div class="pos"><b>它做的事：</b>給 Claude 一整套設計語言，包含 23 個指令、7 份深度參考文件（色彩、字體、動態、空間設計、互動、響應式、UX writing）、一個瀏覽器內的即時編輯模式。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx impeccable install</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">初始化，會產出 PRODUCT.md 與 DESIGN.md</div><pre>/impeccable init</pre></div>
+        <div class="tipline">之後所有指令都會讀這兩個檔案，<b>所以初始化時它問的問題要認真回答</b>。</div>
+        <div class="sub-h" style="margin-top:16px;">最常用的三個指令</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>指令</th><th>用途</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/impeccable audit</td><td>掃描目前的頁面，找出 slop 模式</td><td>第一版做完，還沒開始調之前</td></tr>
+          <tr><td>/impeccable bolder</td><td>把過於保守的設計往上推</td><td>東西沒有錯，但看起來很平的時候</td></tr>
+          <tr><td>/impeccable polish</td><td>上線前的最後整理</td><td>準備 deploy 之前</td></tr>
+        </tbody></table></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">額外的 CLI 偵測器，不需要 AI 就能跑</div><pre>npx impeccable detect src/
+npx impeccable detect https://example.com</pre></div>
+        <div class="tipline">這個可以掛進 CI，讓有 slop 的 PR 直接被擋下來。</div>
+        <div class="warn">⚠️ 官網 impeccable.style 上有每個指令的 before / after 對照。<b>第一次用之前先去看一輪</b>，你會比較知道哪個指令對應哪種問題。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">Taste Skill<span class="en"> · 風格與強度調整</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>定位：</b>impeccable 偏向「規則與檢查」，Taste Skill 偏向「風格與強度調整」。它的特色是三個可調的參數，運作方式像等化器。</div>
+        <ul class="bul">
+          <li><b>VARIANCE：</b>設計語言的變化幅度</li>
+          <li><b>MOTION_INTENSITY：</b>動態的深度（低是 hover，高是滾動觸發與磁吸效果）</li>
+          <li><b>VISUAL_DENSITY：</b>每個視窗裡的資訊量（低是留白型，高是儀表板型）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"</pre></div>
+        <div class="tipline">兩套可以同時裝。作者的用法是 <b>Taste Skill 定調性，impeccable 做檢查</b>。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">Higgsfield MCP<span class="en"> · 圖像與影片</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它做的事：</b>前面兩個處理排版與樣式，這一個處理圖。Hero 圖用免費圖庫的問題是，那些圖大家都在用，一看就知道來源。Higgsfield MCP 讓你在 Claude Code 裡直接生圖跟生影片，不用切換視窗。</div>
+        <div class="sub-h">模型選擇</div>
+        <ul class="bul">
+          <li><b>靜態圖：</b>GPT Image 2</li>
+          <li><b>影片：</b>Seedance（字節跳動的影片模型，Higgsfield 上可用）</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">裝好後在 Claude Code 裡確認連線</div><pre>/mcp</pre></div>
+        <div class="tipline">看到 <b>higgsfield — connected</b> 就可以用了。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">21st.dev<span class="en"> · 元件層級資源庫</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它做的事：</b>按鈕、卡片、定價表、導覽列這些東西，站上有現成的 prompt 可以直接複製。用法：找到你要的元件，複製 prompt，貼進 Claude Code，它會照著實作。</div>
+        <div class="tipline"><b>價值在哪裡：</b>邊框處理、背景層次、分頁樣式這些細節，你自己下 prompt 的時候通常不會想到要指定，結果就是拿到預設值。</div>
+      </div></details>
+
+    </div>
+
+    <div class="sub-h">該避開的東西</div>
+    <p style="font-size:14px;">有一類 Skill 是「單一功能、規則寫死」的。它們的問題是每次輸出都一樣，用第三次的時候你就會發現所有頁面長得像同一個模板。判斷方式：如果一個 Skill 沒有任何可調參數，也不會問你關於專案的問題就直接開始做，那它大概屬於這一類。</p>
+    <div class="insight"><div class="il">方向盤要留在你手上</div><div class="it">工具的作用是擴充可能性，不是替你做決定。</div></div>
+
+    <div class="sub-h">CLAUDE.md 的設定建議</div>
+    <p style="font-size:14px;">在專案根目錄放一個 CLAUDE.md，把不變的規則寫進去，可以省下每次重複交代的時間。這份檔案寫一次，之後每個專案複製過去改參數就好。</p>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份範本</button><div class="pl">CLAUDE.md · 設計規則</div><pre># 設計規則
+
+## 永遠
+- 每個頁面有一張主導視覺，尺寸大到足以定調
+- 影像必須經過處理（半調網點、抖動、顆粒、ASCII、線稿），不用原圖
+- 排版走兩極：巨大的展示字或極小的等寬標籤，中間尺寸少用
+- 近乎單色的底，加單一暖色強調
+
+## 永不
+- 紫色到藍色的漸層
+- 光澤感的 3D 立體形狀
+- 未經處理的免費圖庫照片
+- 所有東西都圓角
+- icon 網格式的功能列
+- 只用 Inter 或系統字體
+- 平均分布的多彩配色
+
+## 字體
+- 標題：<span class="ph">[你的選擇]</span>
+- 內文：<span class="ph">[你的選擇]</span>
+- 等寬：<span class="ph">[你的選擇]</span>
+
+## 色彩
+- 底色：<span class="ph">#______</span>
+- 主文字：<span class="ph">#______</span>
+- 強調：<span class="ph">#______（只用在 ______）</span></pre></div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">品味庫和工具都到位了</div>
+      <h3>做得出有品味的網站是基本<br><span class="g">接成生意才是重點</span></h3>
+      <p>下面把整套流程接成五風格比較法、四段式模板、迭代順序。想把整套 AI 工具接成能變現的系統——我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 3 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 3 · 不要單發，一次生五版</span>
+    <h2>用比較<br><span class="g">取代猜測</span></h2>
+    <p>一次只生一個版本，你得到的是模型當下的第一直覺。你沒有比較對象，所以你只能判斷「這個我喜不喜歡」，無法判斷「有沒有更好的方向」。而且你會陷入一個循環：不喜歡，叫它改，它改了一點，還是不喜歡，再叫它改。<span class="hl">每一輪都在原地打轉，因為你們兩個都不知道目標長什麼樣。</span></p>
+
+    <div class="sub-h">收斂的四個階段</div>
+    <div class="flow">
+      <div class="fnode"><span class="fname">5 STYLES</span><span class="fdo">同樣的內容，五種設計家族，各做一版——判斷哪個方向對</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">3 VARIANTS</span><span class="fdo">選定風格，內文區塊做三個變體——判斷哪個結構對</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">1 WINNER</span><span class="fdo">定案，把 hero 圖做到位——判斷整體氣氛對不對</span></div>
+      <div class="farrow">↓</div>
+      <div class="fnode"><span class="fname">TWEAKS</span><span class="fdo">字體、色彩、動態的小幅調整——判斷細節有沒有到位</span></div>
+    </div>
+    <div class="tipline">範圍越窄，完成度越高。<b>一開始就鎖死一個方向，你會在錯的方向上做出很完整的東西。</b></div>
+
+    <div class="sub-h">為什麼要在瀏覽器裡比，不在終端機裡比</div>
+    <p style="font-size:14px;">終端機會藏住你的選擇。Claude 在終端機裡描述五個方向給你聽，你聽起來都差不多，因為文字描述無法傳達視覺差異。<span class="hl">正確做法是讓它把五個版本都做出來，放在同一個頁面上，你用眼睛比。</span></p>
+
+    <div class="sub-h">主控 Prompt · 五風格 bake-off</div>
+    <p style="font-size:14px;">這是整份文件最重要的一段。複製之後把方括號的部分換成你的內容。</p>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份主控 Prompt</button><div class="pl">五風格 Bake-off 主控 Prompt</div><pre>幫我做一個 landing page，主題是 <span class="ph">[產品名稱]</span>，<span class="ph">[一句話說明這是什麼]</span>。
+轉換目標：<span class="ph">[例如：預約 Demo]</span>。
+每一版的主要 CTA 文字都是「<span class="ph">[CTA 文字]</span>」，
+必須出現在 hero 區塊，並在頁面結尾重複一次。
+
+## 意圖
+這個產品要傳達的感覺是：<span class="ph">[例如：小團隊的不公平優勢、
+經過設計的智慧、冷靜而有自信，不要吵鬧的 SaaS 語氣]</span>。
+一個創辦人看到這個頁面，應該在三秒內想「這群人是真的懂這件事」。
+
+## 護欄
+永遠：
+- 一張主導視覺定調整個頁面
+- 影像經過處理（半調網點、抖動、顆粒、ASCII、線稿），不用原圖
+- 技術性的邊註（座標、編號、尺規刻度、時間戳）
+- 排版走兩極：巨大展示字或極小等寬標籤，中間尺寸少用
+- 近乎單色的底，加單一暖色強調
+
+永不：
+- 紫色到藍色的漸層
+- 光澤感的 3D 形狀
+- 未經處理的免費圖庫照片
+- 所有東西都圓角的親切感
+- icon 網格式的功能列
+- 只用 Inter 或系統字體
+- 平均分布的多彩配色
+
+## 執行方式
+做五個版本，各自放在自己的資料夾（v1/ 到 v5/），
+一個資料夾對應下面一個方向。
+五個版本共用同一份意圖與護欄。
+不要混合方向，每一版完整承諾它自己的美學。
+
+重要：hero 圖之後才會處理。這一輪不要生成或引用任何圖片。
+每一版在 hero 圖的位置，保留一個精確的圖片槽位
+（用 &lt;img&gt; 或 background，寬高比與位置都要正確），
+裡面填一個符合該方向配色的純色 CSS 佔位。
+所有排版與留白都要按照「圖片已經在那裡」的前提來配置，
+這樣真的圖片放進去的時候，版面不需要任何改動。
+
+## 五個方向
+--- 方向 1（v1）：<span class="ph">[家族名稱]</span> ---
+美學：<span class="ph">[3 到 5 個視覺詞彙]</span>
+字體：<span class="ph">[標題字體類型]</span> / <span class="ph">[內文字體類型]</span>
+配色：<span class="ph">[底色]</span> / <span class="ph">[文字色]</span> / <span class="ph">[強調色]</span>
+
+--- 方向 2（v2）：<span class="ph">[家族名稱]</span> ---
+<span class="ph">[同上格式]</span>
+
+--- 方向 3（v3）：<span class="ph">[家族名稱]</span> ---
+<span class="ph">[同上格式]</span>
+
+--- 方向 4（v4）：<span class="ph">[家族名稱]</span> ---
+<span class="ph">[同上格式]</span>
+
+--- 方向 5（v5）：<span class="ph">[家族名稱]</span> ---
+<span class="ph">[同上格式]</span>
+
+## 最後
+做一個 index.html，用 iframe 把五個版本並排顯示在同一個畫面，
+上方有五個按鈕可以切換單獨檢視。</pre></div>
+    <div class="tipline">五個方向的內容，直接從你的品味庫複製。<b>這就是為什麼 Part 1 要先做。</b></div>
+
+    <div class="sub-h">第二輪 · 三個內文變體</div>
+    <p style="font-size:14px;">選定風格之後，用這組 prompt 繼續收斂。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">三個內文變體 Prompt</div><pre>我選定 v<span class="ph">[N]</span> 這個方向。
+現在保持 hero 區塊完全不動，
+只針對 hero 以下的內容區塊，做三個版本（a/ b/ c/）。
+
+三個版本要在「資訊結構」上有實質差異，不要只是換顏色：
+
+版本 a：資訊密度低。大量留白，每個區塊只講一件事，
+        用垂直節奏推進。適合訴求簡單的產品。
+版本 b：資訊密度中。分欄比較，有明確的段落層級，
+        用小標題引導閱讀。適合需要說明的產品。
+版本 c：資訊密度高。接近文件或儀表板的排列，
+        表格、數據、規格並置。適合技術受眾。
+
+三個版本共用同一份設計語言（字體、配色、間距單位、
+元件樣式都不變），差異只在結構。
+
+一樣做一個 compare.html 把三個並排。</pre></div>
+
+    <div class="sub-h">第三輪 · Hero 圖</div>
+    <p style="font-size:14px;">結構定案之後才處理圖。順序反過來的話，你會為了一張圖去遷就版面。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Hero 圖生成 Prompt</div><pre>現在處理 hero 圖。
+用 Higgsfield MCP，模型選 GPT Image 2，
+根據下面的描述生成四張候選：
+
+<span class="ph">[從品味庫複製該風格的 image_prompt]</span>
+
+四張生成後，直接放進 hero 的圖片槽位裡各做一版，
+讓我在瀏覽器裡比較。
+不要調整任何排版，圖片必須完全填滿既有的槽位。</pre></div>
+  </div>
+
+  <!-- Part 4 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 4 · 四段式 Prompt 模板</span>
+    <h2>不需要一萬行的<br><span class="g">design.md</span></h2>
+    <p>前面的 prompt 都是完整範例。這一段是抽象出來的骨架，你可以套用到任何專案。</p>
+
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>區塊</th><th>內容</th><th>來源</th></tr></thead><tbody>
+      <tr><td>1. Aesthetic</td><td>設計家族與視覺詞彙</td><td>品味庫</td></tr>
+      <tr><td>2. Reference</td><td>截圖或實際網址</td><td>品味庫</td></tr>
+      <tr><td>3. Intent</td><td>這是什麼、給誰看、他們該做什麼</td><td>你自己</td></tr>
+      <tr><td>4. Guardrails</td><td>always / never 清單</td><td>CLAUDE.md</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">四個輸入就足夠</div><div class="it">不需要一萬行的 design.md。四個區塊寫清楚，就能給模型足夠的方向。</div></div>
+
+    <div class="sub-h">空白模板</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製空白模板</button><div class="pl">四段式空白模板</div><pre>## 1. 美學方向
+設計家族：<span class="ph">[名稱]</span>
+視覺詞彙：<span class="ph">[5 到 8 個具體的詞]</span>
+字體：標題 <span class="ph">[ ]</span> / 內文 <span class="ph">[ ]</span> / 等寬 <span class="ph">[ ]</span>
+配色：底 <span class="ph">[ ]</span> / 文字 <span class="ph">[ ]</span> / 強調 <span class="ph">[ ]</span>
+
+## 2. 參考
+<span class="ph">[貼上截圖，或提供網址]</span>
+參考的使用方式：學習它的感覺、節奏與處理手法。
+不要複製它的版面、文案或具體元素。
+
+## 3. 意圖
+這是什麼：<span class="ph">[一句話]</span>
+給誰看：<span class="ph">[受眾描述，包含他們的專業程度與時間壓力]</span>
+他們該做什麼：<span class="ph">[單一明確的動作]</span>
+看完應該產生的感覺：<span class="ph">[一句話]</span>
+
+## 4. 護欄
+永遠：
+- <span class="ph">[ ]</span>
+- <span class="ph">[ ]</span>
+- <span class="ph">[ ]</span>
+
+永不：
+- <span class="ph">[ ]</span>
+- <span class="ph">[ ]</span>
+- <span class="ph">[ ]</span></pre></div>
+
+    <div class="sub-h">每個區塊寫多少</div>
+    <ul class="bul">
+      <li><b>Aesthetic：</b>詞彙越具體越好，但控制在 8 個以內。超過的話模型會開始取捨，而且你無法預測它捨掉哪個。</li>
+      <li><b>Reference：</b>一到三張。超過三張，模型會開始平均化，結果反而變回 slop。</li>
+      <li><b>Intent：</b>三到四句。這一段講的是目的，不是樣式。</li>
+      <li><b>Guardrails：</b>never 清單比 always 清單重要。禁止事項是明確的，正面指示容易被模糊詮釋。</li>
+    </ul>
+  </div>
+
+  <!-- Part 5 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · 迭代順序</span>
+    <h2>順序錯了<br><span class="g">你會一直改被推翻的東西</span></h2>
+    <p>第一版出來之後，改的順序有講究。</p>
+
+    <div class="acc">
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">Hero</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>先把 hero 定下來。這一塊決定了整個頁面的氣氛，後面所有東西都是配合它。Higgsfield 生四張，選一張，調整色調讓它跟頁面配色一致。</p></div></details>
+
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">轉場</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>Hero 跟內文之間不要硬切。加一個過渡：漸層遮罩、重疊的區塊邊界、或者讓 hero 圖延伸進第一個內容區塊。</p></div></details>
+
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">動態</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>頁面載入要有重量感。元素進場的時候，加一點延遲跟緩動，讓它感覺是「被放置」而不是「被貼上」。<b>克制是關鍵。</b>選一個代表性的動態時刻，把它做好，其他地方保持安靜。所有東西都在動，等於沒有東西在動。</p></div></details>
+
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">Tweaks Bar<span class="en"> · 很多人不知道可以做</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Tweaks Bar Prompt</div><pre>幫我做一個浮動的調整面板，固定在頁面右側，可以收合。
+面板包含：
+- 標題字體：下拉選單，列出 8 個候選字體，即時切換
+- 內文字體：同上
+- H1 字級：滑桿，範圍 32px 到 96px
+- H1 字距：滑桿，範圍 -0.05em 到 0.05em
+- H1 字重：滑桿
+- 內文字級：滑桿，範圍 14px 到 20px
+- 區塊間距：滑桿，範圍 40px 到 200px
+- 強調色：色票選擇器
+- 底色：色票選擇器
+
+所有調整即時反映在頁面上。
+面板底部有一個「輸出目前設定」按鈕，
+點擊後把當前所有數值輸出成 CSS 變數的區塊，可以複製。
+
+這個面板只在開發時使用，用一個 URL 參數 ?tweaks=1 控制顯示。</pre></div>
+        <div class="tipline">做出這個面板之後，你就不用再叫 Claude「字再大一點」「間距再開一點」。<b>自己拉滑桿，拉到滿意，輸出設定，貼回去。</b></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">持續餵參考</span><span class="ch-mk"></span></summary>
+      <div class="ch-body"><p>每次覺得哪裡不對，回品味庫找一個對應的參考丟給它。</p></div></details>
+    </div>
+
+    <div class="sub-h">不要說的話</div>
+    <div class="judge no"><span class="jl">✕ 沒有可執行的資訊</span>「再高級一點」「做得更有設計感」「感覺還是有點 AI」「再現代一點」</div>
+    <div class="judge ok"><span class="jl">✓ 換成這樣</span>「標題字級加大到 72px，字距收到 -0.02em」「這個區塊的留白不夠，上下各加到 120px」「參考這張截圖的分欄方式，把功能區塊改成兩欄不等寬」「跑 /impeccable audit，把找到的問題列給我」</div>
+  </div>
+
+  <!-- 附錄 A -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 A · 反 Slop 自檢清單</span>
+    <h2>第一版做完之後<br><span class="g">照這份清單走一遍</span></h2>
+    <div class="ck-bar">
+      <div class="ck-track"><div class="ck-fill" id="ckFill"></div></div>
+      <div class="ck-num" id="ckNum">0 / 19</div>
+    </div>
+
+    <div class="ckgroup-h">字體</div>
+    <ul class="ckl" id="ckList">
+      <li><label><input type="checkbox" data-ck="1"><span class="box"></span><span class="txt">標題與內文使用不同字體，而且有明顯的對比關係</span></label></li>
+      <li><label><input type="checkbox" data-ck="2"><span class="box"></span><span class="txt">沒有使用 Inter、Roboto、Arial 或系統預設</span></label></li>
+      <li><label><input type="checkbox" data-ck="3"><span class="box"></span><span class="txt">有明確的字級階層，最大與最小之間至少四級</span></label></li>
+      <li><label><input type="checkbox" data-ck="4"><span class="box"></span><span class="txt">行高有針對不同字級分別設定</span></label></li>
+    </ul>
+
+    <div class="ckgroup-h">色彩</div>
+    <ul class="ckl" data-ckgroup>
+      <li><label><input type="checkbox" data-ck="5"><span class="box"></span><span class="txt">沒有漸層文字</span></label></li>
+      <li><label><input type="checkbox" data-ck="6"><span class="box"></span><span class="txt">強調色只有一種，而且用途一致</span></label></li>
+      <li><label><input type="checkbox" data-ck="7"><span class="box"></span><span class="txt">沒有在彩色背景上放灰色文字</span></label></li>
+      <li><label><input type="checkbox" data-ck="8"><span class="box"></span><span class="txt">底色不是純白或純黑</span></label></li>
+    </ul>
+
+    <div class="ckgroup-h">空間</div>
+    <ul class="ckl" data-ckgroup>
+      <li><label><input type="checkbox" data-ck="9"><span class="box"></span><span class="txt">區塊之間的間距有節奏變化，不是全部一樣</span></label></li>
+      <li><label><input type="checkbox" data-ck="10"><span class="box"></span><span class="txt">有至少一處刻意的大留白</span></label></li>
+      <li><label><input type="checkbox" data-ck="11"><span class="box"></span><span class="txt">圓角半徑不是全站統一值</span></label></li>
+      <li><label><input type="checkbox" data-ck="12"><span class="box"></span><span class="txt">沒有卡片包卡片</span></label></li>
+    </ul>
+
+    <div class="ckgroup-h">影像</div>
+    <ul class="ckl" data-ckgroup>
+      <li><label><input type="checkbox" data-ck="13"><span class="box"></span><span class="txt">Hero 圖不是免費圖庫的原圖</span></label></li>
+      <li><label><input type="checkbox" data-ck="14"><span class="box"></span><span class="txt">影像有經過處理（濾鏡、網點、裁切、疊色）</span></label></li>
+      <li><label><input type="checkbox" data-ck="15"><span class="box"></span><span class="txt">沒有光澤感的 3D 立體圖形</span></label></li>
+    </ul>
+
+    <div class="ckgroup-h">版面</div>
+    <ul class="ckl" data-ckgroup>
+      <li><label><input type="checkbox" data-ck="16"><span class="box"></span><span class="txt">Hero 不是「大標 + 副標 + 兩顆按鈕」置中</span></label></li>
+      <li><label><input type="checkbox" data-ck="17"><span class="box"></span><span class="txt">功能區塊不是三欄等寬各配一個 icon</span></label></li>
+      <li><label><input type="checkbox" data-ck="18"><span class="box"></span><span class="txt">至少有一個區塊使用了非對稱的版面</span></label></li>
+    </ul>
+
+    <div class="ckgroup-h">動態</div>
+    <ul class="ckl" data-ckgroup>
+      <li><label><input type="checkbox" data-ck="19"><span class="box"></span><span class="txt">有一個明確的代表性動態時刻，其他區域的動態是克制的</span></label></li>
+    </ul>
+  </div>
+
+  <!-- 附錄 B -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 B · 可直接使用的風格詞彙表</span>
+    <h2>30 個詞<br><span class="g">直接放進 vocabulary 欄位</span></h2>
+    <div class="vocab-cat">質感類</div>
+    <div class="vocab"><span>halftone dot texture</span><span>dithered monochrome</span><span>canvas grain</span><span>risograph overlay</span><span>photocopied edge</span><span>letterpress emboss</span></div>
+    <div class="vocab-cat">排版類</div>
+    <div class="vocab"><span>monumental display type</span><span>mono coordinate labels</span><span>asymmetric editorial grid</span><span>hairline rules</span><span>hanging punctuation</span><span>extreme type scale contrast</span></div>
+    <div class="vocab-cat">色彩類</div>
+    <div class="vocab"><span>near-monochrome ground</span><span>single warm accent</span><span>pale sage ground</span><span>bone white on ink</span><span>duotone treatment</span><span>muted archival palette</span></div>
+    <div class="vocab-cat">影像類</div>
+    <div class="vocab"><span>topographic line illustration</span><span>archival photography</span><span>ASCII character rendering</span><span>long-exposure landscape</span><span>classical sculpture crop</span><span>technical blueprint linework</span></div>
+    <div class="vocab-cat">結構類</div>
+    <div class="vocab"><span>technical marginalia</span><span>ruler tick marks</span><span>timestamp annotations</span><span>registration crosshairs</span><span>plate numbering</span><span>specimen sheet layout</span></div>
+    <div class="tipline">用法：從裡面挑 5 到 8 個組合成一個方向。挑的時候讓它們互相支援，<b>不要混搭衝突的</b>（例如 illustrated storybook 配 technical blueprint linework 會互相抵銷）。</div>
+  </div>
+
+  <!-- 附錄 C -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 C · 常見錯誤</span>
+    <h2>六個<br><span class="g">最常見的坑</span></h2>
+    <div class="err">
+      <div class="eq">跳過品味庫，直接開始生</div>
+      <div class="ea">結果是你在下 prompt 的時候只能寫抽象形容詞，模型回到平均值。<b>品味庫這一步做兩個小時，之後每個專案省兩天。</b></div>
+      <div class="eq">一開始就要求「完美的一版」</div>
+      <div class="ea">模型在第一次生成的時候不知道你要什麼。橫向出五版，你花的時間差不多，但你會知道自己要哪個。</div>
+      <div class="eq">先做圖，再做版面</div>
+      <div class="ea">Hero 圖先定案的話，你會為了遷就那張圖去改版面。順序應該是版面先定，圖片槽位先預留，最後才放圖。</div>
+      <div class="eq">在終端機裡調視覺</div>
+      <div class="ea">視覺的東西要用看的。做一個 tweaks bar，拉滑桿比打字快十倍，而且你會看到中間值。</div>
+      <div class="eq">裝了 Skill 就不管了</div>
+      <div class="ea">Skill 提供的是詞彙與檢查，方向還是你決定的。裝了 impeccable 不會讓 Claude 知道你的品牌調性。/impeccable init 問你的問題要認真回答，CLAUDE.md 要寫。</div>
+      <div class="eq">一次改太多</div>
+      <div class="ea">發現問題的時候，一次只改一個維度。字體改完看，再改間距，再改顏色。<b>同時改三個，你不知道是哪個造成的差異。</b></div>
+    </div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>品味庫做一次<br><span class="g">之後每個專案都用得到</span></h2>
+    <p>這套流程的核心是把「我喜歡這個」轉換成「這個由這些元素構成」。<span class="hl">模型不缺能力。它缺的是你的參考、你的詞彙、你的禁止清單。</span>這三樣東西建立起來之後，同樣的工具在你手上會產出跟別人完全不同的東西。</p>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>網站你做得出品味了，<span class="g">接下來換我陪你把它接成生意</span></h2>
+      <div class="cta-lead">這套工作流讓你的網站不再長得跟別人一樣。但要把 AI 工具接成一整條「內容 → 流量 → 收入」的產線——那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">會用 Claude Code、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆工作流，卻從來沒真的用起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">模型不缺能力，缺的是你的詞彙</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——拆解 Claude Code、Claude Skills、MCP、自動化工作流<br>※ 本文件內容基於 2026 年 8 月的工具版本，impeccable、Taste Skill、Higgsfield 都在持續更新，實際指令與參數請以官方文件為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function ckBoxes(){ return document.querySelectorAll('.ckl input[type=checkbox]'); }
+function paintCk(){
+  var boxes = ckBoxes(), total = boxes.length, n = 0;
+  boxes.forEach(function(b){ if(b.checked){ n++; } });
+  var fill = document.getElementById('ckFill');
+  var num  = document.getElementById('ckNum');
+  if(fill){ fill.style.width = (total ? (n/total*100) : 0) + '%'; }
+  if(num){ num.textContent = n + ' / ' + total; }
+}
+ckBoxes().forEach(function(b){ b.addEventListener('change', paintCk); });
+paintCk();
+
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：讓 Claude Code 做出有品味的網站——輪播 DM 承接頁／lead magnet（定位：完整三步驟工作流＋可複製 Prompt 模板，工具書型長期查用）
+· 內容：Part0 AI slop 九特徵（.slop 警示編號列表）+ Part1 建立品味庫（來源／存連結／設計家族表／命名／2 個 Prompt／記錄欄位表）+ Part2 武裝 Claude（4 工具摺疊卡：impeccable/Taste Skill/Higgsfield/21st.dev + 該避開 + CLAUDE.md 範本 hero-cp）+ 中段CTA + Part3 五風格橫向比較（收斂四階段 .flow + 主控 Prompt hero-cp 全篇最大 + 兩個延伸 Prompt）+ Part4 四段式模板（空白模板 hero-cp）+ Part5 迭代順序（5 階段摺疊 + Tweaks Bar Prompt + judge 對照「不要說/換成」）+ 附錄A 反slop自檢清單（19項可勾選+進度條，無持久化因跨專案重用）+ 附錄B 風格詞彙表（30個 vocab chips 分5類）+ 附錄C 常見錯誤（.err 六則）
+· 版型決策：
+  - Part0 九特徵用 .slop 警示色編號列表（區別於一般 .steps 金色編號）
+  - 附錄A checkbox 沿用 10-project 頁的 .ckl 元件，但刻意不接 localStorage——這份清單是每個新專案都要重跑一次的自檢表，若持久化會殘留上個專案的勾選狀態造成誤導
+  - Part5「不要說的話」沿用 ai-copywriter 頁的 .judge no/ok 紅綠對照元件
+  - 主控 Prompt（五風格 bake-off）是全篇最長最重要的區塊，用 hero-cp 金框主打
+· 可複製區塊：13 個 .cp（Part1: 2／Part2: impeccable 3+CLAUDE.md 1+Taste 1+Higgsfield 1／Part3: 主控1+變體1+hero圖1／Part4: 空白模板1／Part5: tweaks bar1）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，Part2 與 Part3 之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A）
+· 來源：傑森所長自有「Claude-Code-網站設計工作流」文件
+· 命名：日期前綴（2026-08-06-website-design-workflow.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
