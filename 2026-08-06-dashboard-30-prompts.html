@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard 30 Prompts｜從診斷到上台的完整流程</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:400px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.map td:first-child{font-weight:400;color:var(--text);}
+.tbl.map td:last-child{font-family:var(--mono);color:var(--gold);font-weight:700;white-space:nowrap;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:16px 0 6px;}
+.flow span{font-size:13px;font-weight:700;color:var(--gold);background:rgba(212,144,42,0.10);border:1px solid var(--gold-dim);border-radius:50px;padding:4px 14px;}
+.flow i{color:var(--faint);font-style:normal;font-size:12px;}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row span{font-family:var(--mono);font-size:11px;color:var(--dim);background:var(--card2);border:1px solid var(--line);border-radius:50px;padding:3px 11px;}
+
+.pnum{display:flex;align-items:baseline;gap:9px;margin:22px 0 6px;padding-top:16px;border-top:1px dashed var(--line);}
+.pnum:first-of-type{border-top:none;padding-top:4px;margin-top:8px;}
+.pnum .pn{font-family:"Inter";font-weight:800;font-size:15px;color:var(--gold);flex-shrink:0;}
+.pnum .pt{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;line-height:1.4;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 80px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;margin:20px 0 8px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--text);line-height:1.85;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>30 個跑完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>Prompt 給你了<br><span class="g">工作流還沒接</span></h4>
+  <p>30 個 prompt 讓你把一份 dashboard 做完。怎麼把 AI 接進你每天的工作，我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">DASHBOARD × AI · 7 階段 30 PROMPT</div>
+    <h1>Dashboard<br><span class="g">30 Prompts</span></h1>
+    <div class="h-sub">從診斷到上台的完整流程　每一個 prompt 都能一鍵複製</div>
+    <div class="hero-sub">大部分人做 dashboard 的第一個動作，是打開 Power BI 開始拉圖表。這份文件把順序倒過來：先定義、再清資料、再算數字、再談視覺、再排敘事、再做檢查，最後才是上台。七個階段、三十個 prompt，全部放在可複製區塊裡。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 階段</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">30</div><div class="l">個 · Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">種 · 工具通用</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」，分享一個人也能跑完的 AI 工作流。這裡的內容偏向可以直接套用的東西：拆解到步驟的流程、可以複製貼上的 prompt、把工具真正接進工作裡的方法。Instagram 與 Threads 每週更新。</div></div>
+  </div>
+
+  <!-- 這份文件是什麼 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份文件是什麼</span>
+    <h2>一份 dashboard<br><span class="g">從無到有的完整流程</span></h2>
+    <p>拆成 <span class="hl">7 個階段、30 個 prompt</span>。每一個 prompt 都在獨立的區塊裡，點右上角就能複製貼進 AI 對話框。</p>
+
+    <div class="sub-h">使用方式</div>
+    <div class="steps">
+      <div class="st"><b>依階段順序走，不要跳。</b>每個階段的產出會變成下一階段的輸入</div>
+      <div class="st">方括號 <b>[ ]</b> 是需要你自己填的變數，填完再送出</div>
+      <div class="st">建議<b>開一個對話串跑完整個專案</b>，AI 才記得前面的決策</div>
+      <div class="st">需要讀資料或算數字的 prompt，用<b>有程式碼執行能力</b>的工具效果比較好</div>
+      <div class="st">純文字規劃類的 prompt，任何一個大型語言模型都能跑</div>
+    </div>
+
+    <div class="sub-h">適用工具</div>
+    <p style="font-size:14px;">Power BI、Tableau、Looker Studio、Google Sheets 圖表都適用。DAX 相關的部分（階段 3）是 Power BI 專屬語法，其他工具可以請 AI 換成對應語言。</p>
+  </div>
+
+  <!-- 流程總覽 -->
+  <div class="sec fade">
+    <span class="sec-tag">流程總覽</span>
+    <h2>七個階段<br><span class="g">每一段在做什麼</span></h2>
+    <div class="flow"><span>診斷</span><i>→</i><span>清理</span><i>→</i><span>數字</span><i>→</i><span>視覺</span><i>→</i><span>敘事</span><i>→</i><span>防彈</span><i>→</i><span>上台</span></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>階段</th><th>名稱</th><th>數</th><th>這一段在做什麼</th></tr></thead><tbody>
+      <tr><td>1</td><td>診斷</td><td>4</td><td>定義這份 dashboard 要支撐什麼決策</td></tr>
+      <tr><td>2</td><td>清理</td><td>5</td><td>把底層資料整理成可以用的狀態</td></tr>
+      <tr><td>3</td><td>數字</td><td>5</td><td>設計 KPI 與量值計算邏輯</td></tr>
+      <tr><td>4</td><td>視覺</td><td>5</td><td>把散圖變成有層級的版面</td></tr>
+      <tr><td>5</td><td>敘事</td><td>4</td><td>讓圖表自己把結論講完</td></tr>
+      <tr><td>6</td><td>防彈</td><td>4</td><td>確保沒有錯誤數字流出去</td></tr>
+      <tr><td>7</td><td>上台</td><td>3</td><td>準備報告當下的那幾分鐘</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 30 個 prompt -->
+  <div class="sec fade">
+    <span class="sec-tag">30 個 Prompt</span>
+    <h2>展開任一階段<br><span class="g">Prompt 直接複製</span></h2>
+
+    <div class="acc">
+
+      <!-- 階段 1 -->
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">診斷<span class="en"> · #01-#04 · 打開軟體之前先做完</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>定義這份 dashboard 要支撐什麼決策。這四個 prompt 的產出會被後面六個階段一直引用，<b>建議把 AI 的回覆存下來</b>。</div>
+
+        <div class="pnum"><span class="pn">#01</span><span class="pt">顧問式需求訪談</span></div>
+        <div class="tipline"><b>什麼時候用：</b>專案第一個動作，還沒碰任何資料的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#01 顧問式需求訪談</div><pre>我要做一個 <span class="ph">[主題]</span> 的 dashboard，使用者是 <span class="ph">[誰]</span>。
+
+在做任何視覺之前，先用一個資深 BI 顧問會問的 5 個問題訪談我，一次問一題，等我回答完再問下一題。
+
+你要問出來的東西包含：
+1. 這份 dashboard 支撐的是哪一個具體決策
+2. 使用者看完之後會採取什麼行動
+3. 哪 3 個數字最重要，排序理由是什麼
+4. 使用頻率（每天／每週／每月／臨時查）
+5. 哪些東西刻意不放進去，理由是什麼
+
+訪談完之後，用 5 行總結這個專案，給我確認。</pre></div>
+        <div class="tipline"><b>變數：</b>[主題] 例如「電商月營收」「客服工單效率」；[誰] 例如「業務主管」「營運長」。<b>接下來：</b>把 5 行總結存起來，後面很多 prompt 會叫你貼上。</div>
+
+        <div class="pnum"><span class="pn">#02</span><span class="pt">受眾與決策定位</span></div>
+        <div class="tipline"><b>什麼時候用：</b>同一份 dashboard 有多個對象在看的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#02 受眾與決策定位</div><pre>這份 dashboard 的預期受眾是 <span class="ph">[列出所有會看的角色]</span>。
+
+幫我分析：
+1. 每個角色關心的問題分別是什麼（用他們自己會講的話寫）
+2. 每個角色看完之後可能採取的行動
+3. 這些角色之間有哪些需求是衝突的
+4. 如果只能服務一個角色，應該是誰，理由是什麼
+5. 其他角色的需求，建議用什麼方式處理（分頁、篩選器、另做一份、直接不做）
+
+最後給我一個建議：這份 dashboard 的主受眾定為誰，其他人怎麼安置。</pre></div>
+        <div class="tipline"><b>變數：</b>[列出所有會看的角色] 例如「業務主管、財務、總經理、第一線業務」。</div>
+
+        <div class="pnum"><span class="pn">#03</span><span class="pt">範圍收斂</span></div>
+        <div class="tipline"><b>什麼時候用：</b>需求清單開始膨脹的時候。這個 prompt 的作用是砍東西。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#03 範圍收斂</div><pre>以下是這個 dashboard 目前被提出的所有需求：
+<span class="ph">[貼上需求清單]</span>
+
+專案背景：<span class="ph">[貼上 #01 的 5 行總結]</span>
+
+用一個要對交期負責的專案負責人角度，幫我分成三類：
+
+【核心】沒有這個 dashboard 就不成立，第一版必做
+【延伸】有價值但可以第二版，寫下延後的理由
+【砍掉】對主決策沒有幫助，寫下砍掉的理由
+
+每一項都要標註：
+- 資料取得難度（高／中／低）
+- 製作工時估計
+- 對主決策的貢獻度（高／中／低）
+
+最後告訴我：第一版的範圍應該包含哪幾項，總共幾個視覺元件。</pre></div>
+
+        <div class="pnum"><span class="pn">#04</span><span class="pt">一頁專案規格書</span></div>
+        <div class="tipline"><b>什麼時候用：</b>階段 1 收尾，開始動手之前的最後一步。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#04 一頁專案規格書</div><pre>根據以下資訊，幫我寫一份一頁的 dashboard 規格書：
+
+專案總結：<span class="ph">[貼上 #01 的 5 行總結]</span>
+主受眾：<span class="ph">[貼上 #02 的結論]</span>
+第一版範圍：<span class="ph">[貼上 #03 的核心清單]</span>
+
+規格書要包含這些欄位：
+1. 專案名稱與一句話目的
+2. 主受眾與使用情境（在哪裡看、什麼時候看、看多久）
+3. 支撐的決策
+4. 頂欄 KPI（3 到 5 個，只寫名稱與定義，計算公式之後再處理）
+5. 頁面架構（幾頁、每頁負責回答什麼問題）
+6. 資料來源與更新頻率
+7. 明確排除項目（寫清楚不做什麼）
+8. 驗收標準（怎樣算做完）
+
+用表格排版，我要能直接貼給需求方確認。</pre></div>
+        <div class="tipline">這份規格書是整個專案的參考點。<b>後面每一個階段的 prompt 都可以貼上這份文件當背景。</b></div>
+      </div></details>
+
+      <!-- 階段 2 -->
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">清理<span class="en"> · #05-#09 · 畫第一張圖之前</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>把底層資料弄乾淨。這個階段的 prompt 建議<b>用有程式碼執行能力的 AI 工具跑</b>（Claude、ChatGPT 的資料分析模式）。</div>
+
+        <div class="pnum"><span class="pn">#05</span><span class="pt">資料欄位盤點</span></div>
+        <div class="tipline"><b>什麼時候用：</b>拿到原始檔案，還沒開始清的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#05 資料欄位盤點</div><pre>這是我的原始資料 <span class="ph">[上傳檔案／貼上前 30 列]</span>。
+
+幫我做一份欄位盤點表，每個欄位列出：
+1. 欄位名稱
+2. 推測的資料型別（文字／數值／日期／布林）
+3. 實際內容範例（3 筆）
+4. 空值比例
+5. 唯一值數量
+6. 我推測這個欄位的用途（維度／量值／識別碼／可能沒用）
+
+盤點完之後，告訴我：
+- 哪些欄位看起來是重複的或衍生的
+- 哪些欄位命名不清楚，建議改成什麼
+- 哪些欄位可能可以直接刪掉，理由是什麼</pre></div>
+
+        <div class="pnum"><span class="pn">#06</span><span class="pt">資料 X 光健檢</span></div>
+        <div class="tipline"><b>什麼時候用：</b>盤點完欄位之後，正式清理的核心 prompt。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#06 資料 X 光健檢</div><pre>用程式碼分析這份資料，給我一份 X 光檢查，逐項檢查：
+
+1. 重複值：完全重複的列、以及應該唯一但重複的鍵值
+2. 不可能出現的數值：負數金額、超出合理範圍的數字、未來日期
+3. 空欄位：哪些欄位有空值、比例多少、空值集中在哪些列
+4. 寫法不一致：同一個意思但寫法不同的文字（大小寫、全半形、空白、簡稱）
+5. 日期格式混亂：同欄位出現多種日期格式
+6. 加總對不起來：明細加總與彙總欄位的差額
+7. 孤兒資料：明細表有但主檔沒有的鍵值
+
+每一個問題都要寫清楚三件事：
+- 出現在哪（欄位、大概幾列、舉 2 個實例）
+- 會怎麼影響 dashboard（具體說會讓哪個數字錯）
+- 怎麼修（給我修正的程式碼）
+
+最後給我一份清乾淨、結構化的單一表格，並附上一份修改紀錄。</pre></div>
+
+        <div class="pnum"><span class="pn">#07</span><span class="pt">星型模型建模</span></div>
+        <div class="tipline"><b>什麼時候用：</b>資料清乾淨之後，準備進 Power BI 之前。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#07 星型模型建模</div><pre>這是我清理過的資料：<span class="ph">[上傳／貼上欄位清單]</span>。
+
+幫我設計成星型模型（Star Schema）：
+1. 哪些欄位屬於事實表（Fact），哪些屬於維度表（Dimension）
+2. 事實表的粒度是什麼（一列代表什麼事件）
+3. 每個維度表需要哪些欄位、主鍵是什麼
+4. 事實表與維度表之間的關聯方式與基數（一對多／多對多）
+5. 有沒有需要處理的多對多關係，建議怎麼處理
+
+輸出格式：
+- 一張模型結構圖（用文字或 Mermaid 語法表示）
+- 每張表的欄位清單
+- 建立這些表的程式碼
+
+另外告訴我：這個模型有哪些地方之後可能會出問題。</pre></div>
+
+        <div class="pnum"><span class="pn">#08</span><span class="pt">類別對照與命名統一</span></div>
+        <div class="tipline"><b>什麼時候用：</b>資料裡同一個東西有很多種寫法的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#08 類別對照與命名統一</div><pre>這是我的 <span class="ph">[欄位名稱]</span> 欄位的所有唯一值：
+<span class="ph">[貼上唯一值清單]</span>
+
+幫我：
+1. 找出實際上是同一個東西、但寫法不同的值，分組列出
+2. 每一組建議一個標準寫法，並說明選擇理由
+3. 建立一份對照表（原始值 → 標準值）
+4. 標出你不確定該怎麼歸類的值，讓我自己判斷
+5. 給我套用這份對照表的程式碼
+
+對照表請用可以直接匯入的格式輸出（兩欄式表格）。</pre></div>
+        <div class="tipline"><b>變數：</b>[欄位名稱] 常見的是「客戶名稱」「產品類別」「地區」「業務員」。</div>
+
+        <div class="pnum"><span class="pn">#09</span><span class="pt">日期表建立</span></div>
+        <div class="tipline"><b>什麼時候用：</b>只要 dashboard 有任何時間維度的分析就需要。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#09 日期表建立</div><pre>幫我建立一張標準日期表，用於 Power BI 的時間智慧函數。
+
+需求：
+- 期間範圍：<span class="ph">[起始日]</span> 到 <span class="ph">[結束日]</span>
+- 會計年度起始月：<span class="ph">[月份，一般公司填 1]</span>
+- 語系：繁體中文，台灣用法
+
+日期表需要包含這些欄位：
+日期、年、季、月、月份名稱、週次、星期幾、
+年月（排序用數字格式）、年季、
+是否為工作日、是否為月底、是否為季底、
+會計年度、會計季、會計月、
+相對月份索引（本月為 0，上月為 -1，用於相對期間篩選）
+
+請給我：
+1. 建立這張表的 DAX 程式碼
+2. 建立這張表的 Power Query M 程式碼
+3. 建好之後要在 Power BI 做哪些設定（標記為日期表、建立關聯、排序欄位設定）
+4. 常見的三個設定錯誤與檢查方式</pre></div>
+      </div></details>
+
+      <!-- 階段 3 -->
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">數字<span class="en"> · #10-#14 · 讓 dashboard 會思考的量值</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>設計 KPI 與量值計算邏輯。這個階段的 DAX 語法是 <b>Power BI 專屬</b>，其他工具可以請 AI 轉換成對應語言。</div>
+
+        <div class="pnum"><span class="pn">#10</span><span class="pt">指標定義字典</span></div>
+        <div class="tipline"><b>什麼時候用：</b>開始寫公式之前。這一步能擋掉大部分「兩個部門算出來的數字不一樣」的問題。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#10 指標定義字典</div><pre>這份 dashboard 會用到以下指標：
+<span class="ph">[列出指標名稱，例如：營收、毛利率、客單價、回購率]</span>
+
+專案背景：<span class="ph">[貼上 #04 的規格書]</span>
+
+幫我針對每一個指標建立定義卡，包含：
+1. 指標名稱（中英文）
+2. 一句話定義
+3. 計算方式（文字描述，不要程式碼）
+4. 分子與分母各自的來源欄位
+5. 計入範圍與排除條件（例如：退貨算不算、內部訂單算不算、測試資料怎麼排除）
+6. 常見的三種不同算法，以及各自適用的情境
+7. 這個指標容易被誤讀的地方
+
+最後，把所有定義整理成一張表，我要放進文件裡給團隊對齊。</pre></div>
+
+        <div class="pnum"><span class="pn">#11</span><span class="pt">KPI 提案與 DAX 量值</span></div>
+        <div class="tipline"><b>什麼時候用：</b>定義字典做完之後，這個階段的核心 prompt。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#11 KPI 提案與 DAX 量值</div><pre>根據這份 dashboard 的目標：
+<span class="ph">[貼上 #01 的 5 行總結，或 #04 的規格書]</span>
+
+指標定義：<span class="ph">[貼上 #10 的定義表]</span>
+
+第一步，提出最上排的 4 個 KPI，每一個要寫：
+- 名稱
+- 計算公式（文字描述）
+- 為什麼這一個值得佔據最顯眼的位置
+- 如果拿掉會失去什麼
+
+第二步，給我每一個 KPI 的 DAX 量值程式碼，要求：
+- 逐行加上中文註解
+- 使用變數（VAR）讓邏輯清楚
+- 除法一律使用 DIVIDE 避免除以零
+- 標出這個量值在什麼情況下會算錯或誤導人（例如篩選情境、空值處理、粒度不符）
+
+第三步，告訴我這 4 個 KPI 之間有沒有互相矛盾的可能，以及怎麼在版面上處理。</pre></div>
+
+        <div class="pnum"><span class="pn">#12</span><span class="pt">年度累計與期間比較</span></div>
+        <div class="tipline"><b>什麼時候用：</b>需要「跟上個月比」「跟去年同期比」的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#12 年度累計與期間比較</div><pre>我的日期表叫做 <span class="ph">[日期表名稱]</span>，日期欄位叫做 <span class="ph">[欄位名稱]</span>。
+我要做期間比較的基礎量值是：<span class="ph">[貼上基礎量值的 DAX，例如 總營收]</span>
+
+幫我寫出以下量值的 DAX 程式碼，每一個都要有中文註解：
+1. 年度累計 YTD
+2. 季度累計 QTD
+3. 月度累計 MTD
+4. 上一期間同期（PP）
+5. 去年同期（PY）
+6. 與上期比較的成長率（%）
+7. 與去年同期比較的成長率（%）
+8. 滾動 12 個月合計
+
+每一個量值後面附上：
+- 這個量值在什麼篩選情境下會失效
+- 會計年度不是 1 月起始的話要改哪裡
+- 資料還沒填滿當月時，數字會怎麼失真，怎麼處理</pre></div>
+
+        <div class="pnum"><span class="pn">#13</span><span class="pt">動態排行 TOP N</span></div>
+        <div class="tipline"><b>什麼時候用：</b>需要「前十大客戶」「銷售最好的五個產品」這種視覺的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#13 動態排行 TOP N</div><pre>我要做一個動態排行視覺，需求如下：
+- 排行對象：<span class="ph">[例如 客戶／產品／業務員]</span>
+- 排行依據：<span class="ph">[例如 總營收]</span>
+- 顯示筆數：可由使用者調整（3、5、10、20）
+
+幫我：
+1. 建立參數表的方法與 DAX 程式碼
+2. 排行量值的 DAX（要能跟著篩選器動態變化）
+3. 把未進榜的項目合併成「其他」的量值寫法
+4. 處理同分並列的邏輯
+5. 讓排行在切換篩選器（時間、地區）時正確重算的注意事項
+
+另外告訴我：這個做法在資料量大的時候會不會有效能問題，怎麼優化。</pre></div>
+
+        <div class="pnum"><span class="pn">#14</span><span class="pt">目標 vs 實際</span></div>
+        <div class="tipline"><b>什麼時候用：</b>有預算、有目標、需要看達成率的 dashboard。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#14 目標 vs 實際</div><pre>我有一張目標表：<span class="ph">[描述欄位，例如：年、月、部門、目標金額]</span>
+實際數字來自：<span class="ph">[描述來源，例如 銷售明細表]</span>
+粒度差異：目標是 <span class="ph">[月／部門]</span> 層級，實際是 <span class="ph">[每筆交易]</span> 層級。
+
+幫我：
+1. 設計目標表與事實表的關聯方式（處理粒度不一致的問題）
+2. 寫出以下量值的 DAX，附中文註解：
+   - 目標金額
+   - 實際金額
+   - 達成率（%）
+   - 差額（實際 - 目標）
+   - 累計達成率
+   - 按進度換算的應達成金額（月中看的時候用）
+3. 設計達成率的顏色門檻邏輯（DAX 條件式格式）
+4. 標出：使用者在鑽取到目標表沒有的層級時會發生什麼，怎麼處理
+
+最後說明：這個模型在新增一個沒有設目標的部門時會怎樣。</pre></div>
+      </div></details>
+
+      <!-- 階段 4 -->
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">視覺<span class="en"> · #15-#19 · 把散圖變成有層級的版面</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>把一堆散圖變成顧問等級的版面。<b>#17 需要你上傳截圖</b>，截完整畫面，不要只截局部。</div>
+
+        <div class="pnum"><span class="pn">#15</span><span class="pt">專業配色系統</span></div>
+        <div class="tipline"><b>什麼時候用：</b>開始排版之前，先把顏色定下來。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#15 專業配色系統</div><pre>我要為一份 <span class="ph">[主題]</span> 的 dashboard 設計配色系統。
+
+限制條件：
+- 品牌主色：<span class="ph">[色碼，沒有就填「無」]</span>
+- 使用場景：<span class="ph">[螢幕／投影／列印]</span>
+- 主要受眾：<span class="ph">[例如 高階主管]</span>
+
+請給我一套配色系統，包含：
+1. 背景色、卡片底色、分隔線色（各一個色碼）
+2. 主要文字色、次要文字色、標籤文字色
+3. 資料色階：5 個依序的類別色（要在色盲友善的前提下可分辨）
+4. 語意色：正向、負向、中性、警示（各一個色碼）
+5. 強調色：只用在最重要的那一個數字
+
+每個顏色都要附：
+- 色碼
+- 使用時機
+- 禁止用在哪裡
+
+另外檢查：主要文字色與背景色的對比度是否達到 WCAG AA 標準，附上實際對比值。
+
+最後告訴我：這套配色最容易被誤用的地方是什麼。</pre></div>
+
+        <div class="pnum"><span class="pn">#16</span><span class="pt">Z 型版面配置</span></div>
+        <div class="tipline"><b>什麼時候用：</b>知道要放哪些視覺元件，但不知道怎麼排的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#16 Z 型版面配置</div><pre>我要排一頁 dashboard，元件清單如下：
+<span class="ph">[列出所有要放的視覺元件]</span>
+
+主要決策：<span class="ph">[貼上 #01 的總結]</span>
+畫布尺寸：<span class="ph">[例如 16:9 螢幕]</span>
+
+依照視線動線（左上 → 右上 → 左下 → 右下）幫我配置：
+1. 每個元件放在哪個位置，寫出座標區域與佔比
+2. 每個位置的理由（為什麼這個元件值得這個位置）
+3. 元件之間的留白比例建議
+4. 篩選器放哪裡、用什麼形式
+5. 哪些元件建議合併，哪些建議拆到第二頁
+
+另外給我：
+- 一份文字版的版面草圖（用表格或方框字元表示）
+- 三個這個版面最容易失敗的地方</pre></div>
+
+        <div class="pnum"><span class="pn">#17</span><span class="pt">視覺顧問批評與評分</span></div>
+        <div class="tipline"><b>什麼時候用：</b>已經做出第一版畫面，需要有人告訴你哪裡不對的時候。<b>要上傳截圖。</b></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#17 視覺顧問批評與評分</div><pre>這是我 dashboard 的截圖 <span class="ph">[上傳圖片]</span>。
+
+用一個很挑剔的視覺顧問角度批評它，逐項檢查：
+
+【層級】視線第一眼落在該落的地方嗎？最重要的數字有最大的視覺重量嗎？
+【雜訊】哪些元素刪掉之後資訊不會少？格線、外框、圖例、小數位數、多餘的標題
+【顏色】哪裡在引導視線、哪裡在亂叫？有沒有顏色被用來裝飾而沒有意義？
+【對齊】元件的邊界對齊了嗎？間距一致嗎？
+【密度】哪一區太擠、哪一區太空？
+【一致性】同類型的元件長得一樣嗎？
+
+每一條批評都要附上具體怎麼改（不要寫「建議加強層級」這種）。
+
+最後告訴我：
+1. 只准改一個地方的話，改哪裡最有效
+2. 這份 dashboard 的分數，0 到 10 分
+3. 改完之後大概會到幾分</pre></div>
+
+        <div class="pnum"><span class="pn">#18</span><span class="pt">KPI 卡片設計</span></div>
+        <div class="tipline"><b>什麼時候用：</b>頂欄那幾張數字卡片怎麼做才不醜。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#18 KPI 卡片設計</div><pre>我要設計 dashboard 頂欄的 KPI 卡片，指標如下：
+<span class="ph">[列出 4 個 KPI 名稱與單位]</span>
+
+配色系統：<span class="ph">[貼上 #15 的結果]</span>
+
+每一張卡片幫我設計：
+1. 資訊層級（主數字、比較數字、標籤、趨勢圖，各自的相對大小）
+2. 數字格式化規則（千分位、小數位、單位縮寫、負數怎麼顯示）
+3. 比較資訊要放什麼（絕對差額還是百分比，還是兩個都放）
+4. 趨勢指示的形式（箭頭／小折線／顏色）
+5. 好壞方向定義（有些指標數字越低越好，怎麼處理顏色邏輯）
+6. 卡片內距與元素間距的具體數值
+
+另外處理三個邊界情況：
+- 比較基準為零或空值的時候顯示什麼
+- 數字極大或極小的時候怎麼縮寫
+- 資料尚未更新完整的時候怎麼標示
+
+輸出一份可以直接照做的規格。</pre></div>
+
+        <div class="pnum"><span class="pn">#19</span><span class="pt">亮暗模式適配</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 要在不同環境展示（會議室投影 vs 個人螢幕）。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#19 亮暗模式適配</div><pre>這是我目前的配色系統：<span class="ph">[貼上 #15 的結果]</span>
+
+幫我做出對應的深色模式版本，要求：
+1. 每一個顏色的深色模式對應色碼
+2. 深色背景下，資料色階需要調整的地方（飽和度、明度）
+3. 深色模式下對比度重新檢查，附上實際數值
+4. 陰影與分隔線在深色背景下的處理方式
+5. 哪些顏色在深色模式下會失效，替代方案是什麼
+
+另外告訴我：
+- 投影機環境（對比度差、環境光強）建議用哪一套
+- 這兩套之間切換時，最容易出錯的元件是哪個</pre></div>
+      </div></details>
+
+      <!-- 階段 5 -->
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">敘事<span class="en"> · #20-#23 · 讓圖表自己把結論講完</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>標題要給結論。<b>只描述現況的標題等於沒寫。</b></div>
+
+        <div class="pnum"><span class="pn">#20</span><span class="pt">執行摘要頁</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 主體做完，要加一頁給沒時間看細節的人。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#20 執行摘要頁</div><pre>這是我 dashboard 的內容：
+<span class="ph">[貼上所有視覺元件的標題與關鍵數字]</span>
+
+背景：<span class="ph">[貼上 #01 的總結]</span>
+
+幫我設計一頁執行摘要，內容包含：
+1. 三句話講完這一期的狀況（每句話都要有數字）
+2. 需要立刻注意的兩件事，各附一句理由
+3. 表現最好與最差的各一項，附數字
+4. 建議的下一步行動（1 到 3 個，要具體到可以指派給誰）
+
+寫作規則：
+- 每一句都要有數字支撐，沒有數字的句子刪掉
+- 不用形容詞堆疊
+- 一句話講完一件事
+
+另外告訴我：這頁摘要在版面上應該放在哪個位置、佔多大面積。</pre></div>
+
+        <div class="pnum"><span class="pn">#21</span><span class="pt">敘事骨架規劃</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 有多頁，需要決定順序的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#21 敘事骨架規劃</div><pre>這是我目前的視覺元件清單：
+<span class="ph">[列出所有圖表與其回答的問題]</span>
+
+主要決策：<span class="ph">[貼上 #01 的總結]</span>
+
+幫我依照「背景 → 趨勢 → 原因 → 行動」的骨架重新規劃：
+
+【背景】哪些元件負責建立基準（現在的規模、水位）
+【趨勢】哪些元件負責顯示方向（成長、衰退、波動）
+【原因】哪些元件負責解釋為什麼（拆解、分群、對比）
+【行動】哪些元件負責指向下一步（缺口、優先順序、待辦）
+
+輸出：
+1. 每個階段對應哪些元件
+2. 有哪個階段是空的，需要補什麼元件
+3. 有哪些元件不屬於任何階段，建議刪掉還是移到別頁
+4. 建議的頁面順序與每一頁的主標題
+
+最後用一段話描述：使用者從第一頁看到最後一頁，會經歷什麼樣的理解過程。</pre></div>
+
+        <div class="pnum"><span class="pn">#22</span><span class="pt">洞見型標題改寫與重排</span></div>
+        <div class="tipline"><b>什麼時候用：</b>每個圖表的標題都還是「月營收趨勢」這種的時候。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#22 洞見型標題改寫與重排</div><pre>這是我各張圖表的標題和資料：
+<span class="ph">[貼上每張圖的標題 + 關鍵數字]</span>
+
+第一步，把每個標題改寫成洞見型標題：
+- 一行講完這張圖證明了什麼結論
+- 把關鍵數字寫進標題裡
+- 不要只描述圖表的內容（例如「月營收趨勢」是失敗的標題）
+- 每個標題控制在 20 個字以內
+
+每個標題請給我 2 個版本：一個保守版、一個直接版。
+
+第二步，重新排序這些圖表，排成最好的敘事順序：
+背景 → 趨勢 → 原因 → 行動
+說明每一張為什麼放在那個位置。
+
+第三步，逐一檢查：任何一張圖如果撐不起任何結論，直接判它出局，並說明理由。
+
+第四步，告訴我：如果只能留三張圖，留哪三張。</pre></div>
+        <div class="judge no"><span class="jl">✕ 失敗的標題</span>月營收趨勢</div>
+        <div class="judge ok"><span class="jl">✓ 洞見型標題</span>營收連三個月成長，本月 468 萬創年度新高</div>
+
+        <div class="pnum"><span class="pn">#23</span><span class="pt">圖例與標籤瘦身</span></div>
+        <div class="tipline"><b>什麼時候用：</b>畫面看起來很滿，但說不出哪裡該刪的時候。<b>要上傳截圖。</b></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#23 圖例與標籤瘦身</div><pre>這是我 dashboard 的截圖 <span class="ph">[上傳圖片]</span>。
+
+專門檢查文字與標籤的部分，逐項給我判斷：
+1. 每一個圖例（legend）：留著還是刪掉？如果刪掉，資訊怎麼補（直接標在線上、用顏色對應標題）
+2. 每一個座標軸標題：需要嗎？還是從圖表標題就能推斷
+3. 資料標籤：哪些圖需要標數字、哪些不需要
+4. 小數位數：每一個數字應該顯示到第幾位，理由是什麼
+5. 千分位與單位：哪些應該縮寫（K、M、億）
+6. 重複出現的文字：同樣的字在畫面上出現超過一次的地方
+
+輸出格式：一張表，欄位為「元素 / 現況 / 建議 / 理由」。
+
+最後告訴我：全部照做之後，畫面上大概會少掉多少文字量。</pre></div>
+      </div></details>
+
+      <!-- 階段 6 -->
+      <details class="ch"><summary><span class="ch-n">6</span><span class="ch-t">防彈<span class="en"> · #24-#27 · 老闆看到之前先讓審查員看過</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>確保沒有錯誤數字流出去。<b>#25 是這個階段的核心</b>，上傳截圖讓 AI 用最不信任的角度看一遍。</div>
+
+        <div class="pnum"><span class="pn">#24</span><span class="pt">極端篩選壓力測試</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 做完，發布之前。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#24 極端篩選壓力測試</div><pre>這是我的 dashboard 結構：
+<span class="ph">[描述頁面、視覺元件、篩選器]</span>
+
+幫我設計一份壓力測試清單，模擬使用者可能做出的極端操作：
+1. 全部篩選器都選最窄的範圍（只剩一筆資料）
+2. 篩選出零筆資料的組合
+3. 選擇一個沒有目標值的部門
+4. 選擇資料尚未更新的最新月份
+5. 同時開啟互相衝突的篩選條件
+6. 選擇有空值的維度成員
+7. 時間範圍跨越會計年度切換點
+8. 清除所有篩選器
+
+每一項請告訴我：
+- 預期會發生什麼
+- 哪個視覺元件最可能出錯
+- 錯誤的畫面會長什麼樣（空白、報錯、顯示 0、顯示上一次的值）
+- 建議的處理方式與 DAX 寫法
+
+最後給我一份可以逐項打勾的測試清單。</pre></div>
+
+        <div class="pnum"><span class="pn">#25</span><span class="pt">懷疑型審查員稽核</span></div>
+        <div class="tipline"><b>什麼時候用：</b>這個階段的核心 prompt。<b>要上傳截圖。</b></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#25 懷疑型審查員稽核</div><pre>用一個滿是懷疑的審查員角度稽核這份 dashboard <span class="ph">[上傳截圖]</span>。
+
+逐項檢查並回答：
+1. 各張圖之間的總計對得起來嗎？（把畫面上所有的合計數字列出來互相比對）
+2. 跟原始資料對得起來嗎？（指出哪些數字我應該回頭去核對）
+3. 有沒有忘記關掉的篩選器在扭曲數字？（檢查畫面上的篩選器狀態標示）
+4. 百分比加起來是 100% 嗎？（逐一檢查每個佔比類視覺）
+5. 畫面顯示的期間跟標題寫的一致嗎？
+6. 有沒有數字的單位或量級看起來不對？
+7. 有沒有圖表的軸從非零開始，造成視覺誤導？
+8. 有沒有相同指標在不同圖表顯示不同數字？
+
+格式：
+✔ 表示通過
+✗ 附上每個問題的具體位置與修正方式
+
+最後給我結論：放行，或是一份待修清單（依嚴重程度排序）。</pre></div>
+
+        <div class="pnum"><span class="pn">#26</span><span class="pt">高層刁鑽提問模擬</span></div>
+        <div class="tipline"><b>什麼時候用：</b>報告前一天。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#26 高層刁鑽提問模擬</div><pre>我要把這份 dashboard 報告給 <span class="ph">[對象，例如 總經理／董事會]</span>。
+
+Dashboard 內容：<span class="ph">[貼上主要數字與結論]</span>
+背景：<span class="ph">[貼上 #01 的總結]</span>
+
+用這個對象的角度，提出 10 個最刁鑽的問題，包含：
+- 質疑數字準確性的問題
+- 質疑計算方式的問題
+- 追問原因的問題（為什麼掉、為什麼漲）
+- 追問下一步的問題
+- 拿其他資料來源來對質的問題
+- 問到 dashboard 上沒有的東西
+
+每個問題請給我：
+1. 問題原句（用對方的語氣寫）
+2. 這個問題背後真正在意的是什麼
+3. 建議的回答（30 秒以內能講完）
+4. 需要事先準備的備援資料
+
+最後標出：這 10 題裡面，哪 3 題我最可能答不出來。</pre></div>
+
+        <div class="pnum"><span class="pn">#27</span><span class="pt">效能驗證</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 開起來很慢的時候，或發布前的最後檢查。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#27 效能驗證</div><pre>我的 dashboard 有以下狀況：
+- 資料量：<span class="ph">[列出各表的列數]</span>
+- 量值數量：<span class="ph">[大約幾個]</span>
+- 視覺元件數量：<span class="ph">[每頁幾個]</span>
+- 目前的載入時間：<span class="ph">[秒數]</span>
+
+幫我做效能診斷：
+1. 依照這個規模，合理的載入時間應該是多少
+2. 最可能的五個效能瓶頸，依可能性排序
+3. 每一個瓶頸的檢查方式（要用哪個工具、看哪個數字）
+4. 每一個瓶頸的修正方向
+
+另外針對這些常見問題給我具體建議：
+- 雙向關聯是否必要
+- 計算欄位改成量值的判斷標準
+- 高基數欄位的處理方式
+- 不必要的欄位怎麼在來源端就篩掉
+- 視覺元件數量的建議上限
+
+最後給我一份效能檢查清單，我可以每次發布前跑一遍。</pre></div>
+      </div></details>
+
+      <!-- 階段 7 -->
+      <details class="ch"><summary><span class="ch-n">7</span><span class="ch-t">上台<span class="en"> · #28-#30 · 決定結果的那幾分鐘</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這一段在做什麼：</b>Dashboard 做得好是一回事，上台那幾分鐘決定結果。</div>
+
+        <div class="pnum"><span class="pn">#28</span><span class="pt">電梯 30 秒摘要</span></div>
+        <div class="tipline"><b>什麼時候用：</b>需要在走廊上、電梯裡、會議開場前把重點講完的時候。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#28 電梯 30 秒摘要</div><pre>這是我 dashboard 的主要內容：
+<span class="ph">[貼上關鍵數字與結論]</span>
+
+幫我寫一段 30 秒的口頭摘要（大約 90 到 110 個字），結構：
+1. 第一句：一個具體數字，抓住注意力
+2. 第二句：這個數字代表什麼狀況
+3. 第三句：最需要對方知道的一件事
+4. 第四句：我希望對方做什麼
+
+寫作規則：
+- 每句話都要能唸出來不卡
+- 不用書面語
+- 不用形容詞堆疊
+- 數字唸出來要好懂（例如「四百六十八萬」而不是「4,680,000」）
+
+另外給我三個版本：
+- 給老闆的版本（重點在結果與決策）
+- 給同事的版本（重點在協作與行動）
+- 給外部的版本（重點在脈絡與趨勢）</pre></div>
+
+        <div class="pnum"><span class="pn">#29</span><span class="pt">簡報腳本</span></div>
+        <div class="tipline"><b>什麼時候用：</b>正式報告前，這個階段的核心 prompt。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#29 簡報腳本</div><pre>我要在 <span class="ph">[X]</span> 分鐘內，把這份 dashboard 報告給 <span class="ph">[主管／高層]</span>。
+
+Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]</span>
+背景：<span class="ph">[貼上 #01 的總結]</span>
+對方最在意的事：<span class="ph">[一句話]</span>
+
+幫我寫一份簡報腳本，包含：
+1. 開場句：抓住注意力的第一句話（不要從「今天要跟大家報告」開始）
+2. 圖表的閱讀順序：先看哪一張、再看哪一張，每一張停留多久
+3. 每一張圖表的講解台詞（一到兩句，直接寫出來我要唸的話）
+4. 轉場方式：從這張圖帶到下一張的一句話
+5. 最可能被問的 3 個問題，以及準備好的答案
+6. 收尾：一個具體的行動建議，包含由誰做、何時做
+
+語氣設定：一個敢為自己說出口的話負責的資深分析師。
+
+另外給我：
+- 時間分配表（每一段佔幾分鐘）
+- 如果時間被砍成一半，砍掉哪幾段</pre></div>
+
+        <div class="pnum"><span class="pn">#30</span><span class="pt">會後追蹤 Email</span></div>
+        <div class="tipline"><b>什麼時候用：</b>報告結束後 24 小時內。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#30 會後追蹤 Email</div><pre>我剛報告完這份 dashboard，狀況如下：
+- 對象：<span class="ph">[誰]</span>
+- 會議中被問到的問題：<span class="ph">[列出]</span>
+- 當場答應要補的東西：<span class="ph">[列出]</span>
+- 會議做出的決議：<span class="ph">[列出，沒有就填「無」]</span>
+
+幫我寫一封會後追蹤 email，包含：
+1. 主旨（讓對方一眼知道內容，不超過 20 字）
+2. 開頭一句話回顧會議結論
+3. 三個重點數字的條列（每一個附一句解讀）
+4. 待補資料清單（含預計完成時間）
+5. 需要對方回覆或決定的事項（明確標出）
+6. Dashboard 連結與使用說明一句話
+
+寫作規則：
+- 全文控制在 250 字以內
+- 用條列，少用段落
+- 需要對方行動的部分放在最前面看得到的位置
+- 語氣專業但不客套
+
+另外給我一個更短的版本（100 字以內），用於通訊軟體。</pre></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">30 個 prompt 都在上面了</div>
+      <h3>Prompt 是零件<br><span class="g">工作流才是機器</span></h3>
+      <p>這 30 個讓你把一份 dashboard 做完。要把 AI 接進你每天的工作、變成能省時間也能變現的系統，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 對照表 -->
+  <div class="sec fade">
+    <span class="sec-tag">對照表</span>
+    <h2>你現在卡在哪<br><span class="g">直接跳那一號</span></h2>
+    <div class="tblwrap"><table class="tbl map"><thead><tr><th>你現在的狀況</th><th>用這個</th></tr></thead><tbody>
+      <tr><td>剛接到需求，不知道從哪開始</td><td>#01</td></tr>
+      <tr><td>太多人有意見，需求談不攏</td><td>#02、#03</td></tr>
+      <tr><td>需要一份文件跟對方確認範圍</td><td>#04</td></tr>
+      <tr><td>拿到一堆檔案，不知道有什麼</td><td>#05</td></tr>
+      <tr><td>覺得資料怪怪的但說不出哪裡怪</td><td>#06</td></tr>
+      <tr><td>資料很多張表，不知道怎麼接</td><td>#07</td></tr>
+      <tr><td>同一個客戶有五種寫法</td><td>#08</td></tr>
+      <tr><td>要做時間比較但日期一直算錯</td><td>#09</td></tr>
+      <tr><td>兩個部門算出來的數字不一樣</td><td>#10</td></tr>
+      <tr><td>不知道頂欄要放哪幾個數字</td><td>#11</td></tr>
+      <tr><td>要做去年同期比較</td><td>#12</td></tr>
+      <tr><td>要做前十大排行</td><td>#13</td></tr>
+      <tr><td>要看目標達成率</td><td>#14</td></tr>
+      <tr><td>顏色怎麼配都很醜</td><td>#15</td></tr>
+      <tr><td>元件都做好了但排不出來</td><td>#16</td></tr>
+      <tr><td>做完了但覺得哪裡不對勁</td><td>#17</td></tr>
+      <tr><td>KPI 卡片做起來很陽春</td><td>#18</td></tr>
+      <tr><td>要在會議室投影</td><td>#19</td></tr>
+      <tr><td>對方沒時間看細節</td><td>#20</td></tr>
+      <tr><td>多頁 dashboard 順序亂</td><td>#21</td></tr>
+      <tr><td>圖表標題都是「XX 趨勢」</td><td>#22</td></tr>
+      <tr><td>畫面很滿但不知道刪什麼</td><td>#23</td></tr>
+      <tr><td>怕使用者亂點會壞掉</td><td>#24</td></tr>
+      <tr><td>發布前的最後檢查</td><td>#25</td></tr>
+      <tr><td>明天要報告給高層</td><td>#26</td></tr>
+      <tr><td>Dashboard 開起來很慢</td><td>#27</td></tr>
+      <tr><td>需要一分鐘內講完</td><td>#28</td></tr>
+      <tr><td>正式報告的完整準備</td><td>#29</td></tr>
+      <tr><td>報告完之後</td><td>#30</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 使用建議 -->
+  <div class="sec fade">
+    <span class="sec-tag">使用建議</span>
+    <h2>幾個<br><span class="g">實際跑起來會遇到的事</span></h2>
+    <ul class="bul">
+      <li><b>把階段 1 的產出存好。</b>#01 到 #04 的結果會在後面二十幾個 prompt 裡被反覆引用。建議在 Notion 開一個專案頁面，把這四份產出貼在最上面。</li>
+      <li><b>方括號一定要填完再送出。</b>[主題]、[誰]、[貼上 #01 的總結] 這些留著不填，AI 會自己編一個假的情境，後面全部會歪掉。</li>
+      <li><b>同一個專案用同一個對話串。</b>跨對話串的話 AI 記不得前面的決策，你每次都要重貼背景。</li>
+      <li><b>#17、#23、#25 需要上傳截圖。</b>截圖請截完整畫面，不要只截局部，AI 沒辦法判斷版面比例。</li>
+      <li><b>這份流程不是只能用在 Power BI。</b>除了階段 3 的 DAX 語法之外，其他 27 個 prompt 在 Tableau、Looker Studio、Google Sheets 上都能用。</li>
+    </ul>
+    <div class="warn">⚠️ <b>DAX 產出的程式碼要自己驗過。</b>AI 寫的 DAX 語法通常正確，但商業邏輯是否符合你們公司的算法，要自己核對一次。特別是 <b>#12 的期間比較</b>與 <b>#14 的達成率</b>，這兩個最容易算出「語法沒錯但意思不對」的結果。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>重點不在單句寫得多漂亮<br><span class="g">在順序</span></h2>
+    <p>診斷做完才動資料、資料乾淨才算數字、數字定了才談視覺、視覺穩了才排敘事、敘事完整才做檢查、檢查通過才上台。</p>
+    <div class="insight"><div class="il">這份流程真正的成本</div><div class="it">跳過任何一段，後面都要回頭補。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>Prompt 拿到了，<span class="g">接下來換我陪你把 AI 接進工作裡</span></h2>
+      <div class="cta-lead">這 30 個 prompt 讓你把一份 dashboard 從診斷做到上台。要把 AI 變成每天在幫你省時間、甚至幫你賺錢的系統，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具會用、卻不知道怎麼串成工作流的你</div>
+        <div class="f">收藏了一堆 prompt，卻從來沒真的跑完一輪的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">跑完之後，回貼文底下留言告訴我哪一個階段最有感</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>※ 階段 3 的 DAX 為 Power BI 專屬語法，其他工具請 AI 轉換；AI 產出的計算邏輯發布前請自行核對</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：Dashboard 30 Prompts——輪播 DM 承接頁／lead magnet（定位：貼文講 dashboard 該有的順序，落地頁給 7 階段 30 個完整 prompt）
+· 內容：這份文件是什麼（使用方式 5 步＋適用工具）＋流程總覽（膠囊流程條＋階段表）＋七階段摺疊卡（每張卡＝一個階段，內含該階段所有 prompt，各 prompt 用 .pnum 編號標題／.tipline 什麼時候用／.cp 可複製／變數說明）＋中段CTA＋對照表 30 列（.tbl.map 反轉粗體：狀況一般字、編號金色等寬）＋使用建議 5 條＋DAX 驗算警語＋最後
+· 版型決策：新增兩個元件——.pnum（prompt 編號＋標題，虛線分隔，卡片內用來切開 3-5 個 prompt）與 .tbl.map（對照表專用，把粗體從第一欄移到最後一欄的編號）；#22 加了洞見型標題的 judge no/ok 對照（原文沒有範例，用文中「月營收趨勢是失敗標題」那句補一組實例）
+· 可複製區塊：30 個 .cp（每階段的核心 prompt 用 hero-cp 加框：#04／#06／#11／#17／#22／#25／#29 共 7 個）
+· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
+    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
+    中段 → .mid-cta（id=skool-mid，30 prompt 與對照表之間）
+    後段 → .cta（id=skool-link）
+· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「dashboard-30-prompts」文件
+· 命名：日期前綴（2026-08-06-dashboard-30-prompts.html），對齊 kma-pages 慣例
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>
