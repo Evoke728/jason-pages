@@ -98,6 +98,14 @@ a{color:var(--gold);text-decoration:none;word-break:break-all;}
 .steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
 .steps .st b{color:var(--gold);}
 
+.rule{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 18px;margin:11px 0;}
+.rule .rh{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin-bottom:6px;}
+.rule .rh .rn{font-family:"Inter";font-weight:800;color:var(--gold);margin-right:8px;}
+.rule p{font-size:13.6px;color:var(--text);line-height:1.78;margin:6px 0 0;}
+.rule .sm{font-size:13.2px;color:var(--dim);line-height:1.75;margin-top:7px;padding-left:16px;position:relative;}
+.rule .sm::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.rule b{color:var(--gold);}
+
 .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:16px 0 6px;}
 .flow span{font-size:13px;font-weight:700;color:var(--gold);background:rgba(212,144,42,0.10);border:1px solid var(--gold-dim);border-radius:50px;padding:4px 14px;}
 .flow i{color:var(--faint);font-style:normal;font-size:12px;}
@@ -209,7 +217,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 <aside class="side-cta">
   <div class="sk-k">NEXT STEP</div>
   <h4>Prompt 給你了<br><span class="g">工作流還沒接</span></h4>
-  <p>30 個 prompt 讓你把一份 dashboard 做完。怎麼把 AI 接進你每天的工作，我在 Skool 帶你。</p>
+  <p>30 個 Prompt 讓你把一份 dashboard 做完。怎麼把 AI 接進你每天的工作，我在 Skool 帶你。</p>
   <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
 </aside>
 
@@ -218,36 +226,74 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
   <div class="hero">
     <div class="kicker">DASHBOARD × AI · 7 階段 30 PROMPT</div>
     <h1>Dashboard<br><span class="g">30 Prompts</span></h1>
-    <div class="h-sub">從診斷到上台的完整流程　每一個 prompt 都能一鍵複製</div>
-    <div class="hero-sub">大部分人做 dashboard 的第一個動作，是打開 Power BI 開始拉圖表。這份文件把順序倒過來：先定義、再清資料、再算數字、再談視覺、再排敘事、再做檢查，最後才是上台。七個階段、三十個 prompt，全部放在可複製區塊裡。</div>
+    <div class="h-sub">從診斷到上台的完整流程　每一個 Prompt 都能一鍵複製</div>
+    <div class="hero-sub">大部分人做 dashboard 的第一個動作，是打開 Power BI 開始拉圖表。這份文件把順序倒過來：先定義、再清資料、再算數字、再談視覺、再排敘事、再做檢查，最後才是上台。七個階段、三十個 Prompt，全部放在可複製區塊裡。</div>
     <div class="divider"></div>
     <div class="stats">
       <div class="stat"><div class="n">7</div><div class="l">個 · 階段</div></div>
       <div class="stat-op">·</div>
       <div class="stat"><div class="n">30</div><div class="l">個 · Prompt</div></div>
       <div class="stat-op">·</div>
-      <div class="stat"><div class="n">4</div><div class="l">種 · 工具通用</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">條 · 使用原則</div></div>
     </div>
-    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」，分享一個人也能跑完的 AI 工作流。這裡的內容偏向可以直接套用的東西：拆解到步驟的流程、可以複製貼上的 prompt、把工具真正接進工作裡的方法。Instagram 與 Threads 每週更新。</div></div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」，分享一個人也能跑完的 AI 工作流。這裡的內容偏向可以直接套用的東西：拆解到步驟的流程、可以複製貼上的 Prompt、把工具真正接進工作裡的方法。Instagram 與 Threads 每週更新。</div></div>
   </div>
 
   <!-- 這份文件是什麼 -->
   <div class="sec fade">
     <span class="sec-tag">這份文件是什麼</span>
     <h2>一份 dashboard<br><span class="g">從無到有的完整流程</span></h2>
-    <p>拆成 <span class="hl">7 個階段、30 個 prompt</span>。每一個 prompt 都在獨立的區塊裡，點右上角就能複製貼進 AI 對話框。</p>
+    <p>拆成 <span class="hl">7 個階段、30 個 Prompt</span>。每一個 Prompt 都在獨立的區塊裡，點右上角就能複製貼進 AI 對話框。</p>
 
-    <div class="sub-h">使用方式</div>
-    <div class="steps">
-      <div class="st"><b>依階段順序走，不要跳。</b>每個階段的產出會變成下一階段的輸入</div>
-      <div class="st">方括號 <b>[ ]</b> 是需要你自己填的變數，填完再送出</div>
-      <div class="st">建議<b>開一個對話串跑完整個專案</b>，AI 才記得前面的決策</div>
-      <div class="st">需要讀資料或算數字的 prompt，用<b>有程式碼執行能力</b>的工具效果比較好</div>
-      <div class="st">純文字規劃類的 prompt，任何一個大型語言模型都能跑</div>
-    </div>
+    <div class="insight"><div class="il">名詞說明｜Dashboard 與 Power BI Report</div><div class="it" style="font-size:14.5px;font-weight:400;font-family:var(--sans);">這份文件使用 <b>dashboard</b> 泛指決策型數據儀表板。<br><br>如果你使用 Power BI，Microsoft 官方術語中，多頁、含篩選器與互動式視覺的內容主要稱為 <b>Report</b>；<b>Dashboard</b> 則特指 Power BI Service 裡的單頁 dashboard。<br><br>為了閱讀一致，這段說明之後全文統一使用 <b>dashboard</b>。</div></div>
 
     <div class="sub-h">適用工具</div>
-    <p style="font-size:14px;">Power BI、Tableau、Looker Studio、Google Sheets 圖表都適用。DAX 相關的部分（階段 3）是 Power BI 專屬語法，其他工具可以請 AI 換成對應語言。</p>
+    <p style="font-size:14px;">Power BI、Tableau、Looker Studio、Google Sheets 圖表都可以套用這套流程。</p>
+    <p style="font-size:14px;">但部分 Prompt 使用 Power BI 專屬的 DAX、日期表、資料模型與效能工具；使用其他工具時，請把這些部分換成對應語法與做法。</p>
+  </div>
+
+  <!-- 使用原則 -->
+  <div class="sec fade">
+    <span class="sec-tag">使用原則</span>
+    <h2>六條先看完<br><span class="g">再開始跑 Prompt</span></h2>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">1</span>七個階段照順序，Prompt 依情況選</div>
+      <p>建議依照：<b>診斷 → 清理 → 數字 → 視覺 → 敘事 → 防彈 → 上台</b></p>
+      <p>每個專案不需要把 30 個 Prompt 全跑完。例如：</p>
+      <div class="sm">沒有目標值，不需要 #14</div>
+      <div class="sm">不做深色模式，不需要 #19</div>
+      <div class="sm">只有單頁，不一定需要 #21</div>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">2</span>方括號一定要先填</div>
+      <p>所有 <b>[ ]</b> 都代表你需要提供的背景或變數。</p>
+      <p>如果必要資訊不足，要求 AI 先詢問再執行。不要讓它自行補假情境、假數字、假日期、假期限、假商業規則。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">3</span>樣本不能當完整資料</div>
+      <p>只貼 20 到 30 列時，AI 可以分析樣本裡看得到的問題，但不能把空值比例、唯一值數量、異常比例、整體分布直接當成完整資料的結果。<b>需要完整統計時，要上傳完整資料。</b></p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">4</span>把 #01～#04 的結果存好</div>
+      <p>這四個 Prompt 定義整個 dashboard 的目的、主受眾、決策、範圍與規格。建議存成固定的專案背景文件，後面的 Prompt 直接引用，<b>不要依賴 AI 記得前面所有決策</b>。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">5</span>截圖只能檢查看得到的東西</div>
+      <p>會使用截圖的三支 Prompt：<b>#17 視覺顧問批評與評分</b>、<b>#23 圖例與標籤瘦身</b>、<b>#25 懷疑型審查員稽核</b>。</p>
+      <p>截圖適合檢查：視覺層級、文字與標籤、畫面內數字是否互相矛盾、篩選器顯示狀態、排版、顏色、資訊密度。</p>
+      <p>但只靠截圖無法證明：底層資料正確、DAX 正確、KPI 商業定義正確、原始資料沒有漏。要驗證這些，必須一起提供原始資料、量值或已知答案。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">6</span>AI 算出的數字與程式碼都要驗證</div>
+      <p>程式碼能執行不代表商業邏輯正確。至少拿一組已知答案的資料交叉驗證。</p>
+      <p>特別注意：<b>篩選情境、資料粒度、期間比較、空值、目標達成率。</b></p>
+    </div>
   </div>
 
   <!-- 流程總覽 -->
@@ -260,8 +306,8 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
       <tr><td>2</td><td>清理</td><td>5</td><td>把底層資料整理成可以用的狀態</td></tr>
       <tr><td>3</td><td>數字</td><td>5</td><td>設計 KPI 與量值計算邏輯</td></tr>
       <tr><td>4</td><td>視覺</td><td>5</td><td>把散圖變成有層級的版面</td></tr>
-      <tr><td>5</td><td>敘事</td><td>4</td><td>讓圖表自己把結論講完</td></tr>
-      <tr><td>6</td><td>防彈</td><td>4</td><td>確保沒有錯誤數字流出去</td></tr>
+      <tr><td>5</td><td>敘事</td><td>4</td><td>讓圖表自己把結論講清楚</td></tr>
+      <tr><td>6</td><td>防彈</td><td>4</td><td>發布前再檢查錯誤與風險</td></tr>
       <tr><td>7</td><td>上台</td><td>3</td><td>準備報告當下的那幾分鐘</td></tr>
     </tbody></table></div>
   </div>
@@ -276,7 +322,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
       <!-- 階段 1 -->
       <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">診斷<span class="en"> · #01-#04 · 打開軟體之前先做完</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <div class="pos"><b>這一段在做什麼：</b>定義這份 dashboard 要支撐什麼決策。這四個 prompt 的產出會被後面六個階段一直引用，<b>建議把 AI 的回覆存下來</b>。</div>
+        <div class="pos"><b>這一段在做什麼：</b>定義這份 dashboard 要支撐什麼決策。這四個 Prompt 的產出會被後面六個階段一直引用，<b>建議把 AI 的回覆存下來</b>。</div>
 
         <div class="pnum"><span class="pn">#01</span><span class="pt">顧問式需求訪談</span></div>
         <div class="tipline"><b>什麼時候用：</b>專案第一個動作，還沒碰任何資料的時候。</div>
@@ -292,13 +338,14 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 5. 哪些東西刻意不放進去，理由是什麼
 
 訪談完之後，用 5 行總結這個專案，給我確認。</pre></div>
-        <div class="tipline"><b>變數：</b>[主題] 例如「電商月營收」「客服工單效率」；[誰] 例如「業務主管」「營運長」。<b>接下來：</b>把 5 行總結存起來，後面很多 prompt 會叫你貼上。</div>
+        <div class="tipline"><b>變數：</b>[主題] 例如「電商月營收」「客服工單效率」；[誰] 例如「業務主管」「營運長」。<b>接下來：</b>把 5 行總結存起來，後面很多 Prompt 會叫你貼上。</div>
 
         <div class="pnum"><span class="pn">#02</span><span class="pt">受眾與決策定位</span></div>
         <div class="tipline"><b>什麼時候用：</b>同一份 dashboard 有多個對象在看的時候。</div>
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#02 受眾與決策定位</div><pre>這份 dashboard 的預期受眾是 <span class="ph">[列出所有會看的角色]</span>。
 
 幫我分析：
+
 1. 每個角色關心的問題分別是什麼（用他們自己會講的話寫）
 2. 每個角色看完之後可能採取的行動
 3. 這些角色之間有哪些需求是衝突的
@@ -309,7 +356,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
         <div class="tipline"><b>變數：</b>[列出所有會看的角色] 例如「業務主管、財務、總經理、第一線業務」。</div>
 
         <div class="pnum"><span class="pn">#03</span><span class="pt">範圍收斂</span></div>
-        <div class="tipline"><b>什麼時候用：</b>需求清單開始膨脹的時候。這個 prompt 的作用是砍東西。</div>
+        <div class="tipline"><b>什麼時候用：</b>需求清單開始膨脹的時候。這個 Prompt 的作用是砍東西。</div>
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#03 範圍收斂</div><pre>以下是這個 dashboard 目前被提出的所有需求：
 <span class="ph">[貼上需求清單]</span>
 
@@ -323,8 +370,10 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 
 每一項都要標註：
 - 資料取得難度（高／中／低）
-- 製作工時估計
+- 製作工時粗估
 - 對主決策的貢獻度（高／中／低）
+
+工時只做粗估，資訊不足時列出估算假設。
 
 最後告訴我：第一版的範圍應該包含哪幾項，總共幾個視覺元件。</pre></div>
 
@@ -347,17 +396,17 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 8. 驗收標準（怎樣算做完）
 
 用表格排版，我要能直接貼給需求方確認。</pre></div>
-        <div class="tipline">這份規格書是整個專案的參考點。<b>後面每一個階段的 prompt 都可以貼上這份文件當背景。</b></div>
+        <div class="tipline">這份規格書是整個專案的參考點。<b>後面每一個階段的 Prompt 都可以貼上這份文件當背景。</b></div>
       </div></details>
 
       <!-- 階段 2 -->
       <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">清理<span class="en"> · #05-#09 · 畫第一張圖之前</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <div class="pos"><b>這一段在做什麼：</b>把底層資料弄乾淨。這個階段的 prompt 建議<b>用有程式碼執行能力的 AI 工具跑</b>（Claude、ChatGPT 的資料分析模式）。</div>
+        <div class="pos"><b>這一段在做什麼：</b>把底層資料弄乾淨。這個階段的 Prompt 建議<b>用有程式碼執行能力的 AI 工具跑</b>。</div>
 
         <div class="pnum"><span class="pn">#05</span><span class="pt">資料欄位盤點</span></div>
         <div class="tipline"><b>什麼時候用：</b>拿到原始檔案，還沒開始清的時候。</div>
-        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#05 資料欄位盤點</div><pre>這是我的原始資料 <span class="ph">[上傳檔案／貼上前 30 列]</span>。
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#05 資料欄位盤點</div><pre>這是我的原始資料 <span class="ph">[上傳完整檔案／貼上資料樣本]</span>。
 
 幫我做一份欄位盤點表，每個欄位列出：
 1. 欄位名稱
@@ -367,22 +416,26 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 5. 唯一值數量
 6. 我推測這個欄位的用途（維度／量值／識別碼／可能沒用）
 
+如果我只提供樣本，空值比例、唯一值數量等統計請明確標示為「僅限目前樣本，不能代表完整資料」。
+
 盤點完之後，告訴我：
 - 哪些欄位看起來是重複的或衍生的
 - 哪些欄位命名不清楚，建議改成什麼
 - 哪些欄位可能可以直接刪掉，理由是什麼</pre></div>
 
         <div class="pnum"><span class="pn">#06</span><span class="pt">資料 X 光健檢</span></div>
-        <div class="tipline"><b>什麼時候用：</b>盤點完欄位之後，正式清理的核心 prompt。</div>
+        <div class="tipline"><b>什麼時候用：</b>盤點完欄位之後，正式清理的核心 Prompt。</div>
         <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#06 資料 X 光健檢</div><pre>用程式碼分析這份資料，給我一份 X 光檢查，逐項檢查：
 
 1. 重複值：完全重複的列、以及應該唯一但重複的鍵值
-2. 不可能出現的數值：負數金額、超出合理範圍的數字、未來日期
+2. 疑似異常數值：負數、0、極大值、超出合理範圍的數字、未來日期
 3. 空欄位：哪些欄位有空值、比例多少、空值集中在哪些列
 4. 寫法不一致：同一個意思但寫法不同的文字（大小寫、全半形、空白、簡稱）
 5. 日期格式混亂：同欄位出現多種日期格式
 6. 加總對不起來：明細加總與彙總欄位的差額
-7. 孤兒資料：明細表有但主檔沒有的鍵值
+7. 關聯不到主檔的資料
+
+負數、0、極大值、未來日期先視為疑似異常，不要直接判定一定錯；例如退款可能是負數、預算資料可能有未來日期。
 
 每一個問題都要寫清楚三件事：
 - 出現在哪（欄位、大概幾列、舉 2 個實例）
@@ -396,6 +449,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#07 星型模型建模</div><pre>這是我清理過的資料：<span class="ph">[上傳／貼上欄位清單]</span>。
 
 幫我設計成星型模型（Star Schema）：
+
 1. 哪些欄位屬於事實表（Fact），哪些屬於維度表（Dimension）
 2. 事實表的粒度是什麼（一列代表什麼事件）
 3. 每個維度表需要哪些欄位、主鍵是什麼
@@ -432,6 +486,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 - 期間範圍：<span class="ph">[起始日]</span> 到 <span class="ph">[結束日]</span>
 - 會計年度起始月：<span class="ph">[月份，一般公司填 1]</span>
 - 語系：繁體中文，台灣用法
+- 週次規則：<span class="ph">[ISO week／一般週次／公司自訂]</span>
 
 日期表需要包含這些欄位：
 日期、年、季、月、月份名稱、週次、星期幾、
@@ -443,14 +498,14 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 請給我：
 1. 建立這張表的 DAX 程式碼
 2. 建立這張表的 Power Query M 程式碼
-3. 建好之後要在 Power BI 做哪些設定（標記為日期表、建立關聯、排序欄位設定）
+3. 建好之後要在 Power BI 做哪些設定（Mark as date table、建立關聯、排序欄位設定）
 4. 常見的三個設定錯誤與檢查方式</pre></div>
       </div></details>
 
       <!-- 階段 3 -->
       <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">數字<span class="en"> · #10-#14 · 讓 dashboard 會思考的量值</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <div class="pos"><b>這一段在做什麼：</b>設計 KPI 與量值計算邏輯。這個階段的 DAX 語法是 <b>Power BI 專屬</b>，其他工具可以請 AI 轉換成對應語言。</div>
+        <div class="pos"><b>這一段在做什麼：</b>設計 KPI 與量值計算邏輯。這個階段的 DAX 語法是 <b>Power BI 專屬</b>，其他工具可以請 AI 轉換。</div>
 
         <div class="pnum"><span class="pn">#10</span><span class="pt">指標定義字典</span></div>
         <div class="tipline"><b>什麼時候用：</b>開始寫公式之前。這一步能擋掉大部分「兩個部門算出來的數字不一樣」的問題。</div>
@@ -468,10 +523,10 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 6. 常見的三種不同算法，以及各自適用的情境
 7. 這個指標容易被誤讀的地方
 
-最後，把所有定義整理成一張表，我要放進文件裡給團隊對齊。</pre></div>
+最後，把所有定義整理成一張指標定義字典，我要放進文件裡給團隊對齊。</pre></div>
 
         <div class="pnum"><span class="pn">#11</span><span class="pt">KPI 提案與 DAX 量值</span></div>
-        <div class="tipline"><b>什麼時候用：</b>定義字典做完之後，這個階段的核心 prompt。</div>
+        <div class="tipline"><b>什麼時候用：</b>定義字典做完之後，這個階段的核心 Prompt。</div>
         <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#11 KPI 提案與 DAX 量值</div><pre>根據這份 dashboard 的目標：
 <span class="ph">[貼上 #01 的 5 行總結，或 #04 的規格書]</span>
 
@@ -491,17 +546,19 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 
 第三步，告訴我這 4 個 KPI 之間有沒有互相矛盾的可能，以及怎麼在版面上處理。</pre></div>
 
-        <div class="pnum"><span class="pn">#12</span><span class="pt">年度累計與期間比較</span></div>
+        <div class="pnum"><span class="pn">#12</span><span class="pt">累計與期間比較</span></div>
         <div class="tipline"><b>什麼時候用：</b>需要「跟上個月比」「跟去年同期比」的時候。</div>
-        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#12 年度累計與期間比較</div><pre>我的日期表叫做 <span class="ph">[日期表名稱]</span>，日期欄位叫做 <span class="ph">[欄位名稱]</span>。
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#12 累計與期間比較</div><pre>我的日期表叫做 <span class="ph">[日期表名稱]</span>，日期欄位叫做 <span class="ph">[欄位名稱]</span>。
 我要做期間比較的基礎量值是：<span class="ph">[貼上基礎量值的 DAX，例如 總營收]</span>
+上一期間定義：<span class="ph">[上月／上季／上一個同長度期間／其他]</span>
 
 幫我寫出以下量值的 DAX 程式碼，每一個都要有中文註解：
+
 1. 年度累計 YTD
 2. 季度累計 QTD
 3. 月度累計 MTD
-4. 上一期間同期（PP）
-5. 去年同期（PY）
+4. 上一期間
+5. 去年同期
 6. 與上期比較的成長率（%）
 7. 與去年同期比較的成長率（%）
 8. 滾動 12 個月合計
@@ -517,12 +574,13 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 - 排行對象：<span class="ph">[例如 客戶／產品／業務員]</span>
 - 排行依據：<span class="ph">[例如 總營收]</span>
 - 顯示筆數：可由使用者調整（3、5、10、20）
+- 同分規則：<span class="ph">[允許超過 N 名／固定只留 N 個並指定第二排序條件]</span>
 
 幫我：
 1. 建立參數表的方法與 DAX 程式碼
 2. 排行量值的 DAX（要能跟著篩選器動態變化）
 3. 把未進榜的項目合併成「其他」的量值寫法
-4. 處理同分並列的邏輯
+4. 處理同分邏輯
 5. 讓排行在切換篩選器（時間、地區）時正確重算的注意事項
 
 另外告訴我：這個做法在資料量大的時候會不會有效能問題，怎麼優化。</pre></div>
@@ -531,6 +589,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
         <div class="tipline"><b>什麼時候用：</b>有預算、有目標、需要看達成率的 dashboard。</div>
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#14 目標 vs 實際</div><pre>我有一張目標表：<span class="ph">[描述欄位，例如：年、月、部門、目標金額]</span>
 實際數字來自：<span class="ph">[描述來源，例如 銷售明細表]</span>
+
 粒度差異：目標是 <span class="ph">[月／部門]</span> 層級，實際是 <span class="ph">[每筆交易]</span> 層級。
 
 幫我：
@@ -543,7 +602,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
    - 累計達成率
    - 按進度換算的應達成金額（月中看的時候用）
 3. 設計達成率的顏色門檻邏輯（DAX 條件式格式）
-4. 標出：使用者在鑽取到目標表沒有的層級時會發生什麼，怎麼處理
+4. 使用者向下鑽研到目標表不存在的粒度時，會發生什麼？應該怎麼處理？
 
 最後說明：這個模型在新增一個沒有設目標的部門時會怎樣。</pre></div>
       </div></details>
@@ -551,7 +610,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
       <!-- 階段 4 -->
       <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">視覺<span class="en"> · #15-#19 · 把散圖變成有層級的版面</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <div class="pos"><b>這一段在做什麼：</b>把一堆散圖變成顧問等級的版面。<b>#17 需要你上傳截圖</b>，截完整畫面，不要只截局部。</div>
+        <div class="pos"><b>這一段在做什麼：</b>把一堆散圖變成顧問等級的版面。這個階段有幾個 Prompt 需要你上傳截圖，<b>截完整畫面，不要只截局部</b>。</div>
 
         <div class="pnum"><span class="pn">#15</span><span class="pt">專業配色系統</span></div>
         <div class="tipline"><b>什麼時候用：</b>開始排版之前，先把顏色定下來。</div>
@@ -565,9 +624,10 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 請給我一套配色系統，包含：
 1. 背景色、卡片底色、分隔線色（各一個色碼）
 2. 主要文字色、次要文字色、標籤文字色
-3. 資料色階：5 個依序的類別色（要在色盲友善的前提下可分辨）
-4. 語意色：正向、負向、中性、警示（各一個色碼）
-5. 強調色：只用在最重要的那一個數字
+3. 類別配色：5 個彼此可區分的離散色
+4. 連續色階：由低到高 5 個層級
+5. 語意色：正向、負向、中性、警示（各一個色碼）
+6. 強調色：只用在最重要的那一個數字
 
 每個顏色都要附：
 - 色碼
@@ -578,23 +638,27 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 
 最後告訴我：這套配色最容易被誤用的地方是什麼。</pre></div>
 
-        <div class="pnum"><span class="pn">#16</span><span class="pt">Z 型版面配置</span></div>
+        <div class="pnum"><span class="pn">#16</span><span class="pt">版面配置與視線動線</span></div>
         <div class="tipline"><b>什麼時候用：</b>知道要放哪些視覺元件，但不知道怎麼排的時候。</div>
-        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#16 Z 型版面配置</div><pre>我要排一頁 dashboard，元件清單如下：
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#16 版面配置與視線動線</div><pre>我要排一頁 dashboard，元件清單如下：
 <span class="ph">[列出所有要放的視覺元件]</span>
 
 主要決策：<span class="ph">[貼上 #01 的總結]</span>
 畫布尺寸：<span class="ph">[例如 16:9 螢幕]</span>
 
-依照視線動線（左上 → 右上 → 左下 → 右下）幫我配置：
+依照資訊重要性、使用者最先需要回答的問題、視覺層級與自然閱讀動線幫我配置。
+
+Z 型或其他閱讀動線可以當參考，但不要為了符合固定版型犧牲資訊優先順序。
+
+請告訴我：
 1. 每個元件放在哪個位置，寫出座標區域與佔比
-2. 每個位置的理由（為什麼這個元件值得這個位置）
+2. 每個位置的理由
 3. 元件之間的留白比例建議
 4. 篩選器放哪裡、用什麼形式
 5. 哪些元件建議合併，哪些建議拆到第二頁
 
 另外給我：
-- 一份文字版的版面草圖（用表格或方框字元表示）
+- 一份文字版的線框圖
 - 三個這個版面最容易失敗的地方</pre></div>
 
         <div class="pnum"><span class="pn">#17</span><span class="pt">視覺顧問批評與評分</span></div>
@@ -610,7 +674,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 【密度】哪一區太擠、哪一區太空？
 【一致性】同類型的元件長得一樣嗎？
 
-每一條批評都要附上具體怎麼改（不要寫「建議加強層級」這種）。
+每一條批評都要附上具體怎麼改，不要只寫抽象建議。
 
 最後告訴我：
 1. 只准改一個地方的話，改哪裡最有效
@@ -639,24 +703,24 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 
 輸出一份可以直接照做的規格。</pre></div>
 
-        <div class="pnum"><span class="pn">#19</span><span class="pt">亮暗模式適配</span></div>
-        <div class="tipline"><b>什麼時候用：</b>dashboard 要在不同環境展示（會議室投影 vs 個人螢幕）。</div>
-        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#19 亮暗模式適配</div><pre>這是我目前的配色系統：<span class="ph">[貼上 #15 的結果]</span>
+        <div class="pnum"><span class="pn">#19</span><span class="pt">深色模式調整</span></div>
+        <div class="tipline"><b>什麼時候用：</b>dashboard 要在不同環境展示，或需要深色版本。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#19 深色模式調整</div><pre>這是我目前的配色系統：<span class="ph">[貼上 #15 的結果]</span>
 
 幫我做出對應的深色模式版本，要求：
 1. 每一個顏色的深色模式對應色碼
-2. 深色背景下，資料色階需要調整的地方（飽和度、明度）
+2. 深色背景下，類別配色與連續色階需要調整的地方（飽和度、明度）
 3. 深色模式下對比度重新檢查，附上實際數值
 4. 陰影與分隔線在深色背景下的處理方式
 5. 哪些顏色在深色模式下會失效，替代方案是什麼
 
 另外告訴我：
 - 投影機環境（對比度差、環境光強）建議用哪一套
-- 這兩套之間切換時，最容易出錯的元件是哪個</pre></div>
+- 兩套模式切換時，最容易出錯的元件是哪個</pre></div>
       </div></details>
 
       <!-- 階段 5 -->
-      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">敘事<span class="en"> · #20-#23 · 讓圖表自己把結論講完</span></span><span class="ch-mk"></span></summary>
+      <details class="ch"><summary><span class="ch-n">5</span><span class="ch-t">敘事<span class="en"> · #20-#23 · 讓圖表自己把結論講清楚</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
         <div class="pos"><b>這一段在做什麼：</b>標題要給結論。<b>只描述現況的標題等於沒寫。</b></div>
 
@@ -668,13 +732,14 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 背景：<span class="ph">[貼上 #01 的總結]</span>
 
 幫我設計一頁執行摘要，內容包含：
-1. 三句話講完這一期的狀況（每句話都要有數字）
+1. 三句話講完這一期的狀況，每個判斷性結論都要有數字支撐
 2. 需要立刻注意的兩件事，各附一句理由
 3. 表現最好與最差的各一項，附數字
 4. 建議的下一步行動（1 到 3 個，要具體到可以指派給誰）
 
 寫作規則：
-- 每一句都要有數字支撐，沒有數字的句子刪掉
+- 判斷性結論要有數字支撐
+- 行動建議要能追溯到前面的數據
 - 不用形容詞堆疊
 - 一句話講完一件事
 
@@ -687,11 +752,11 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 
 主要決策：<span class="ph">[貼上 #01 的總結]</span>
 
-幫我依照「背景 → 趨勢 → 原因 → 行動」的骨架重新規劃：
+幫我依照「背景 → 趨勢 → 驅動因素 → 行動」的骨架重新規劃：
 
 【背景】哪些元件負責建立基準（現在的規模、水位）
 【趨勢】哪些元件負責顯示方向（成長、衰退、波動）
-【原因】哪些元件負責解釋為什麼（拆解、分群、對比）
+【驅動因素】哪些元件負責解釋可能跟變化有關的因素；如果資料只能顯示關聯，不要直接寫成因果
 【行動】哪些元件負責指向下一步（缺口、優先順序、待辦）
 
 輸出：
@@ -708,15 +773,16 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 <span class="ph">[貼上每張圖的標題 + 關鍵數字]</span>
 
 第一步，把每個標題改寫成洞見型標題：
-- 一行講完這張圖證明了什麼結論
+- 一行講完這張圖最支持什麼結論
 - 把關鍵數字寫進標題裡
 - 不要只描述圖表的內容（例如「月營收趨勢」是失敗的標題）
 - 每個標題控制在 20 個字以內
+- 不把相關性寫成因果
 
 每個標題請給我 2 個版本：一個保守版、一個直接版。
 
 第二步，重新排序這些圖表，排成最好的敘事順序：
-背景 → 趨勢 → 原因 → 行動
+背景 → 趨勢 → 驅動因素 → 行動
 說明每一張為什麼放在那個位置。
 
 第三步，逐一檢查：任何一張圖如果撐不起任何結論，直接判它出局，並說明理由。
@@ -726,15 +792,16 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
         <div class="judge ok"><span class="jl">✓ 洞見型標題</span>營收連三個月成長，本月 468 萬創年度新高</div>
 
         <div class="pnum"><span class="pn">#23</span><span class="pt">圖例與標籤瘦身</span></div>
-        <div class="tipline"><b>什麼時候用：</b>畫面看起來很滿，但說不出哪裡該刪的時候。<b>要上傳截圖。</b></div>
-        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#23 圖例與標籤瘦身</div><pre>這是我 dashboard 的截圖 <span class="ph">[上傳圖片]</span>。
+        <div class="tipline"><b>什麼時候用：</b>畫面看起來很滿，但說不出哪裡該刪的時候。<b>要上傳完整畫面截圖。</b></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#23 圖例與標籤瘦身</div><pre>這是我 dashboard 的截圖 <span class="ph">[上傳完整畫面]</span>。
 
 專門檢查文字與標籤的部分，逐項給我判斷：
-1. 每一個圖例（legend）：留著還是刪掉？如果刪掉，資訊怎麼補（直接標在線上、用顏色對應標題）
+
+1. 每一個圖例：留著還是刪掉？如果刪掉，資訊怎麼補（直接標在線上、用顏色對應標題）
 2. 每一個座標軸標題：需要嗎？還是從圖表標題就能推斷
 3. 資料標籤：哪些圖需要標數字、哪些不需要
 4. 小數位數：每一個數字應該顯示到第幾位，理由是什麼
-5. 千分位與單位：哪些應該縮寫（K、M、億）
+5. 千分位與單位：哪些應該縮寫（K、M、萬、億）
 6. 重複出現的文字：同樣的字在畫面上出現超過一次的地方
 
 輸出格式：一張表，欄位為「元素 / 現況 / 建議 / 理由」。
@@ -745,7 +812,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
       <!-- 階段 6 -->
       <details class="ch"><summary><span class="ch-n">6</span><span class="ch-t">防彈<span class="en"> · #24-#27 · 老闆看到之前先讓審查員看過</span></span><span class="ch-mk"></span></summary>
       <div class="ch-body">
-        <div class="pos"><b>這一段在做什麼：</b>確保沒有錯誤數字流出去。<b>#25 是這個階段的核心</b>，上傳截圖讓 AI 用最不信任的角度看一遍。</div>
+        <div class="pos"><b>這一段在做什麼：</b>發布前再檢查錯誤與風險。<b>#25 是這個階段的核心</b>，上傳截圖讓 AI 用最不信任的角度看一遍。</div>
 
         <div class="pnum"><span class="pn">#24</span><span class="pt">極端篩選壓力測試</span></div>
         <div class="tipline"><b>什麼時候用：</b>dashboard 做完，發布之前。</div>
@@ -753,6 +820,7 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 <span class="ph">[描述頁面、視覺元件、篩選器]</span>
 
 幫我設計一份壓力測試清單，模擬使用者可能做出的極端操作：
+
 1. 全部篩選器都選最窄的範圍（只剩一筆資料）
 2. 篩選出零筆資料的組合
 3. 選擇一個沒有目標值的部門
@@ -766,29 +834,36 @@ details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
 - 預期會發生什麼
 - 哪個視覺元件最可能出錯
 - 錯誤的畫面會長什麼樣（空白、報錯、顯示 0、顯示上一次的值）
-- 建議的處理方式與 DAX 寫法
+- 建議在哪一層處理：資料清理／模型／Power Query／DAX／視覺設定／介面
 
-最後給我一份可以逐項打勾的測試清單。</pre></div>
+最後給我一份可以逐項打勾的驗收清單。</pre></div>
 
         <div class="pnum"><span class="pn">#25</span><span class="pt">懷疑型審查員稽核</span></div>
-        <div class="tipline"><b>什麼時候用：</b>這個階段的核心 prompt。<b>要上傳截圖。</b></div>
+        <div class="tipline"><b>什麼時候用：</b>這個階段的核心 Prompt。<b>要上傳截圖。</b></div>
         <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#25 懷疑型審查員稽核</div><pre>用一個滿是懷疑的審查員角度稽核這份 dashboard <span class="ph">[上傳截圖]</span>。
 
+先把每一項檢查分成：
+A. 從畫面可以驗證
+B. 必須回原始資料才能確認
+
 逐項檢查並回答：
-1. 各張圖之間的總計對得起來嗎？（把畫面上所有的合計數字列出來互相比對）
-2. 跟原始資料對得起來嗎？（指出哪些數字我應該回頭去核對）
-3. 有沒有忘記關掉的篩選器在扭曲數字？（檢查畫面上的篩選器狀態標示）
-4. 百分比加起來是 100% 嗎？（逐一檢查每個佔比類視覺）
+
+1. 各張圖之間的總計對得起來嗎？
+2. 跟原始資料對得起來嗎？如果目前沒有原始資料，標記「需要回原始資料確認」
+3. 有沒有忘記關掉的篩選器在扭曲數字？
+4. 如果是互斥且完整的占比分類，百分比加起來是否約等於 100%？
 5. 畫面顯示的期間跟標題寫的一致嗎？
 6. 有沒有數字的單位或量級看起來不對？
-7. 有沒有圖表的軸從非零開始，造成視覺誤導？
+7. 有沒有圖表的軸設定造成視覺誤導？
 8. 有沒有相同指標在不同圖表顯示不同數字？
 
 格式：
-✔ 表示通過
-✗ 附上每個問題的具體位置與修正方式
+✔ 已驗證通過
+✗ 發現問題，附上具體位置與修正方式
+？需要回原始資料確認
 
-最後給我結論：放行，或是一份待修清單（依嚴重程度排序）。</pre></div>
+最後給我結論：放行，或是一份待修清單，依「嚴重／高／中／低」排序。</pre></div>
+        <div class="tipline">這一版的重點是<b>先分 A／B 兩類</b>：畫面能驗證的直接判，不能的老實標「需要回原始資料確認」，不要讓 AI 用看圖硬答資料問題。</div>
 
         <div class="pnum"><span class="pn">#26</span><span class="pt">高層刁鑽提問模擬</span></div>
         <div class="tipline"><b>什麼時候用：</b>報告前一天。</div>
@@ -816,25 +891,36 @@ Dashboard 內容：<span class="ph">[貼上主要數字與結論]</span>
         <div class="pnum"><span class="pn">#27</span><span class="pt">效能驗證</span></div>
         <div class="tipline"><b>什麼時候用：</b>dashboard 開起來很慢的時候，或發布前的最後檢查。</div>
         <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#27 效能驗證</div><pre>我的 dashboard 有以下狀況：
+- 儲存模式：<span class="ph">[Import／DirectQuery／Direct Lake／其他]</span>
+- 資料來源：<span class="ph">[填寫]</span>
 - 資料量：<span class="ph">[列出各表的列數]</span>
 - 量值數量：<span class="ph">[大約幾個]</span>
 - 視覺元件數量：<span class="ph">[每頁幾個]</span>
-- 目前的載入時間：<span class="ph">[秒數]</span>
+- 使用環境：<span class="ph">[Desktop／Service]</span>
+- 目前的載入體感或問題：<span class="ph">[填寫]</span>
+- Performance Analyzer 結果：<span class="ph">[有的話貼上]</span>
 
-幫我做效能診斷：
-1. 依照這個規模，合理的載入時間應該是多少
-2. 最可能的五個效能瓶頸，依可能性排序
-3. 每一個瓶頸的檢查方式（要用哪個工具、看哪個數字）
-4. 每一個瓶頸的修正方向
+幫我做效能診斷。
+
+不要直接給一個所有 dashboard 都適用的固定載入秒數，也不要給沒有依據的固定視覺元件上限。
+
+請根據儲存模式、資料來源、模型大小、DAX、視覺元件、網路、Capacity、Query 與 Performance Analyzer 結果判斷。
+
+幫我：
+1. 列出最可能的五個效能瓶頸，依可能性排序
+2. 每一個瓶頸的檢查方式（要用哪個工具、看哪個數字）
+3. 每一個瓶頸的修正方向
+4. 排出優先處理順序
 
 另外針對這些常見問題給我具體建議：
 - 雙向關聯是否必要
 - 計算欄位改成量值的判斷標準
 - 高基數欄位的處理方式
 - 不必要的欄位怎麼在來源端就篩掉
-- 視覺元件數量的建議上限
+- 視覺元件過多或過重的判斷方式
 
-最後給我一份效能檢查清單，我可以每次發布前跑一遍。</pre></div>
+最後給我一份效能驗收清單，我可以每次發布前跑一遍。</pre></div>
+        <div class="tipline">這支特別要求 AI <b>不要給「幾秒算合格」「幾個視覺算太多」這種固定數字</b>，因為那要看儲存模式與資料來源，講死了只會誤導。</div>
       </div></details>
 
       <!-- 階段 7 -->
@@ -865,7 +951,7 @@ Dashboard 內容：<span class="ph">[貼上主要數字與結論]</span>
 - 給外部的版本（重點在脈絡與趨勢）</pre></div>
 
         <div class="pnum"><span class="pn">#29</span><span class="pt">簡報腳本</span></div>
-        <div class="tipline"><b>什麼時候用：</b>正式報告前，這個階段的核心 prompt。</div>
+        <div class="tipline"><b>什麼時候用：</b>正式報告前，這個階段的核心 Prompt。</div>
         <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">#29 簡報腳本</div><pre>我要在 <span class="ph">[X]</span> 分鐘內，把這份 dashboard 報告給 <span class="ph">[主管／高層]</span>。
 
 Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]</span>
@@ -873,6 +959,7 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
 對方最在意的事：<span class="ph">[一句話]</span>
 
 幫我寫一份簡報腳本，包含：
+
 1. 開場句：抓住注意力的第一句話（不要從「今天要跟大家報告」開始）
 2. 圖表的閱讀順序：先看哪一張、再看哪一張，每一張停留多久
 3. 每一張圖表的講解台詞（一到兩句，直接寫出來我要唸的話）
@@ -893,14 +980,17 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
 - 會議中被問到的問題：<span class="ph">[列出]</span>
 - 當場答應要補的東西：<span class="ph">[列出]</span>
 - 會議做出的決議：<span class="ph">[列出，沒有就填「無」]</span>
+- 已確認期限：<span class="ph">[填寫，沒有就填「無」]</span>
 
-幫我寫一封會後追蹤 email，包含：
+幫我寫一封會後追蹤 Email，包含：
 1. 主旨（讓對方一眼知道內容，不超過 20 字）
 2. 開頭一句話回顧會議結論
 3. 三個重點數字的條列（每一個附一句解讀）
-4. 待補資料清單（含預計完成時間）
+4. 待補資料清單（含負責人與期限）
 5. 需要對方回覆或決定的事項（明確標出）
 6. Dashboard 連結與使用說明一句話
+
+如果期限沒有確認，標示「待確認」。
 
 寫作規則：
 - 全文控制在 250 字以內
@@ -917,7 +1007,7 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
   <!-- 中段 CTA -->
   <div class="mid-cta fade">
     <div class="mid-card">
-      <div class="mk">30 個 prompt 都在上面了</div>
+      <div class="mk">30 個 Prompt 都在上面了</div>
       <h3>Prompt 是零件<br><span class="g">工作流才是機器</span></h3>
       <p>這 30 個讓你把一份 dashboard 做完。要把 AI 接進你每天的工作、變成能省時間也能變現的系統，我在 Skool 帶你做、每週更新。</p>
       <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
@@ -946,33 +1036,20 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
       <tr><td>元件都做好了但排不出來</td><td>#16</td></tr>
       <tr><td>做完了但覺得哪裡不對勁</td><td>#17</td></tr>
       <tr><td>KPI 卡片做起來很陽春</td><td>#18</td></tr>
-      <tr><td>要在會議室投影</td><td>#19</td></tr>
+      <tr><td>要做深色模式或會議室投影</td><td>#19</td></tr>
       <tr><td>對方沒時間看細節</td><td>#20</td></tr>
-      <tr><td>多頁 dashboard 順序亂</td><td>#21</td></tr>
+      <tr><td>多頁 dashboard 不知道怎麼排序</td><td>#21</td></tr>
       <tr><td>圖表標題都是「XX 趨勢」</td><td>#22</td></tr>
       <tr><td>畫面很滿但不知道刪什麼</td><td>#23</td></tr>
       <tr><td>怕使用者亂點會壞掉</td><td>#24</td></tr>
       <tr><td>發布前的最後檢查</td><td>#25</td></tr>
       <tr><td>明天要報告給高層</td><td>#26</td></tr>
-      <tr><td>Dashboard 開起來很慢</td><td>#27</td></tr>
+      <tr><td>dashboard 開起來很慢</td><td>#27</td></tr>
       <tr><td>需要一分鐘內講完</td><td>#28</td></tr>
       <tr><td>正式報告的完整準備</td><td>#29</td></tr>
       <tr><td>報告完之後</td><td>#30</td></tr>
     </tbody></table></div>
-  </div>
-
-  <!-- 使用建議 -->
-  <div class="sec fade">
-    <span class="sec-tag">使用建議</span>
-    <h2>幾個<br><span class="g">實際跑起來會遇到的事</span></h2>
-    <ul class="bul">
-      <li><b>把階段 1 的產出存好。</b>#01 到 #04 的結果會在後面二十幾個 prompt 裡被反覆引用。建議在 Notion 開一個專案頁面，把這四份產出貼在最上面。</li>
-      <li><b>方括號一定要填完再送出。</b>[主題]、[誰]、[貼上 #01 的總結] 這些留著不填，AI 會自己編一個假的情境，後面全部會歪掉。</li>
-      <li><b>同一個專案用同一個對話串。</b>跨對話串的話 AI 記不得前面的決策，你每次都要重貼背景。</li>
-      <li><b>#17、#23、#25 需要上傳截圖。</b>截圖請截完整畫面，不要只截局部，AI 沒辦法判斷版面比例。</li>
-      <li><b>這份流程不是只能用在 Power BI。</b>除了階段 3 的 DAX 語法之外，其他 27 個 prompt 在 Tableau、Looker Studio、Google Sheets 上都能用。</li>
-    </ul>
-    <div class="warn">⚠️ <b>DAX 產出的程式碼要自己驗過。</b>AI 寫的 DAX 語法通常正確，但商業邏輯是否符合你們公司的算法，要自己核對一次。特別是 <b>#12 的期間比較</b>與 <b>#14 的達成率</b>，這兩個最容易算出「語法沒錯但意思不對」的結果。</div>
+    <div class="warn">⚠️ <b>DAX 產出的程式碼要自己驗過。</b>程式碼能跑，不代表商業邏輯一定正確，尤其是<b>期間比較（#12）</b>與<b>達成率（#14）</b>。至少拿一組已知答案的資料交叉驗證過再發布。</div>
   </div>
 
   <!-- 最後 -->
@@ -980,7 +1057,7 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
     <span class="sec-tag">最後</span>
     <h2>重點不在單句寫得多漂亮<br><span class="g">在順序</span></h2>
     <p>診斷做完才動資料、資料乾淨才算數字、數字定了才談視覺、視覺穩了才排敘事、敘事完整才做檢查、檢查通過才上台。</p>
-    <div class="insight"><div class="il">這份流程真正的成本</div><div class="it">跳過任何一段，後面都要回頭補。</div></div>
+    <div class="insight"><div class="il">怎麼把這 30 個用起來</div><div class="it">七個階段照順序走，每一階段再依你的專案情境選 Prompt。</div></div>
   </div>
 
   <!-- 後段 CTA -->
@@ -988,11 +1065,11 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
     <div class="cta-card">
       <div class="cta-kicker">下一步</div>
       <h2>Prompt 拿到了，<span class="g">接下來換我陪你把 AI 接進工作裡</span></h2>
-      <div class="cta-lead">這 30 個 prompt 讓你把一份 dashboard 從診斷做到上台。要把 AI 變成每天在幫你省時間、甚至幫你賺錢的系統，那不該你一個人慢慢摸。</div>
+      <div class="cta-lead">這 30 個 Prompt 讓你把一份 dashboard 從診斷做到上台。要把 AI 變成每天在幫你省時間、甚至幫你賺錢的系統，那不該你一個人慢慢摸。</div>
       <div class="fit">
         <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
         <div class="f">工具會用、卻不知道怎麼串成工作流的你</div>
-        <div class="f">收藏了一堆 prompt，卻從來沒真的跑完一輪的人</div>
+        <div class="f">收藏了一堆 Prompt，卻從來沒真的跑完一輪的人</div>
       </div>
       <div class="gives">
         <div class="gt">進來你會拿到</div>
@@ -1009,7 +1086,7 @@ Dashboard 內容：<span class="ph">[貼上各頁的視覺元件與關鍵數字]
 
   <div class="footer">
     <div class="fa">傑森所長 @jasonxtsai</div>
-    <div class="fc">AI × 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>※ 階段 3 的 DAX 為 Power BI 專屬語法，其他工具請 AI 轉換；AI 產出的計算邏輯發布前請自行核對</div>
+    <div class="fc">AI × 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>※ 部分 Prompt 使用 Power BI 專屬的 DAX、日期表、模型與效能設定，其他工具請換成對應做法；AI 產出的計算邏輯發布前請自行驗證</div>
   </div>
 
 </div>
@@ -1045,19 +1122,21 @@ setTimeout(function(){
 ═══════════════════════════════════════════
 落地頁設定備註（不顯示，給操盤手）
 ═══════════════════════════════════════════
-· 用途：Dashboard 30 Prompts——輪播 DM 承接頁／lead magnet（定位：貼文講 dashboard 該有的順序，落地頁給 7 階段 30 個完整 prompt）
-· 內容：這份文件是什麼（使用方式 5 步＋適用工具）＋流程總覽（膠囊流程條＋階段表）＋七階段摺疊卡（每張卡＝一個階段，內含該階段所有 prompt，各 prompt 用 .pnum 編號標題／.tipline 什麼時候用／.cp 可複製／變數說明）＋中段CTA＋對照表 30 列（.tbl.map 反轉粗體：狀況一般字、編號金色等寬）＋使用建議 5 條＋DAX 驗算警語＋最後
-· 版型決策：新增兩個元件——.pnum（prompt 編號＋標題，虛線分隔，卡片內用來切開 3-5 個 prompt）與 .tbl.map（對照表專用，把粗體從第一欄移到最後一欄的編號）；#22 加了洞見型標題的 judge no/ok 對照（原文沒有範例，用文中「月營收趨勢是失敗標題」那句補一組實例）
-· 可複製區塊：30 個 .cp（每階段的核心 prompt 用 hero-cp 加框：#04／#06／#11／#17／#22／#25／#29 共 7 個）
-· 三段 Skool CTA（指向 奇點研究所 × D11，與其他落地頁同設定）：
-    前段 → .side-cta（id=skool-side）／.top-cta（id=skool-top）
-    中段 → .mid-cta（id=skool-mid，30 prompt 與對照表之間）
-    後段 → .cta（id=skool-link）
-· Skool 連結：https://www.skool.com/d11-lab/about（無 ref 純網址，2026-07-13 定案標準）
+· 用途：Dashboard 30 Prompts——輪播 DM 承接頁／lead magnet
+· 版本：2026-08-06 依 dashboard_30_prompts_notion_final.md（最終版）全面改寫
+· 這一版相對初版的改動：
+    新增「名詞說明｜Dashboard 與 Power BI Report」（Report vs Dashboard 術語澄清，放在文件說明區的 insight）
+    新增「使用原則」整節六條（.rule 新元件）：階段照順序但 Prompt 依情況選／方括號先填不准補假設定／樣本不能當完整資料／#01-#04 存成背景文件／截圖只能驗畫面看得到的／數字與程式碼都要驗證
+    Prompt 改名 3 支：#12 累計與期間比較（去掉「年度」）、#16 版面配置與視線動線（去掉「Z 型」定型）、#19 深色模式調整
+    Prompt 內文更新 15 支：#03 工時粗估＋列假設／#05 樣本統計要標註／#06 疑似異常不直接判錯＋關聯不到主檔／#09 週次規則＋Mark as date table／#10 指標定義字典／#12 上一期間定義／#13 同分規則／#14 鑽研到不存在粒度／#15 類別配色與連續色階分開／#16 全段重寫／#17 不只寫抽象建議／#19 兩套切換／#20 判斷性結論要有數字／#21 原因改驅動因素＋不寫成因果／#22 最支持什麼結論＋不把相關性寫成因果／#23 完整畫面＋萬億／#24 建議在哪一層處理＋驗收清單／#25 先分 A/B＋加「？需回原始資料」＋嚴重高中低／#27 加儲存模式等 4 欄＋禁止給固定秒數與元件上限／#30 已確認期限＋負責人
+    階段描述：階段 5 改「講清楚」、階段 6 改「發布前再檢查錯誤與風險」
+    對照表 3 列更新：#19 深色模式或投影／#21 不知道怎麼排序／#27 小寫 dashboard
+    #25、#27 各加一行 tipline 說明改版重點
+· 結構調整：初版的「使用方式 5 步」與尾段「使用建議 6 條」內容重疊，改為前段放完整「使用原則」六條，尾段只留 DAX 驗證紅框警語，避免同一頁講兩次
+· 可複製區塊：30 個 .cp（hero-cp 7 個：#04／#06／#11／#17／#22／#25／#29）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
 · 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
-· 來源：傑森所長自有「dashboard-30-prompts」文件
-· 命名：日期前綴（2026-08-06-dashboard-30-prompts.html），對齊 kma-pages 慣例
-· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+· 來源：~/Downloads/dashboard_30_prompts_notion_final.md
 ═══════════════════════════════════════════
 -->
 </body>
