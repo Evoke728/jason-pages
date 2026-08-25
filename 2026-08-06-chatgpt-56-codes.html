@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>56 組 ChatGPT 指令代碼｜貼在句首，直接切換回答模式</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.cmd td:nth-child(2){font-family:var(--mono);color:var(--gold);font-weight:700;white-space:nowrap;font-size:12.5px;}
+.tbl.cmd td:first-child{font-family:"Inter";color:var(--faint);font-weight:700;width:34px;}
+.tbl.cmd td:last-child{font-family:var(--mono);font-size:11.5px;color:var(--dim);line-height:1.7;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.rule{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 18px;margin:11px 0;}
+.rule .rh{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;margin-bottom:6px;}
+.rule .rh .rn{font-family:"Inter";font-weight:800;color:var(--gold);margin-right:8px;}
+.rule p{font-size:13.6px;color:var(--text);line-height:1.78;margin:6px 0 0;}
+.rule b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 100px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.judge{border-radius:12px;padding:12px 15px;margin:8px 0;font-size:13.6px;line-height:1.75;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:5px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:14px 0 8px;}
+.flow span{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--gold);background:rgba(212,144,42,0.10);border:1px solid var(--gold-dim);border-radius:50px;padding:4px 13px;}
+.flow i{color:var(--faint);font-style:normal;font-size:12px;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>設定完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>代碼設好了<br><span class="g">時間拿來做什麼</span></h4>
+  <p>省下的是打字時間。省下來的時間拿去做什麼，才是差距的來源。我在 Skool 帶你把它變成產出。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CHATGPT · 56 組指令代碼</div>
+    <h1>56 組<br><span class="g">ChatGPT 指令代碼</span></h1>
+    <div class="h-sub">貼在句首，直接切換回答模式</div>
+    <div class="hero-sub">先講清楚一件事：這些代碼<b>不是官方隱藏功能</b>，斜線本身沒有魔力。它們要先寫進自訂指令，才會從「模型猜你的意思」變成「模型有一份對照表可以查」。這份文件給你完整設定區塊（精簡版與完整版）、56 組附實際用法的清單、四組組合技，以及三家 AI 的設定路徑。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">56</div><div class="l">組 · 指令代碼</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">7</div><div class="l">大 · 分類</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">種 · 設定方式</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">我是傑森，專注在「AI ＋ 自媒體變現」。我把自己每天在用的 AI 工具、工作流與內容產製方法拆開來講。這裡不談概念，只談你今天就能打開電腦照做的東西。</div></div>
+  </div>
+
+  <!-- 第一章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第一章 · 先講清楚</span>
+    <h2>這些代碼<br><span class="g">到底是什麼</span></h2>
+    <p>網路上很多人把這類清單叫做「ChatGPT 隱藏代碼」或「秘密指令」。<span class="hl">這個說法會害你設定錯方向</span>，所以先講清楚。兩種東西長得很像，但完全不同。</p>
+
+    <div class="judge ok"><span class="jl">A · 官方原生的 Slash 指令</span>ChatGPT 本身確實有一套斜線指令，那是<b>介面動作</b>，不是回答風格。在輸入框打一個 <b>/</b> 會跳出你的帳號當下可用的清單，可用項目依方案、平台與功能開通狀況而不同。常見的有 /goal（持續朝目標推進）、/plan（先把目標定義清楚）、/prompts:&lt;名稱&gt;（呼叫存好的提示詞），已啟用的 Skills 也會出現在這份清單裡。</div>
+    <div class="judge no"><span class="jl">B · 本文這 56 組，屬於自訂代碼</span>/eli5:、/critic:、/human: 這些<b>不在官方清單裡</b>，斜線本身沒有觸發任何功能。它們會生效，是因為模型讀得懂你在下什麼指令。你打「/eli5: 什麼是複利」，跟你打「用五歲小孩聽得懂的方式解釋複利」，效果差不多。</div>
+    <div class="tipline"><b>確認方法：</b>開一個新對話，在輸入框打 <b>/</b>，跳出來的就是你帳號真正支援的清單。</div>
+
+    <div class="sub-h">那為什麼還要用代碼</div>
+    <div class="steps">
+      <div class="st"><b>輸入成本。</b>你每天要打的字從一整句變成一個詞。一天用二十次，一年省下的打字量很可觀。</div>
+      <div class="st"><b>穩定度。</b>你每次寫「講白話一點」的方式都會有細微差異，模型的理解也會跟著飄。代碼是固定字串，指向固定定義，輸出的一致性明顯較高。</div>
+      <div class="st"><b>可以真的變成功能。</b>把定義寫進自訂指令或專案指令之後，代碼就從「模型猜你的意思」變成「模型有一份對照表可以查」。</div>
+    </div>
+
+    <div class="insight"><div class="il">關鍵結論</div><div class="it">沒有設定過的代碼，效果等同於一般提示詞。設定過之後，它才會變成快捷鍵。</div></div>
+    <div class="links-row"><a href="https://learn.chatgpt.com/docs/reference/slash-commands" target="_blank" rel="noopener">官方 Slash 指令文件</a></div>
+  </div>
+
+  <!-- 第二章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第二章 · 三種設定方式</span>
+    <h2>從最快到最穩<br><span class="g">建議三個都做</span></h2>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">層級一</span>單次貼上（零設定，馬上可用）</div>
+      <p>直接把代碼貼在句首。<b>適用：</b>臨時用一次、還在測試哪些代碼合你的胃口。<b>限制：</b>模型是靠語意推測，不同對話的表現會有落差。</p>
+    </div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">直接試一次</div><pre>/eli5: 什麼是 RAG</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">帶內容的用法</div><pre>/critic: 幫我看這段文案有什麼問題
+「我們提供全方位的解決方案，協助您在數位轉型的浪潮中掌握先機。」</pre></div>
+
+    <div class="rule" style="margin-top:20px;">
+      <div class="rh"><span class="rn">層級二</span>全域自訂指令（設定一次，所有對話生效）</div>
+      <p><b>這是投報率最高的一步，兩分鐘做完。</b></p>
+      <p><b>網頁版與桌面版：</b>設定 → 個人化 → 自訂指令<br><b>iOS 與 Android：</b>設定 → 自訂 ChatGPT</p>
+    </div>
+    <div class="warn">⚠️ <b>務必確認「啟用自訂功能（Enable customization）」是開啟狀態。</b>這個開關預設不一定是開的，很多人卡在這裡。</div>
+    <div class="tipline">貼上第三章的設定區塊後儲存。依官方說明，自訂指令儲存後會立即套用到所有對話（包含既有對話），不過測試時建議還是開一個新對話，結果比較乾淨。</div>
+
+    <div class="sub-h">字數上限（這點很多人踩坑）</div>
+    <p style="font-size:14px;">自訂指令有字元上限。2026 年 7 月，OpenAI 將付費方案（Plus、Pro、Enterprise、Business、Education）的上限<span class="hl">從 1,500 字元提高到 5,000 字元</span>。免費方案的空間較小。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>版本</th><th>長度</th><th>適用</th></tr></thead><tbody>
+      <tr><td>精簡版</td><td>約 1,200 字元以內</td><td>免費方案也塞得下</td></tr>
+      <tr><td>完整版</td><td>約 3,500 字元</td><td>付費方案或專案指令</td></tr>
+    </tbody></table></div>
+
+    <div class="rule" style="margin-top:20px;">
+      <div class="rh"><span class="rn">層級三</span>專案指令（最穩，且不污染其他對話）</div>
+      <p>全域自訂指令的缺點是，那 56 條定義會跟著你<b>所有</b>對話跑，包含你只想閒聊的那些。專案（Projects）解決這個問題：建立一個叫「指令模式」的專案，把完整版放進專案指令，<b>只有在這個專案裡代碼才生效</b>，其他對話維持乾淨。</p>
+      <p><b>路徑：</b>側邊欄的「專案」→ 建立新專案 → 專案指令欄位貼上完整版。<b>額外好處：</b>專案指令的空間比全域自訂指令大很多，定義可以寫得更完整。</p>
+    </div>
+
+    <div class="warn">⚠️ <b>關於 Custom GPT 的 2026 年變動：</b>很多教學會建議你「做一個 Custom GPT」。但依 OpenAI 說明中心，<b>新建與發布 GPT 目前不開放給個人帳號</b>（包含 Free、Go、Plus、Pro），既有的 GPT 仍可繼續使用與編輯；Business、Enterprise、Edu 工作區在權限允許下可以建立。<br><br>所以如果你是個人帳號，<b>專案指令就是你的最佳選擇</b>，不要浪費時間找 GPT 建立入口。</div>
+    <div class="links-row"><a href="https://help.openai.com/en/articles/8096356-chatgpt-custom-instructions" target="_blank" rel="noopener">官方 · 自訂指令說明</a><a href="https://help.openai.com/en/articles/9358033-key-guidelines-for-writing-instructions-for-custom-gpts" target="_blank" rel="noopener">官方 · GPT 指示撰寫</a></div>
+  </div>
+
+  <!-- 第三章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第三章 · 設定區塊</span>
+    <h2>兩個版本<br><span class="g">選一個貼上</span></h2>
+
+    <div class="sub-h">精簡版 · 約 1,200 字元（免費方案適用）</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製精簡版</button><div class="pl">貼進自訂指令</div><pre>當我的訊息以斜線開頭時，請把它當作模式指令，依下表切換回答方式。斜線後面的文字才是我要問的主題。同時出現多個指令時，依序疊加套用。
+
+/human:寫得像人，去掉 AI 腔與套話
+/copywriter:有說服力的行銷文案
+/persuasivemode:強化說服力與行動誘因
+/storytellerai:改寫成有畫面的故事
+/emailwizard:專業信件格式
+/brief:只給結論，不要鋪陳
+/tl;dr:三行以內濃縮重點
+/examplewizard:附兩個真實案例
+/teacher:白話拆解，循序講
+/eli5:用五歲小孩懂的比喻
+/booksummary:整本書濃縮成重點
+/skillbuilder:排一份學習計畫
+/research:多角度深入查證
+/deepthink:逐步推理，不跳結論
+/frameworkify:整理成步驟框架
+/datainterpreter:分析數據並給洞見
+/expert:用該領域專家水準回答
+/ceo:用創辦人與商業視角分析
+/critic:只挑問題，不誇獎
+/unpopularopinion:給主流之外的誠實看法
+/problemsolver:一步一步解決
+/decisionhelper:列選項與取捨後給建議
+/strategy:長期規劃視角
+/negotiationcoach:談判策略與話術
+/promptengineer:重寫我的提示詞
+/promptimprover:優化提示詞並說明改動
+/brainstorm:大量發想，先量後質
+/productivityboost:可執行的效率做法
+/automateit:找出可自動化的環節
+/moneyideas:可獲利的商業點子
+/growthhack:低成本的成長手法
+/competitorroast:拆解對手策略與弱點
+/jobinterviewer:模擬面試並給回饋
+/careercoach:職涯路線建議
+/resumewriter:改寫履歷
+/coverlettergen:針對職缺寫求職信
+/linkedinbooster:優化個人檔案文案
+/brandstory:寫品牌故事
+/audienceavatar:建立受眾輪廓
+/psychowords:換成有行動力的字詞
+/healthcoach:健康作息建議
+/mealplanner:一週菜單
+/workoutbuddy:訓練菜單
+/habittracker:習慣建立方法
+/personaldeveloper:30 天提升計畫
+/budgetplanner:每月預算表
+/financetips:存錢與理財觀念
+/travelplanner:預算內的行程
+/viral:高互動內容點子
+/viralhook:開場鉤子
+/socialmediaai:社群貼文
+/contentrecycler:一稿多用拆解
+/contentoptimizer:優化內容結構與關鍵字
+/seo:搜尋導向的內容
+/ctaexpert:高轉換行動呼籲
+/trendpredictor:趨勢預測與依據</pre></div>
+
+    <div class="sub-h">完整版 · 約 3,500 字元（付費方案或專案指令）</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製完整版</button><div class="pl">貼進自訂指令或專案指令</div><pre>【指令模式】
+
+當我的訊息以斜線開頭時，請把它辨識為模式指令，依下方定義切換回答方式。斜線後面的文字才是我要處理的主題或內容。
+
+規則：
+1. 同時出現多個指令時，依出現順序疊加套用。例如「/expert: /brief:」代表用專家水準回答，但只給結論。
+2. 指令沒有出現時，維持你的一般回答方式。
+3. 如果我打了一個不在下表的指令，直接照字面意思理解，不用問我。
+4. 套用指令時不要在開頭覆述「好的，我將以某某模式回答」，直接給內容。
+
+【寫作與文案】
+/human: 去掉 AI 腔調、套話與制式轉折，寫成一般人會講的話。句子長短交錯。
+/copywriter: 寫行銷文案。先講對讀者的好處，再講功能。避免形容詞堆疊。
+/persuasivemode: 強化說服力。加入具體證據、對比與明確的行動誘因。
+/storytellerai: 改寫成故事。要有場景、人物與轉折，不要抽象敘述。
+/emailwizard: 寫成專業信件。含主旨、開場、正文、明確請求、結尾。
+/brief: 只給結論。不要鋪陳、不要免責聲明、不要延伸建議。
+/tl;dr: 三行以內濃縮全部重點。
+/examplewizard: 說明之後附上兩個真實可查證的案例。
+
+【學習與理解】
+/teacher: 白話拆解，從最基礎講起，每一步都確認前一步成立。
+/eli5: 用五歲小孩聽得懂的比喻解釋，不用專業術語。
+/booksummary: 濃縮成核心論點、三到五個支撐重點、可執行的行動。
+/skillbuilder: 排一份分階段學習計畫，含每階段的產出物與檢核方式。
+/research: 多角度查證，列出不同立場與各自依據，標示哪些有共識、哪些仍有爭議。
+/deepthink: 逐步推理，把中間推導過程寫出來，不要直接跳到結論。
+/frameworkify: 把主題整理成可重複執行的步驟框架，每步標明輸入與輸出。
+/datainterpreter: 分析數據，指出趨勢、異常與可能的解釋，並說明限制。
+
+【思考與決策】
+/expert: 用該領域資深工作者的水準回答，可以使用專業術語。
+/ceo: 用創辦人視角分析，關注成本、風險、機會成本與長期影響。
+/critic: 只挑問題。列出弱點、漏洞與反例，不要給正面評價。
+/unpopularopinion: 給主流之外的誠實看法，並說明你的理由。
+/problemsolver: 一步一步解決，每步給出具體動作與判斷條件。
+/decisionhelper: 列出所有選項、各自的取捨，最後給一個明確建議並說明原因。
+/strategy: 用長期視角規劃，區分短期戰術與長期佈局。
+/negotiationcoach: 給談判策略、可用話術，以及對方可能的反應與應對。
+
+【效率與成長】
+/promptengineer: 重寫我給的提示詞，讓輸出更精準。
+/promptimprover: 優化提示詞，並列出你改了哪些地方與原因。
+/brainstorm: 大量發想，先求數量再求品質，至少給十五個方向。
+/productivityboost: 給可以今天就執行的效率做法，不要泛泛的原則。
+/automateit: 找出流程中可自動化的環節，並建議具體工具或做法。
+/moneyideas: 提出可獲利的商業點子，含目標客群、收費方式與啟動成本。
+/growthhack: 給低成本、可快速測試的成長手法。
+/competitorroast: 拆解對手策略，指出弱點與可切入的縫隙。
+
+【職涯與個人品牌】
+/jobinterviewer: 模擬面試，一次問一題，我回答後給回饋再問下一題。
+/careercoach: 分析職涯路線選項與各自需要補的能力。
+/resumewriter: 改寫履歷，用可量化的成果取代職務描述。
+/coverlettergen: 針對職缺寫求職信，扣緊職缺要求。
+/linkedinbooster: 優化個人檔案標題與簡介，突出差異化定位。
+/brandstory: 寫品牌故事，含起點、轉折與現在在做的事。
+/audienceavatar: 建立受眾輪廓，含處境、痛點、已試過的方法與真正想要的結果。
+/psychowords: 把文字換成更有行動力的用詞，並標出改了哪些。
+
+【生活與理財】
+/healthcoach: 給作息與生活習慣建議，並提醒需要諮詢專業人員的情況。
+/mealplanner: 排一週菜單，含採買清單。
+/workoutbuddy: 依目標設計訓練菜單，含頻率與漸進安排。
+/habittracker: 設計習慣建立方法，含觸發點、最小單位與追蹤方式。
+/personaldeveloper: 排一份 30 天提升計畫，每週有明確主題與檢核點。
+/budgetplanner: 做每月預算表，分固定支出、變動支出與儲蓄。
+/financetips: 給存錢與理財觀念，說明適用情境與風險。
+/travelplanner: 在指定預算內排行程，含交通、住宿與時間分配。
+
+【內容與流量】
+/viral: 提出高互動的內容點子，並說明為什麼會有互動。
+/viralhook: 寫開場鉤子，至少五個方向。
+/socialmediaai: 寫社群貼文，依平台調整長度與語氣。
+/contentrecycler: 把一個主題拆成多種格式與平台的版本。
+/contentoptimizer: 優化內容結構、標題與關鍵字配置。
+/seo: 產出搜尋導向的內容，含標題與段落安排。
+/ctaexpert: 寫行動呼籲，給三個不同壓力層級的版本。
+/trendpredictor: 預測趨勢，並列出你的判斷依據。</pre></div>
+    <div class="tipline"><b>貼上前檢查一件事：</b>完整版裡刻意保留了「不要覆述模式」這條規則。少了它，ChatGPT 常常會先講一段「好的，我將以專家模式為您解答」才進入正題，<b>很浪費你的時間</b>。</div>
+  </div>
+
+  <!-- 第四章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第四章 · 56 組完整清單</span>
+    <h2>展開任一類<br><span class="g">每條都附實際用法</span></h2>
+    <p>把中括號的部分換成你自己的內容就能直接用。</p>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">一</span><span class="ch-t">寫作與文案<span class="en"> · #01-08</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>01</td><td>/human:</td><td>寫出像人寫的自然文字</td><td>/human: 把這段改寫成一般人會講的話：[貼上你的文字]</td></tr>
+          <tr><td>02</td><td>/copywriter:</td><td>寫有說服力的行銷文案</td><td>/copywriter: 幫我寫線上課程的銷售段落，對象是剛開始做自媒體的上班族</td></tr>
+          <tr><td>03</td><td>/persuasivemode:</td><td>讓訊息更有說服力</td><td>/persuasivemode: 我要說服主管採用新的專案管理工具，幫我強化這段說法：[貼上]</td></tr>
+          <tr><td>04</td><td>/storytellerai:</td><td>把想法變成好看的故事</td><td>/storytellerai: 把「我花三年才搞懂內容要垂直」寫成一個有畫面的開場故事</td></tr>
+          <tr><td>05</td><td>/emailwizard:</td><td>快速寫出專業信件</td><td>/emailwizard: 寫信給合作方，說明這次專案要延後兩週，並提出新的時程</td></tr>
+          <tr><td>06</td><td>/brief:</td><td>給最短的答案</td><td>/brief: 個人品牌初期該先做 IG 還是 YouTube</td></tr>
+          <tr><td>07</td><td>/tl;dr:</td><td>把長內容濃縮成短重點</td><td>/tl;dr: [貼上一篇長文或會議記錄]</td></tr>
+          <tr><td>08</td><td>/examplewizard:</td><td>用真實例子幫助理解</td><td>/examplewizard: 什麼是產品市場契合度</td></tr>
+        </tbody></table></div>
+        <div class="tipline">這組<b>最值得先設定的是 /human:</b>。它處理的是 AI 文字最明顯的破綻：過度工整的句長、制式的轉折詞、每段都想總結。設定過之後差異最明顯。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">二</span><span class="ch-t">學習與理解<span class="en"> · #09-16</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>09</td><td>/teacher:</td><td>講得清楚又簡單</td><td>/teacher: 解釋什麼是 API，我完全沒有技術背景</td></tr>
+          <tr><td>10</td><td>/eli5:</td><td>講到五歲小孩也懂</td><td>/eli5: 什麼是通貨膨脹</td></tr>
+          <tr><td>11</td><td>/booksummary:</td><td>把整本書濃縮成重點</td><td>/booksummary: 《原子習慣》，重點放在可執行的部分</td></tr>
+          <tr><td>12</td><td>/skillbuilder:</td><td>客製一份學習計畫</td><td>/skillbuilder: 我想在三個月內學會用 AI 做短影音，每天可投入一小時</td></tr>
+          <tr><td>13</td><td>/research:</td><td>進入深度研究模式</td><td>/research: 台灣的自媒體變現模式有哪幾種，各自的門檻與天花板</td></tr>
+          <tr><td>14</td><td>/deepthink:</td><td>極度深入地逐步思考</td><td>/deepthink: 我該把預算全押在廣告投放，還是分一半做內容累積</td></tr>
+          <tr><td>15</td><td>/frameworkify:</td><td>把主題變成步驟框架</td><td>/frameworkify: 從零開始經營一個 IG 帳號到接到第一筆業配</td></tr>
+          <tr><td>16</td><td>/datainterpreter:</td><td>分析數據並給出洞見</td><td>/datainterpreter: [貼上你的貼文數據]，告訴我哪一類內容表現最好</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>/research: 搭配網路搜尋功能一起用效果最好。</b>單獨使用時它只會整理模型既有的知識，不會去查最新資料。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">三</span><span class="ch-t">思考與決策<span class="en"> · #17-24</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>17</td><td>/expert:</td><td>用專家等級回答</td><td>/expert: 從 SEO 角度看，這個網站結構有什麼問題：[說明結構]</td></tr>
+          <tr><td>18</td><td>/ceo:</td><td>用創辦人視角分析</td><td>/ceo: 我該不該請一個全職剪輯，月薪四萬</td></tr>
+          <tr><td>19</td><td>/critic:</td><td>找出弱點與破綻</td><td>/critic: 這是我的商業模式，幫我找出會出問題的地方：[說明]</td></tr>
+          <tr><td>20</td><td>/unpopularopinion:</td><td>給誠實的逆風觀點</td><td>/unpopularopinion: 每天發文對帳號成長的實際幫助</td></tr>
+          <tr><td>21</td><td>/problemsolver:</td><td>一步一步解決問題</td><td>/problemsolver: 我的貼文觸及從三千掉到五百，幫我排查</td></tr>
+          <tr><td>22</td><td>/decisionhelper:</td><td>幫我做出更好的決定</td><td>/decisionhelper: 現有工作月薪六萬穩定，全職做自媒體目前月收三萬但成長中</td></tr>
+          <tr><td>23</td><td>/strategy:</td><td>切換長期規劃模式</td><td>/strategy: 我想在兩年內把自媒體做成主要收入，該怎麼排順序</td></tr>
+          <tr><td>24</td><td>/negotiationcoach:</td><td>教我談判怎麼贏</td><td>/negotiationcoach: 品牌方開價一萬，我想談到兩萬五</td></tr>
+        </tbody></table></div>
+        <div class="insight"><div class="il">這 56 條裡最被低估的一條</div><div class="it">/critic:。ChatGPT 預設偏向鼓勵，你問「這樣可以嗎」它多半說可以。/critic: 直接把它切換成挑錯模式，用來檢查文案、企劃與商業模式都很有效。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">四</span><span class="ch-t">效率與成長<span class="en"> · #25-32</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>25</td><td>/promptengineer:</td><td>優化任何一段提示詞</td><td>/promptengineer: 幫我寫一篇關於 AI 的文章</td></tr>
+          <tr><td>26</td><td>/promptimprover:</td><td>把提示詞改到更好用</td><td>/promptimprover: [貼上你現在在用的提示詞]</td></tr>
+          <tr><td>27</td><td>/brainstorm:</td><td>大量發想創意點子</td><td>/brainstorm: 「AI 工具」這個主題可以拍的短影音題目</td></tr>
+          <tr><td>28</td><td>/productivityboost:</td><td>給可執行的效率建議</td><td>/productivityboost: 我每天花三小時在回訊息跟排程</td></tr>
+          <tr><td>29</td><td>/automateit:</td><td>建議任務怎麼自動化</td><td>/automateit: 我每週要把貼文數據手動整理到試算表</td></tr>
+          <tr><td>30</td><td>/moneyideas:</td><td>產出能賺錢的商業點子</td><td>/moneyideas: 我會剪片跟寫文案，手上有兩萬預算</td></tr>
+          <tr><td>31</td><td>/growthhack:</td><td>給快速成長的操作手法</td><td>/growthhack: 帳號目前八百追蹤，想在兩個月破三千</td></tr>
+          <tr><td>32</td><td>/competitorroast:</td><td>拆解並吐槽對手策略</td><td>/competitorroast: [貼上對手帳號的內容特徵]</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>25 跟 26 功能重疊，實務上擇一即可。</b>差別在 /promptimprover: 會告訴你改了什麼，適合用來學；/promptengineer: 直接給結果，適合趕時間。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">五</span><span class="ch-t">生活與理財<span class="en"> · #33-40</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>33</td><td>/healthcoach:</td><td>客製個人健康計畫</td><td>/healthcoach: 我久坐工作，下背常常痠</td></tr>
+          <tr><td>34</td><td>/mealplanner:</td><td>排一週的健康菜單</td><td>/mealplanner: 兩人份，一週菜單，含採買清單</td></tr>
+          <tr><td>35</td><td>/workoutbuddy:</td><td>依目標設計訓練菜單</td><td>/workoutbuddy: 每週三次，家裡只有一對啞鈴</td></tr>
+          <tr><td>36</td><td>/habittracker:</td><td>建立並追蹤好習慣</td><td>/habittracker: 我想養成每天寫作三十分鐘的習慣</td></tr>
+          <tr><td>37</td><td>/personaldeveloper:</td><td>排一份 30 天自我提升計畫</td><td>/personaldeveloper: 我想改善公開說話會緊張的問題</td></tr>
+          <tr><td>38</td><td>/budgetplanner:</td><td>做一份每月預算表</td><td>/budgetplanner: 月收入六萬，房租一萬八，想每月存兩萬</td></tr>
+          <tr><td>39</td><td>/financetips:</td><td>給存錢與投資的建議</td><td>/financetips: 三十歲，有六十萬存款，沒有投資經驗</td></tr>
+          <tr><td>40</td><td>/travelplanner:</td><td>在預算內排好行程</td><td>/travelplanner: 東京五天四夜，兩人共六萬台幣</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>健康與理財這幾條，把 AI 的輸出當成起點而非結論。</b>涉及身體狀況或資金配置的決定，找專業人員確認過再執行。AI 給你的是一份可以拿去討論的草稿。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">六</span><span class="ch-t">職涯與個人品牌<span class="en"> · #41-48</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>41</td><td>/jobinterviewer:</td><td>模擬面試並給回饋</td><td>/jobinterviewer: 職缺是社群行銷專員，一次問一題</td></tr>
+          <tr><td>42</td><td>/careercoach:</td><td>規劃理想的職涯路線</td><td>/careercoach: 做了五年行銷，想轉到產品端</td></tr>
+          <tr><td>43</td><td>/resumewriter:</td><td>寫一份能拿到面試的履歷</td><td>/resumewriter: [貼上現有履歷]，目標職缺是內容行銷主管</td></tr>
+          <tr><td>44</td><td>/coverlettergen:</td><td>針對職缺寫求職信</td><td>/coverlettergen: [貼上職缺描述] ＋ [貼上你的背景]</td></tr>
+          <tr><td>45</td><td>/linkedinbooster:</td><td>優化 LinkedIn 標題與簡介</td><td>/linkedinbooster: 我是自由接案的品牌顧問，服務中小企業</td></tr>
+          <tr><td>46</td><td>/brandstory:</td><td>寫一個賣得動的品牌故事</td><td>/brandstory: 我從工程師轉做 AI 教學，做了兩年</td></tr>
+          <tr><td>47</td><td>/audienceavatar:</td><td>建立詳細的受眾輪廓</td><td>/audienceavatar: 我的內容是教上班族用 AI 提升效率</td></tr>
+          <tr><td>48</td><td>/psychowords:</td><td>用能觸發行動的字眼</td><td>/psychowords: [貼上你的 CTA 文案]</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>/audienceavatar: 建議一年做一次，並且把結果存起來。</b>每次要寫新內容時，把它貼進對話當背景資料，輸出的精準度會差很多。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">七</span><span class="ch-t">內容與流量<span class="en"> · #49-56</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>#</th><th>指令</th><th>用途</th><th>實際用法</th></tr></thead><tbody>
+          <tr><td>49</td><td>/viral:</td><td>產出高互動內容點子</td><td>/viral: 主題是 AI 工具，受眾是完全沒用過的新手</td></tr>
+          <tr><td>50</td><td>/viralhook:</td><td>寫抓住注意力的開場鉤子</td><td>/viralhook: 主題是「我刪掉了八成的 AI 工具」</td></tr>
+          <tr><td>51</td><td>/socialmediaai:</td><td>寫會被瘋傳的社群貼文</td><td>/socialmediaai: 平台是 Threads，主題是 AI 取代不了的三件事</td></tr>
+          <tr><td>52</td><td>/contentrecycler:</td><td>一個點子拆成十種格式</td><td>/contentrecycler: 主題是「用 AI 一週產出三十則貼文」</td></tr>
+          <tr><td>53</td><td>/contentoptimizer:</td><td>優化內容的 SEO 與互動</td><td>/contentoptimizer: [貼上你的文章]</td></tr>
+          <tr><td>54</td><td>/seo:</td><td>產出搜尋優化內容</td><td>/seo: 主題是「AI 生圖工具比較」，主關鍵字是 AI 生圖</td></tr>
+          <tr><td>55</td><td>/ctaexpert:</td><td>寫高轉換的行動呼籲</td><td>/ctaexpert: 我要引導讀者留言關鍵字領取檔案</td></tr>
+          <tr><td>56</td><td>/trendpredictor:</td><td>預測領域的下一波趨勢</td><td>/trendpredictor: 華文自媒體圈，未來六個月</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>/viral: 跟 /socialmediaai: 產出的內容要過濾。</b>模型對「會爆」的理解來自訓練資料裡的既有模式，它給你的是安全牌。拿它當發想起點，<b>最後那層判斷還是要你自己下</b>。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">56 組都在上面了</div>
+      <h3>單條指令的價值有限<br><span class="g">串起來才是工作流</span></h3>
+      <p>代碼幫你省下打字時間。要把它接成一條「內容 → 流量 → 收入」的產線，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 第五章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第五章 · 組合技</span>
+    <h2>單條有限<br><span class="g">串起來才是工作流</span></h2>
+
+    <div class="sub-h">組合一 · 把陌生主題變成可教的內容</div>
+    <div class="flow"><span>/research:</span><i>→</i><span>/frameworkify:</span><i>→</i><span>/eli5:</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製三步</button><div class="pl">依序丟三次</div><pre>/research: <span class="ph">[主題]</span>
+
+/frameworkify: 把上面的內容整理成步驟框架
+
+/eli5: 把這個框架講給完全沒背景的人聽</pre></div>
+    <div class="tipline">三步之後，你手上有一份<b>可以直接拍成影片的腳本骨架</b>。</div>
+
+    <div class="sub-h">組合二 · 文案從草稿到定稿</div>
+    <div class="flow"><span>/viralhook:</span><i>→</i><span>/copywriter:</span><i>→</i><span>/critic:</span><i>→</i><span>/human:</span></div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製四步</button><div class="pl">依序丟四次</div><pre>/viralhook: <span class="ph">[主題]</span>
+
+/copywriter: 用第三個鉤子往下寫完整篇貼文
+
+/critic: 挑出這篇的問題
+
+/human: 依上面的批評修正，並去掉 AI 腔</pre></div>
+    <div class="insight"><div class="il">這四步是我實際在用的流程</div><div class="it">關鍵在第三步。多數人跳過批評直接發布，成品的水準就卡在模型的第一版。</div></div>
+
+    <div class="sub-h">組合三 · 一稿多用</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">拆解後再逐平台改寫</div><pre>/contentrecycler: <span class="ph">[貼上你已經發過的長文]</span>
+
+/socialmediaai: 把其中的第二點寫成 Threads 貼文</pre></div>
+
+    <div class="sub-h">組合四 · 同一則訊息裡疊加</div>
+    <p style="font-size:14px;">指令可以疊，用空格分開。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">用專家水準回答，但只給結論</div><pre>/expert: /brief: 從 SEO 角度看，內部連結該怎麼配置</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">用創辦人視角，只挑問題</div><pre>/ceo: /critic: 我打算把三成營收投在廣告，幫我看這個決定</pre></div>
+    <div class="warn">⚠️ <b>疊加最多兩到三個。</b>超過之後模型會開始漏掉其中幾個。</div>
+  </div>
+
+  <!-- 第六章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第六章 · 五種常見失敗</span>
+    <h2>沒反應的時候<br><span class="g">照這裡排查</span></h2>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">一</span>貼了設定，但完全沒反應</div>
+      <p><b>最常見原因：</b>沒有開啟「啟用自訂功能（Enable customization）」。到設定裡確認開關是開的。這個開關預設狀態不一定是開，很多人卡在這裡。</p>
+    </div>
+    <div class="rule">
+      <div class="rh"><span class="rn">二</span>免費方案塞不下 56 條</div>
+      <p>三個解法：① 用精簡版 ② 從 56 條裡挑你真的會用的十到十五條，其他刪掉 ③ 建立一個專案，把完整版放進專案指令。</p>
+      <p><b>實務建議選第二個。你不會用到 56 條，挑出常用的反而讓模型更準。</b></p>
+    </div>
+    <div class="rule">
+      <div class="rh"><span class="rn">三</span>設定有效，但過幾天又失效</div>
+      <p><b>原因通常是記憶（Memory）功能。</b>Memory 會從你的對話裡自動累積偏好，如果它記下了跟自訂指令衝突的內容，兩邊會打架。</p>
+      <p><b>修法：</b>到設定裡檢查 Memory 內容，刪掉衝突的項目。或是在自訂指令裡加一句：「當記憶內容與本指令衝突時，以本指令為準。」</p>
+    </div>
+    <div class="rule">
+      <div class="rh"><span class="rn">四</span>長對話講到後面就開始飄</div>
+      <p>對話拉長之後，開頭的指令權重會下降。<b>修法：</b>直接補一句「依自訂指令回答」，或重新打一次代碼。不用重開對話。</p>
+    </div>
+    <div class="rule">
+      <div class="rh"><span class="rn">五</span>以為斜線本身有魔力</div>
+      <p>如果你完全沒做過設定，/critic: 跟直接寫「幫我挑毛病」效果差不多。</p>
+      <p><b>判斷方法：</b>同一個問題問兩次，一次帶代碼一次不帶。如果輸出幾乎一樣，代表你的設定沒生效，回到第二章重做。</p>
+    </div>
+  </div>
+
+  <!-- 第七章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第七章 · 三家設定路徑</span>
+    <h2>這套不限 ChatGPT<br><span class="g">差別只在入口在哪</span></h2>
+
+    <div class="sub-h">ChatGPT</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>內容</th></tr></thead><tbody>
+      <tr><td>網址</td><td><a href="https://chatgpt.com" target="_blank" rel="noopener">chatgpt.com</a></td></tr>
+      <tr><td>全域設定</td><td>設定 → 個人化 → 自訂指令（手機：設定 → 自訂 ChatGPT）</td></tr>
+      <tr><td>專案設定</td><td>側邊欄「專案」→ 新增專案 → 專案指令</td></tr>
+      <tr><td>官方說明</td><td><a href="https://help.openai.com/en/articles/8096356-chatgpt-custom-instructions" target="_blank" rel="noopener">自訂指令</a>／<a href="https://learn.chatgpt.com/docs/reference/slash-commands" target="_blank" rel="noopener">原生 Slash 指令</a></td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>注意：</b>新建與發布 Custom GPT 目前不開放個人帳號。個人帳號請用專案指令。</div>
+
+    <div class="sub-h">Claude</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>內容</th></tr></thead><tbody>
+      <tr><td>網址</td><td><a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a></td></tr>
+      <tr><td>全域設定</td><td>左下角頭像 → 設定 → Instructions for Claude（個人偏好指令）</td></tr>
+      <tr><td>專案設定</td><td>側邊欄「Projects」→ 新增專案 → 專案指令</td></tr>
+      <tr><td>官方說明</td><td><a href="https://support.claude.com/en/articles/10185728-understanding-claude-s-personalization-features" target="_blank" rel="noopener">個人化功能</a>／<a href="https://support.claude.com/en/articles/9519177-how-can-i-create-and-manage-projects" target="_blank" rel="noopener">專案管理</a></td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>方案差異：</b>依官方說明，專案本身開放給所有使用者，免費帳號最多可建立五個專案；<b>專案指令列為付費方案功能</b>。個人偏好指令則所有方案皆可使用。功能與方案細節會調整，以官方說明頁為準。<br><br><b>Claude 的額外選項：</b>Skills 可以把重複性的行為包成可呼叫的能力，比純文字指令更結構化。適合你已經把某個工作流跑順、想固定下來的時候。</div>
+
+    <div class="sub-h">Gemini</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>內容</th></tr></thead><tbody>
+      <tr><td>網址</td><td><a href="https://gemini.google.com" target="_blank" rel="noopener">gemini.google.com</a></td></tr>
+      <tr><td>全域設定</td><td>設定與說明 → 自訂指令（Custom instructions）</td></tr>
+      <tr><td>Gem 設定</td><td>左側「Gems」或「Explore Gems」→ New Gem → 填入 Instructions → 儲存</td></tr>
+      <tr><td>官方說明</td><td><a href="https://support.google.com/gemini/answer/15235603" target="_blank" rel="noopener">自訂指令</a>／<a href="https://gemini.google/overview/gems/" target="_blank" rel="noopener">Gems 介紹</a></td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ <b>Gem 最多人踩的坑：</b>建立時右側有預覽視窗可以直接測試，但<b>預覽不會自動儲存</b>，測完記得按儲存。</div>
+
+    <div class="sub-h">三家怎麼選</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>情境</th><th>建議</th></tr></thead><tbody>
+      <tr><td>只想快速套用，不想研究</td><td>ChatGPT 全域自訂指令</td></tr>
+      <tr><td>想要指令只在特定工作時生效</td><td>Claude 專案 或 Gemini Gem</td></tr>
+      <tr><td>需要放大量參考文件一起用</td><td>Claude 專案 或 Gemini Gem（都支援上傳知識檔案）</td></tr>
+      <tr><td>想把工作流固定成可重複呼叫的能力</td><td>Claude Skills</td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>三家的核心邏輯相同：把重複講的話存起來，不要每次重打。</b>換平台時，第三章的設定區塊可以直接複製過去，只有入口位置不一樣。</div>
+  </div>
+
+  <!-- 第八章 -->
+  <div class="sec fade">
+    <span class="sec-tag">第八章 · 七天上手</span>
+    <h2>一次記 56 條<br><span class="g">不會成功</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>天</th><th>做什麼</th></tr></thead><tbody>
+      <tr><td>第 1 天</td><td>貼上精簡版設定，開啟自訂功能，用 /eli5: 測一次確認生效</td></tr>
+      <tr><td>第 2 天</td><td>只練 /brief: 跟 /human:。這兩條是日常使用頻率最高的</td></tr>
+      <tr><td>第 3 天</td><td>練 /critic:。拿一篇你已經寫好的東西丟進去</td></tr>
+      <tr><td>第 4 天</td><td>練 /frameworkify: 跟 /research:。用在你手上正在查的主題</td></tr>
+      <tr><td>第 5 天</td><td>跑一次第五章的組合二（鉤子 → 文案 → 批評 → 修正）</td></tr>
+      <tr><td>第 6 天</td><td>檢查你這六天實際用到哪幾條，其他從設定裡刪掉</td></tr>
+      <tr><td>第 7 天</td><td>把精簡過的版本改寫進專案指令，加上你自己的專屬代碼</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">第 6 天是整個計畫的關鍵</div><div class="it">大部分人裝了 56 條，實際只用五到八條。留下你真的會用的，模型的執行率會明顯上升。</div></div>
+
+    <div class="sub-h">自己造代碼</div>
+    <p style="font-size:14px;">到第七天你應該已經發現，有些你天天在講的話還沒有代碼。自己加就好，格式一樣。</p>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">四個現成的自訂代碼</div><pre>/deck: 整理成十頁簡報的大綱，每頁一個重點加三行說明
+/zh: 翻成繁體中文，台灣用語，技術名詞保留英文
+/ig: 改寫成 IG 貼文，一百五十字內，結尾帶一個互動問句
+/check: 只做事實查核，列出無法驗證的說法</pre></div>
+    <div class="tipline">把這幾行加進你的自訂指令，它們就跟原本那 56 條一樣好用。<b>這套系統的價值在這裡：它可以一直長，長成只屬於你的一組快捷鍵。</b></div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>省下的是打字時間<br><span class="g">差距在時間拿去做什麼</span></h2>
+    <p>這 56 組代碼幫你省下的是打字時間。<span class="hl">省下來的時間拿去做什麼，才是差距的來源。</span></p>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>代碼設好了，<span class="g">接下來換我陪你把時間變成收入</span></h2>
+      <div class="cta-lead">56 組代碼讓你每天少打幾千個字。但要把省下來的時間接成一條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">Prompt 會寫、卻不知道怎麼串成系統的你</div>
+        <div class="f">收藏了一堆指令包，卻從來沒真的設定過一次的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">設定完之後，回貼文底下留言告訴我你留下了哪幾條</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件內容整理自公開資料與實際測試。各平台的介面與方案內容會持續調整，設定路徑若與你看到的不同，以各平台官方說明頁為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：56 組 ChatGPT 指令代碼——輪播 DM 承接頁／lead magnet
+· 內容：第1章 官方 slash vs 自訂代碼（綠/紅 judge 對照）＋三個理由＋關鍵結論／第2章 三層級設定（.rule）＋字數上限表＋Custom GPT 個人帳號限制警語／第3章 精簡版與完整版兩個 hero-cp／第4章 七類摺疊卡共 56 條（.tbl.cmd 四欄：編號/指令/用途/實際用法）／中段CTA／第5章 四組組合技（含 .flow 流程膠囊）／第6章 五種失敗（.rule）／第7章 三家設定路徑＋怎麼選／第8章 七天表＋自己造代碼／最後
+· 版型決策：
+    1. 第 1 章的 A/B 對照用 judge ok/no——這是全文最重要的觀念（斜線沒有魔力），做成綠紅對照比純文字有力，也直接對應第 6 章的失敗五
+    2. .tbl.cmd 改成四欄版：編號灰、指令金色等寬、用途一般、實際用法等寬小字，56 條掃描時三種字級各司其職
+    3. 組合技加 .flow 膠囊流程條，讓四步流程在展開前就看得懂
+    4. 第 6 章五種失敗改用 .rule 卡（與第 2 章三層級同元件），因為兩章是對照關係：設定方式 vs 設定失敗
+· 可複製區塊：12 個 .cp，hero-cp 4（精簡版、完整版、組合二四步、自己造代碼）
+· 內容處理：原稿 /prompts:<名稱> 的角括號在 HTML 需跳脫，已處理
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「56組ChatGPT指令代碼_傑森所長」
+· 命名：日期前綴（2026-08-06-chatgpt-56-codes.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

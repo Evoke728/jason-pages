@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五個 Claude Code 開源工具．實裝手冊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:440px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+.cost{flex-shrink:0;font-size:11px;font-weight:700;padding:4px 11px;border-radius:50px;white-space:nowrap;}
+.cost.free{background:var(--ok-bg);border:1px solid var(--ok-line);color:var(--ok);}
+.cost.token{background:rgba(212,144,42,0.13);border:1px solid var(--gold-dim);color:var(--gold);}
+.cost.pay{background:var(--no-bg);border:1px solid var(--no-line);color:var(--no);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.day{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 18px;margin:10px 0;}
+.ck{display:flex;gap:11px;align-items:flex-start;padding:7px 0;cursor:pointer;}
+.ck input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:19px;height:19px;margin-top:3px;border:2px solid var(--gold-dim);border-radius:5px;background:var(--bg2);cursor:pointer;position:relative;transition:all .18s;}
+.ck input:hover{border-color:var(--gold);}
+.ck input:checked{background:var(--gold);border-color:var(--gold);}
+.ck input:checked::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #1a1406;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+.ck span{font-size:14px;line-height:1.7;color:var(--text);}
+.ck input:checked + span{color:var(--faint);text-decoration:line-through;}
+.prog{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--pill);padding:11px 22px;margin:16px 0;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.prog .pt2{font-size:13px;color:rgba(255,255,255,0.72);font-weight:700;white-space:nowrap;}
+.prog .pv{font-family:"Inter";font-weight:800;font-size:17px;color:var(--gold-bright);white-space:nowrap;}
+.prog .bar{flex:1;height:6px;background:rgba(255,255,255,0.14);border-radius:50px;overflow:hidden;}
+.prog .bar i{display:block;height:100%;width:0;background:var(--gold);border-radius:50px;transition:width .3s;}
+
+.combo{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 18px;margin:12px 0;}
+.combo .cn{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--gold);margin-bottom:6px;}
+.combo .ct{font-family:var(--serif);font-weight:900;font-size:17px;color:#2a2620;margin-bottom:6px;}
+.combo .cf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0;}
+.combo .cf span{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--gold);background:rgba(212,144,42,0.12);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 12px;}
+.combo .cf i{color:var(--faint);font-style:normal;}
+.combo p{font-size:13.6px;color:var(--text);line-height:1.78;margin:6px 0 0;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .cost{display:none;}
+  .ch-t .en{display:block;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>工具裝好了<br><span class="g">產能還沒接</span></h4>
+  <p>工具的價值來自你真的在用，不是裝在電腦裡。怎麼把它接成產能，我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE CODE · 五個開源工具實裝手冊</div>
+    <h1>五個<br><span class="g">Claude Code 開源工具</span></h1>
+    <div class="h-sub">中文圈幾乎沒人在講　但裝完當天就能用</div>
+    <div class="hero-sub">每個工具都寫五個區塊：解決什麼問題、安裝指令、第一次怎麼跑、<b>真實成本</b>、什麼情況不要用。最後那一段通常比前面四段更省你時間。五個工具彼此獨立，可以只挑一個裝。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">5</div><div class="l">個 · 獨立工具</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">2</div><div class="l">個 · 完全免費</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">種 · 組合用法</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">這裡分享的東西只有一種：我自己真的裝過、跑過、踩過坑的 AI 工具與工作流。不寫沒驗證過的功能，不抄英文貼文的數字，遇到要花錢的地方會直接寫出來要花多少。</div></div>
+  </div>
+
+  <!-- 怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份手冊怎麼用</span>
+    <h2>建議的閱讀順序<br><span class="g">不要全部一次裝</span></h2>
+    <div class="insight"><div class="il">先做這件事</div><div class="it">先看每個工具的「它解決什麼問題」，挑出跟你現在痛點對得上的那一兩個，再回頭看安裝。全部一次裝完的結果通常是全部都沒在用。</div></div>
+
+    <div class="sub-h">三個共同前提</div>
+    <p style="font-size:14px;">這五個工具有三個共通的環境需求，先確認完再往下走，<b>可以省掉一半的錯誤訊息</b>。</p>
+    <div class="steps">
+      <div class="st"><b>你要有 Claude Code。</b>其中三個工具（scroll-world、agency-agents、cognee）是掛在 Claude Code 上的擴充</div>
+      <div class="st"><b>確認 Node 與 Python 版本。</b>OmniRoute 需要較新的 Node，cognee 需要 Python</div>
+      <div class="st"><b>認識三個資料夾。</b>Claude Code 的擴充都放在使用者家目錄底下</div>
+    </div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">先跑這兩行看版本</div><pre>node -v
+python3 --version</pre></div>
+    <div class="tipline">Node 版本太舊的話，<b>建議用 nvm 管理，不要直接覆蓋系統的 Node</b>。</div>
+    <div class="cp"><div class="pl">記住這三個路徑，後面會一直出現</div><pre class="art">~/.claude/agents/     放 subagent 角色定義
+~/.claude/skills/     放 skill
+~/.claude/plugins/    放 plugin</pre></div>
+    <div class="tipline">在 Windows 上對應到 <b>C:\Users\你的帳號\.claude\</b>。</div>
+    <div class="links-row"><a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">Claude Code 官方安裝說明</a></div>
+  </div>
+
+  <!-- 五個工具 -->
+  <div class="sec fade">
+    <span class="sec-tag">五個工具</span>
+    <h2>展開任一個<br><span class="g">安裝到成本全寫完</span></h2>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">scroll-world<span class="en"> · 把品牌變成可以捲動穿越的 3D 世界</span></span><span class="cost pay">要付費</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它解決什麼問題：</b>你看過 Apple 產品頁那種效果嗎。滑鼠往下捲，鏡頭就往前飛，穿過一個場景進到下一個場景，中間完全沒有剪接痕跡。<b>這種頁面過去要一組 3D 動態設計團隊做，報價六位數起跳。</b>scroll-world 把整套流程包成一個 skill：訪談你的品牌 → 生成場景圖 → 生成鏡頭飛行影片 → 把捲動位置對應到影片時間軸 → 輸出可以直接放進任何網站的前端程式碼。輸出是框架無關的。</div>
+        <div class="links-row"><a href="https://github.com/oso95/scroll-world" target="_blank" rel="noopener">GitHub · oso95/scroll-world</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">最快：skills CLI 一行裝好</div><pre>npx skills add oso95/scroll-world</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">或手動控制檔案位置</div><pre>git clone https://github.com/oso95/scroll-world
+cp -R scroll-world/skills/scroll-world ~/.claude/skills/</pre></div>
+        <div class="tipline">Codex 使用者路徑換成 <b>~/.codex/skills/</b> 即可。</div>
+
+        <div class="blk-h">依賴：這裡是重點</div>
+        <p style="font-size:14px;">skill 本體是免費的，但它需要外部服務生成畫面。裝之前先確認這三樣：</p>
+        <ul class="bul">
+          <li><b>影片生成後端（二選一）：</b>Monid CLI 是預設後端，按每支影片以美金計費。或者用 Higgsfield CLI，需要先登入並儲值 credits</li>
+          <li><b>影格處理工具：</b>ffmpeg 與 ffprobe，用來抽影格、接縫、編碼，<b>這個是免費的</b></li>
+          <li><b>Python 與 Pillow：</b>處理手機直式畫布跟去背用</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">確認依賴</div><pre>higgsfield auth login
+
+ffmpeg -version
+ffprobe -version
+
+pip install Pillow</pre></div>
+        <div class="tipline">沒裝 ffmpeg 的話，macOS 用 <b>brew install ffmpeg</b>，Windows 到 ffmpeg 官網下載。</div>
+
+        <div class="blk-h">第一次怎麼跑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在 Claude Code 裡直接說</div><pre>幫我做一個 scroll-through 的 3D 世界落地頁</pre></div>
+        <p style="font-size:14px;">接下來 Claude 會開始訪談你。<b>這一段不要敷衍，它問的東西直接決定輸出品質。</b>準備好這四個答案：</p>
+        <div class="steps">
+          <div class="st"><b>品牌是什麼，賣什麼</b>——一句話講完</div>
+          <div class="st"><b>視覺方向</b>——等距黏土泥塑風？超寫實建築攝影風？賽博龐克？這一句話的差異會讓整組場景長得完全不同</div>
+          <div class="st"><b>場景順序</b>——建議四到六個。例如飲料品牌：農場 → 製作廚房 → 門市 → 外送 → 顧客手上</div>
+          <div class="st"><b>每個場景要傳達什麼訊息</b>——會變成疊在畫面上的文案</div>
+        </div>
+
+        <div class="warn">⚠️ <b>真實成本：這是整份手冊裡唯一要花錢的工具。</b>一組六場景的完整輸出，上游大約需要十幾次付費生成。每次生成的單價依你選的後端與模型而定，官方 repo 的 README 有寫明計費方式。<b>建議先跑三場景的縮小版測試，確認風格對了再跑完整版。</b>想先看效果再決定要不要花錢，repo 裡有兩個現成 demo 可以直接看。</div>
+
+        <div class="blk-h">什麼情況不要用</div>
+        <ul class="bul">
+          <li>你的頁面主要目的是<b>轉換而不是展示</b>。這種頁面載入重、行動網路上體驗會打折</li>
+          <li>你需要頁面內容<b>常常更新</b>。改一個場景等於重新生成一段影片</li>
+          <li>你只想要一般的捲動動畫。<b>那用 GSAP ScrollTrigger 就好，免費而且輕很多</b></li>
+        </ul>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">OmniRoute<span class="en"> · 額度滿了自動跳下一家</span></span><span class="cost token">本體免費</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它解決什麼問題：</b>你正在跑一個很長的 Claude Code 任務，跑到一半跳出額度限制。任務中斷，上下文散掉，你要重來。<br><br>OmniRoute 是一個跑在你自己電腦上的 AI 閘道器，在你的工具跟各家 AI 供應商中間開一個 OpenAI 相容的 endpoint。核心機制是<b>四層降級：訂閱額度 → API Key → 便宜模型 → 免費模型</b>。前面那層滿了，毫秒內切到下一層，你的任務不會斷。</div>
+        <div class="links-row"><a href="https://github.com/diegosouzapw/OmniRoute" target="_blank" rel="noopener">GitHub · diegosouzapw/OmniRoute</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">npm 全域安裝並啟動</div><pre>npm install -g omniroute
+
+omniroute</pre></div>
+        <div class="tipline">啟動後 API 跟儀表板會同時起來，都在 port <b>20128</b>。儀表板網址：http://localhost:20128/dashboard</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">偏好容器化部署</div><pre>docker pull diegosouzapw/omniroute</pre></div>
+
+        <div class="blk-h">第一次怎麼跑</div>
+        <div class="steps">
+          <div class="st"><b>接上供應商。</b>儀表板 → Providers。已有的訂閱走 OAuth 登入，有 API Key 的直接貼 Key。<b>建議至少掛三層：一個付費主力、一個便宜備援、一個免費墊底</b></div>
+          <div class="st"><b>把工具指過去。</b>在你的 IDE 或 CLI 裡把 base URL 改成下面那行，API Key 欄位隨便填一個字串就行，本機不驗證</div>
+          <div class="st"><b>設定降級順序。</b>儀表板 → Combos，把供應商從最好的排到最便宜的</div>
+          <div class="st"><b>（選用）接成 MCP。</b>讓 Claude Code 直接呼叫 OmniRoute 的工具集</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">base URL</div><pre>http://localhost:20128/v1</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">接成 MCP</div><pre>claude mcp add-server omniroute --type http --url http://localhost:20128/api/mcp/stream</pre></div>
+
+        <div class="blk-h">幾個實用細節</div>
+        <ul class="bul">
+          <li>儀表板會顯示每個模型剩餘的免費額度，<b>這比自己記各家的重置時間實際得多</b></li>
+          <li>內建 token 壓縮，透明作用在每個請求上，不需要改客戶端。程式碼區塊、URL、JSON 會被保護不動</li>
+          <li>有內建的 log 儀表板，request、proxy、audit、console 四個分頁，debug 的時候很好用</li>
+        </ul>
+
+        <div class="warn">⚠️ <b>真實成本：</b>OmniRoute 本體免費開源，但要注意兩件事。<b>第一，免費層的額度數字會變</b>，各家供應商隨時可能調整或關閉免費方案，repo 裡的 docs/reference/FREE_TIERS.md 有維護一份現況表，<b>看那份比看任何二手文章準</b>。<b>第二，掛上付費 API Key 之後就是真的在花錢</b>，儀表板有預算控制跟成本追蹤，設定好上限再開始跑。</div>
+
+        <div class="blk-h">什麼情況不要用</div>
+        <ul class="bul">
+          <li>你只用一個供應商而且從來沒撞到額度。<b>那多這一層只是多一個故障點</b></li>
+          <li>你的工作流對延遲極度敏感。中間多一跳就是多一點延遲</li>
+          <li>你在公司環境且有資安規範。<b>這東西會經手你所有的 API Key，先問過再裝</b></li>
+        </ul>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">voicebox<span class="en"> · 語音克隆、聽寫、TTS，全部跑在自己電腦上</span></span><span class="cost free">完全免費</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它解決什麼問題：</b>做 podcast、做短影音口播、或需要大量語音素材的人，過去只有兩個選擇：付月費給雲端服務，或接受品質差一截的本機方案。<br><br>voicebox 是本機優先的語音工作站。<b>輸出端：</b>7 個 TTS 引擎、23 種語言，零樣本克隆，幾秒鐘的參考音檔就能建出一個聲音檔案。<b>輸入端：</b>全域聽寫，在任何應用程式的任何輸入框裡按住熱鍵講話，放開之後逐字稿貼進游標所在位置。<b>中間層：</b>內建本機 LLM 潤稿。<b>整個流程沒有一個位元組離開你的電腦。</b></div>
+        <div class="links-row"><a href="https://github.com/jamiepine/voicebox" target="_blank" rel="noopener">GitHub</a><a href="https://voicebox.sh" target="_blank" rel="noopener">官網 voicebox.sh</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝</div>
+        <p style="font-size:14px;">一般使用者直接下載打包好的應用程式（<a href="https://voicebox.sh/download" target="_blank" rel="noopener">voicebox.sh/download</a>）。macOS 分 Apple Silicon 跟 Intel 兩個版本，Windows 是 MSI 安裝檔，<b>有 NVIDIA 顯卡會自動設定 CUDA</b>。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Linux 需要從原始碼建置</div><pre>git clone https://github.com/jamiepine/voicebox.git
+cd voicebox
+just setup
+just dev
+
+<span class="cm"># 沒裝 just 的話</span>
+brew install just</pre></div>
+
+        <div class="blk-h">第一次怎麼跑</div>
+        <div class="steps">
+          <div class="st"><b>克隆你自己的聲音。</b>準備一段 5 到 30 秒的乾淨錄音（沒有背景音樂、沒有環境噪音、沒有其他人講話）。<b>錄音品質決定克隆品質，這件事沒有捷徑</b>——用手機貼近嘴巴在安靜房間裡錄，效果會比用爛麥克風在有回音的空間錄好很多</div>
+          <div class="st"><b>設定全域聽寫。</b>Settings → Dictation，開啟 Global Hotkey。macOS 預設是 Option + Space，需要授予「輔助使用」跟「輸入監控」兩個權限。Whisper 模型<b>建議選 Turbo</b>，速度跟準確度的平衡點最好</div>
+          <div class="st"><b>接上 Claude Code。</b>REST API 在 http://localhost:17493，完整 API 文件在 /docs</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">用 curl 測一下生成</div><pre>curl -X POST http://localhost:17493/generate \
+  -H "Content-Type: application/json" \
+  -d '{"text": "測試一下這個聲音", "profile_id": "<span class="ph">你的profile_id</span>", "language": "zh"}'</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">列出你所有的聲音檔案</div><pre>curl http://localhost:17493/profiles</pre></div>
+
+        <div class="blk-h">幾個實用細節</div>
+        <ul class="bul">
+          <li><b>多段參考音檔可以提升克隆品質。</b>不要只丟一段，丟三段不同語氣的效果更好</li>
+          <li><b>Captures 分頁</b>會保留每一次聽寫的原始音檔跟逐字稿，可以重跑不同大小的 Whisper 模型比較，也可以把任何一段 capture 直接升級成參考樣本</li>
+          <li><b>Voice Personality：</b>可以幫每個聲音檔案寫一段人設描述，本機 LLM 會依照那個人設改寫你輸入的文字再唸出來</li>
+          <li>Apple Silicon 走 MLX 後端，<b>推論速度比 PyTorch 快好幾倍</b></li>
+        </ul>
+
+        <div class="insight"><div class="il">真實成本</div><div class="it">零。模型下載完之後完全離線，沒有訂閱、沒有按字計費、沒有生成次數上限。唯一的成本是硬碟空間跟第一次下載模型的時間。</div></div>
+
+        <div class="warn">⚠️ <b>什麼情況不要用：</b>你要克隆的<b>不是自己的聲音</b>——用別人的聲音做內容涉及肖像權跟聲音權，這是法律問題不是技術問題。另外，電腦很舊而且沒有獨立顯卡的話，純 CPU 推論會慢到不實用；需要即時串流語音的也不行，目前的架構是生成完再播放。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">cognee<span class="en"> · 給 agent 一份關掉視窗也不會消失的記憶</span></span><span class="cost token">吃 token</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它解決什麼問題：</b>每次開新的 Claude Code session，你都要重新解釋一次專案結構、重新講一次你的偏好、重新貼一次上次的決策。<br><br>cognee 是一個記憶層，把你的文件、對話、決策紀錄，透過 ECL pipeline（Extract, Cognify, Load）處理成<b>知識圖譜</b>，存在你自己的機器上。<b>跟一般向量檢索的差別在於它同時保留關聯性</b>：純向量檢索能回答「這份文件講什麼」，知識圖譜能回答「哪個決定影響了哪個模組」這種需要跨越多個節點的問題。</div>
+        <div class="links-row"><a href="https://github.com/topoteretes/cognee" target="_blank" rel="noopener">GitHub</a><a href="https://www.cognee.ai" target="_blank" rel="noopener">官網</a><a href="https://github.com/topoteretes/cognee-integrations" target="_blank" rel="noopener">Claude Code 整合</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Python 套件，一行裝好</div><pre>pip install cognee</pre></div>
+        <div class="tipline">本機儲存用的是 SQLite、LanceDB、Kuzu 三個輕量方案，<b>不需要另外架資料庫</b>。要上規模的時候可以換成 Neo4j、Qdrant、PostgreSQL。</div>
+
+        <div class="blk-h">第一次怎麼跑</div>
+        <p style="font-size:14px;">cognee 的核心是四個動作：<span class="hl">記住、回想、忘記、改善</span>。</p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">最小可跑範例 · 存成 test_cognee.py</div><pre>import cognee
+import asyncio
+
+async def main():
+    # 第一步：把資料丟進去
+    await cognee.add("這個專案用 Next.js 14 App Router，狀態管理用 Zustand，不用 Redux。")
+
+    # 第二步：建立知識圖譜
+    await cognee.cognify()
+
+    # 第三步：查詢
+    results = await cognee.search("這個專案的狀態管理用什麼")
+
+    for result in results:
+        print(result)
+
+if __name__ == '__main__':
+    asyncio.run(main())</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">也可以直接用 CLI，不寫程式</div><pre>cognee-cli add "你要記住的內容"
+cognee-cli cognify
+cognee-cli search "你的問題"</pre></div>
+
+        <div class="blk-h">接上 Claude Code（對內容創作者最實用的部分）</div>
+        <p style="font-size:14px;">cognee 有官方的 Claude Code 整合，會掛上生命週期 hook，在 session 開始、工具呼叫後、送出提示前、壓縮上下文前、session 結束時<b>自動記憶跟回想，不需要你手動下指令</b>。</p>
+        <div class="tipline"><b>一個重要的預設行為：</b>cognee 會依照不同的 MCP 客戶端自動建立分開的資料集。Claude Code 的記憶存在 claude_code_memory，Cursor 的存在 cursor_vscode_memory，彼此不會互相污染。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">希望所有工具共用同一份記憶，關掉隔離</div><pre>export COGNEE_MCP_AGENT_SCOPED=false</pre></div>
+
+        <div class="blk-h">幾個實用細節</div>
+        <ul class="bul">
+          <li><b>cognify() 會呼叫 LLM 做實體與關係抽取，這一步是有 token 成本的。</b>丟一整個資料夾進去之前先估算一下</li>
+          <li>記憶會隨著使用變準。當 agent 對某個回答給出評價，那個回饋會更新圖譜裡的邊權重</li>
+          <li>支援自訂 ontology。如果你的領域有固定的概念結構（例如「選題 → 腳本 → 素材 → 成品」），可以定義成 schema 讓抽取更準</li>
+          <li><b>依賴很重。</b>40 多個核心套件，第一次安裝會跑一陣子，<b>建議開獨立的虛擬環境</b></li>
+        </ul>
+
+        <div class="warn">⚠️ <b>真實成本：</b>自架版本本身免費開源，實際成本來自兩個地方。<b>第一，cognify() 的 LLM 呼叫</b>——這個可以用本機模型（Ollama）跑掉，完全免費，代價是抽取品質會差一些。<b>第二，雲端託管版本</b>的計價方式在官方定價頁。</div>
+
+        <div class="blk-h">什麼情況不要用</div>
+        <ul class="bul">
+          <li>你的專案很小、上下文塞得進單一 session。<b>那多這一層是過度工程</b></li>
+          <li>你不想處理 Python 環境問題。<b>這是五個工具裡安裝最麻煩的一個</b></li>
+          <li>你需要記憶內容完全可預測。知識圖譜的抽取結果會隨模型而變，不是確定性的</li>
+        </ul>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">agency-agents<span class="en"> · 一整間 AI 公司的專家角色</span></span><span class="cost free">完全免費</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它解決什麼問題：</b>你請 Claude「寫一個 React 元件」，它會寫。但它是用一個通才的視角在寫，不會主動幫你檢查無障礙、不會提醒你 Core Web Vitals、不會質疑你的元件拆分方式。<br><br>agency-agents 是一批寫好的專家角色定義，每一個都是一份 Markdown，包含身分設定、工作流程、可交付成果、成功指標、溝通風格。<b>目前超過 230 個角色，橫跨二十多個部門。</b>對做內容的人來說行銷部門特別有用。</div>
+        <div class="links-row"><a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener">GitHub</a><a href="https://agencyagents.app" target="_blank" rel="noopener">桌面應用</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝：三種方式</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方式一 · 桌面應用（最簡單，會自動更新）</div><pre>brew install --cask msitarzewski/agency-agents/agency-agents</pre></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方式二 · 命令列選擇性安裝（推薦）</div><pre>git clone https://github.com/msitarzewski/agency-agents
+cd agency-agents
+
+<span class="cm"># 看看有哪些部門跟各自的角色數量</span>
+./scripts/install.sh --list teams
+
+<span class="cm"># 只裝你要的部門，這是最重要的一步</span>
+./scripts/install.sh --tool claude-code --division marketing,design
+
+<span class="cm"># 或者精準到單一角色</span>
+./scripts/install.sh --tool cursor --agent instagram-curator,seo-specialist
+
+<span class="cm"># 不確定會裝到哪些東西，先空跑一次</span>
+./scripts/install.sh --tool claude-code --division marketing --dry-run</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">方式三 · 手動複製</div><pre>cp marketing/*.md ~/.claude/agents/</pre></div>
+
+        <div class="warn">⚠️ <b>為什麼強烈建議「不要全裝」（這是我踩過的坑）：</b>230 多個角色全部倒進 ~/.claude/agents/，每次啟動 Claude Code 都要載入全部的角色描述。結果是<b>啟動變慢、上下文被佔掉一大塊、而且 Claude 在挑選角色時會猶豫，因為選項太多太相似</b>。<br><br>實際上你用得到的大概五到十個。先挑一兩個部門，用一個月，看哪些真的有在叫，再決定要不要擴充。<br><br>另外有一個已知限制：<b>某些工具的執行環境對角色數量有上限，超過會靜默丟棄後面的。</b>安裝腳本在你的選擇會超過限制時會跳警告。</div>
+
+        <div class="blk-h">第一次怎麼跑</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">在 Claude Code 裡直接點名</div><pre>啟動 Instagram Curator 模式，幫我看這組輪播的資訊結構有沒有問題</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">或用 subagent 的方式呼叫</div><pre>用 SEO Specialist 這個 agent，分析這篇文章的關鍵字佈局</pre></div>
+
+        <div class="blk-h">內容創作者值得先看的幾個角色</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>角色</th><th>檔案位置</th><th>適合什麼場景</th></tr></thead><tbody>
+          <tr><td>Instagram Curator</td><td>marketing/marketing-instagram-curator.md</td><td>視覺敘事、貼文節奏規劃</td></tr>
+          <tr><td>Carousel Growth Engine</td><td>marketing/marketing-carousel-growth-engine.md</td><td>輪播貼文的結構與鉤子</td></tr>
+          <tr><td>Xiaohongshu Specialist</td><td>marketing/marketing-xiaohongshu-specialist.md</td><td>小紅書的內容邏輯</td></tr>
+          <tr><td>SEO Specialist</td><td>marketing/marketing-seo-specialist.md</td><td>長文的關鍵字與結構</td></tr>
+          <tr><td>Content Creator</td><td>marketing/marketing-content-creator.md</td><td>多平台內容排程</td></tr>
+          <tr><td>Reality Checker</td><td>testing/testing-reality-checker.md</td><td>交付前的事實查核與品質把關</td></tr>
+          <tr><td>Whimsy Injector</td><td>design/design-whimsy-injector.md</td><td>幫太嚴肅的內容加人味</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>最後那個 Reality Checker 我特別推薦。</b>它的設定是預設要找出三到五個問題並且要求證據，<b>對於避免自己的內容出現沒查證的數字很有效</b>。</div>
+
+        <div class="blk-h">給其他工具用</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">轉換成十幾種工具的格式</div><pre>./scripts/convert.sh
+
+<span class="cm"># 然後互動式安裝，它會自動偵測你裝了哪些工具</span>
+./scripts/install.sh</pre></div>
+
+        <div class="blk-h">什麼情況不要用</div>
+        <ul class="bul">
+          <li>你已經有一套自己寫的 prompt 模板而且用得順手。<b>那這些角色只會干擾</b></li>
+          <li>你的任務很單純。叫一個「資深後端架構師」來幫你改一行 CSS 是浪費</li>
+          <li>你介意角色定義的語氣。有些角色寫得很有個性，會影響輸出風格</li>
+        </ul>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">五個都講完了</div>
+      <h3>工具的價值來自你真的在用<br><span class="g">不是裝在電腦裡</span></h3>
+      <p>挑一個，用滿一個月，再看下一個。想把工具接成真的在產出的工作流，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 組合 -->
+  <div class="sec fade">
+    <span class="sec-tag">組合起來用</span>
+    <h2>單獨裝已經有用<br><span class="g">組合起來更明顯</span></h2>
+
+    <div class="combo">
+      <div class="cn">COMBO 01</div>
+      <div class="ct">內容產出流水線</div>
+      <div class="cf"><span>agency-agents</span><i>＋</i><span>cognee</span></div>
+      <p>把 cognee 掛上 Claude Code，讓它記住你的品牌調性、禁用句型、過往選題。再裝 agency-agents 的行銷部門角色。<b>結果是：你叫 Instagram Curator 幫你想選題時，它同時知道你的品牌規範跟你上個月發過什麼，不會重複也不會走鐘。</b></p>
+    </div>
+
+    <div class="combo">
+      <div class="cn">COMBO 02</div>
+      <div class="ct">長任務不中斷</div>
+      <div class="cf"><span>OmniRoute</span><i>＋</i><span>agency-agents</span></div>
+      <p>跑多角色協作的長任務時，最怕的是中途撞額度。OmniRoute 掛在前面，額度滿了自動換供應商，<b>整條流程不會斷在一半</b>。</p>
+    </div>
+
+    <div class="combo">
+      <div class="cn">COMBO 03</div>
+      <div class="ct">語音轉內容</div>
+      <div class="cf"><span>voicebox</span><i>＋</i><span>cognee</span></div>
+      <p>用 voicebox 的全域聽寫，把你的口播、會議、隨手想法都轉成文字。轉出來的逐字稿餵給 cognee 建成知識圖譜。<b>一個月之後，你等於有一份自己講過的所有話的可查詢資料庫。</b>寫貼文的時候問它「我之前對這個主題講過什麼」，答案就出來了。</p>
+    </div>
+  </div>
+
+  <!-- 檢查清單 -->
+  <div class="sec fade">
+    <span class="sec-tag">安裝檢查清單</span>
+    <h2>照這個順序<br><span class="g">一次裝完不會亂</span></h2>
+    <div class="prog"><span class="pt2">完成度</span><span class="bar"><i id="bar"></i></span><span class="pv"><span id="done">0</span> / <span id="all">0</span></span></div>
+    <div class="day">
+      <label class="ck"><input type="checkbox"><span>確認 Claude Code 已安裝且能正常啟動</span></label>
+      <label class="ck"><input type="checkbox"><span>跑 node -v 跟 python3 --version 確認版本</span></label>
+      <label class="ck"><input type="checkbox"><span>確認 ~/.claude/ 資料夾存在</span></label>
+      <label class="ck"><input type="checkbox"><span>從五個工具裡挑出一到兩個真的對得上你痛點的</span></label>
+      <label class="ck"><input type="checkbox"><span>裝第一個工具，跑通「第一次怎麼跑」那一段</span></label>
+      <label class="ck"><input type="checkbox"><span>實際用一週，再決定要不要裝第二個</span></label>
+      <label class="ck"><input type="checkbox"><span>agency-agents 只裝一到兩個部門</span></label>
+      <label class="ck"><input type="checkbox"><span>scroll-world 先跑三場景測試版再跑完整版</span></label>
+      <label class="ck"><input type="checkbox"><span>任何要接 API Key 的地方，先在儀表板設好預算上限</span></label>
+    </div>
+  </div>
+
+  <!-- 幾件事 -->
+  <div class="sec fade">
+    <span class="sec-tag">幾件我想先講清楚的事</span>
+    <h2>裝之前<br><span class="g">先知道這四件</span></h2>
+    <div class="warn"><b>開源不等於免費。</b>這五個工具的授權都是免費的，但 scroll-world 要付生成費用、cognee 的知識圖譜建立會消耗 LLM token、OmniRoute 掛上付費 Key 之後就在花錢。<b>免費的只有 voicebox 跟 agency-agents。</b></div>
+    <div class="warn"><b>星數不是品質指標。</b>這幾個 repo 的星數都不低，但星數反映的是曝光跟話題度。<b>裝之前看 issue 區跟最近的 commit 頻率，比看星數有用。</b></div>
+    <div class="warn"><b>開源專案會變。</b>這份手冊裡的指令、路徑、依賴，都是撰寫當下對照官方 README 確認過的。<b>如果你照著跑出現錯誤，第一件事是回去看該 repo 的 README，不是懷疑自己。</b></div>
+    <div class="warn"><b>不要一次全裝。</b>拿到一份工具清單的直覺反應是全部裝起來。但<b>工具的價值來自於你真的在用，不是來自於它裝在你電腦裡</b>。挑一個，用滿一個月，再看下一個。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工具裝好了，<span class="g">接下來換我陪你把它變成產能</span></h2>
+      <div class="cta-lead">這五個裝起來只是第一步。要把它接成一條真的在幫你產出、幫你賺錢的工作流，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆工具清單，卻從來沒真的用滿一個月的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">裝完之後，回貼文底下留言告訴我你挑了哪一個</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 這份手冊裡的每一個指令都自己跑過，每一個路徑都對照過官方文件。開源專案更新速度快，指令有變動時以各 repo 的 README 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+var cks = document.querySelectorAll('.ck input');
+function tally(){
+  var n = 0;
+  cks.forEach(function(b){ if(b.checked) n++; });
+  document.getElementById('done').textContent = n;
+  document.getElementById('all').textContent = cks.length;
+  document.getElementById('bar').style.width = (n / cks.length * 100) + '%';
+}
+cks.forEach(function(b){ b.addEventListener('change', tally); });
+tally();
+
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：五個 Claude Code 開源工具實裝手冊——輪播 DM 承接頁／lead magnet
+· 內容：手冊怎麼用（三個共同前提＋三個資料夾）／五工具摺疊卡（解決什麼／安裝／第一次怎麼跑／真實成本／什麼情況不要用）／中段CTA／三種組合／安裝檢查清單（可勾選）／四件先講清楚的事
+· 版型決策：
+    1. 新增 .cost 成本徽章掛在卡頭（綠=完全免費／金=吃 token 或本體免費／紅=要付費）——原稿最強調「開源不等於免費」，做成徽章讓人不展開就看得到哪一個會花錢
+    2. 新增 .combo 組合卡（膠囊流程條），三種組法各一張
+    3. 「真實成本」一律用 warn 紅框或 insight，不埋在內文
+    4. 安裝檢查清單做成可勾選＋進度條（分母 JS 動態算）
+· 可複製區塊：21 個 .cp（hero-cp 3：cognee 最小範例、agency-agents 選擇性安裝、OmniRoute base URL 相關）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「五個Claude Code開源工具實裝手冊」
+· 命名：日期前綴（2026-08-06-claude-code-5-tools.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

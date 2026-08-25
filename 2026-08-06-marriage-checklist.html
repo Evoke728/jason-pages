@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夫妻長跑檢核表｜給有小孩以後還想一起走很久的兩個人</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin-bottom:18px;line-height:1.7;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:25px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:22px 0 8px;}
+
+.quote{font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.9;color:#4a4640;border-left:3px solid var(--gold);padding:2px 0 2px 18px;margin:6px 0 22px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14.5px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14.5px;line-height:1.74;color:var(--text);margin-bottom:9px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+/* 檢核區 */
+.zone{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 22px 18px;margin:18px 0;}
+.zone-h{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;}
+.zone-h .zn{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;color:var(--gold);font-weight:500;}
+.zone-h .zt{font-family:var(--serif);font-weight:900;font-size:20px;color:#2a2620;}
+.zone .zq{font-family:var(--serif);font-style:italic;font-size:14.5px;line-height:1.8;color:var(--dim);margin:8px 0 16px;}
+.q-item{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(0,0,0,0.05);cursor:pointer;}
+.q-item:last-of-type{border-bottom:none;}
+.q-item input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:21px;height:21px;margin-top:3px;border:2px solid var(--gold-dim);border-radius:6px;background:var(--bg2);cursor:pointer;position:relative;transition:all .18s;}
+.q-item input:hover{border-color:var(--gold);}
+.q-item input:checked{background:var(--gold);border-color:var(--gold);}
+.q-item input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #1a1406;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+.q-item span{font-size:14.5px;line-height:1.7;color:var(--text);}
+.q-item input:checked + span{color:var(--dim);}
+.zone-sum{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:14px;border-top:2px solid var(--gold-dim);font-size:13px;color:var(--dim);font-weight:700;}
+.zone-sum b{font-family:"Inter";font-size:22px;color:var(--gold);font-weight:800;}
+
+/* 總分 */
+.score-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:26px 24px;text-align:center;margin:18px 0;}
+.score-card .sk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:10px;font-weight:500;}
+.score-card .sv{font-family:"Inter";font-weight:800;font-size:56px;line-height:1;color:#fff;}
+.score-card .sv span{font-size:24px;color:rgba(255,255,255,0.5);}
+.score-card .sl{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--gold-bright);margin-top:12px;}
+.score-card .sd{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-top:6px;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:420px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;transition:background .3s;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr.on td{background:rgba(212,144,42,0.14);}
+.tbl tr.on td:first-child{color:var(--gold);}
+
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 4px;}
+.tools button{font-family:var(--sans);font-size:13px;font-weight:700;padding:9px 20px;border-radius:var(--pill);border:1px solid var(--gold-dim);background:var(--card);color:var(--gold);cursor:pointer;transition:all .2s;}
+.tools button:hover{background:var(--gold);color:#1a1406;border-color:var(--gold);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+.end-quote{font-family:var(--serif);font-style:italic;font-size:17px;line-height:2;color:#4a4640;text-align:center;margin:8px 0;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:29px;}
+  .sec h2{font-size:21px;}
+  .zone{padding:18px 16px 16px;}
+}
+
+@media print{
+  .glow,.top-cta,.side-cta,.mid-cta,.cta,.tools,.author-card{display:none !important;}
+  body{background:#fff;padding-top:0;}
+  .js .fade{opacity:1 !important;transform:none !important;}
+  .sec,.hero{padding:14px 0;border-top:none;}
+  .zone{break-inside:avoid;border:1px solid #ccc;}
+  .score-card{background:#fff;border:1px solid #999;color:#000;}
+  .score-card .sv,.score-card .sl,.score-card .sd,.score-card .sk{color:#000;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>把時間拿回來 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">為什麼我做這個</div>
+  <h4>把重複的事<br><span class="g">交給機器</span></h4>
+  <p>工作時間變短，陪家人的時間才會變長。我在 Skool 分享怎麼用 AI 把重複的事壓縮掉。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">30 題 · 兩個人分開填</div>
+    <h1>夫妻<br><span class="g">長跑檢核表</span></h1>
+    <div class="h-sub">給有小孩以後<br>還想一起走很久的兩個人</div>
+    <div class="hero-sub">婚姻不會在某一天壞掉。它是在三百個沒有對話的晚上裡，慢慢安靜下來的。這份表分四區共 30 題，兩個人分開填、填完對答案。下面可以直接勾，分數會自動算。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">30</div><div class="l">題 · 四個區塊</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">40</div><div class="l">分鐘 · 對答案</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">90</div><div class="l">分鐘 · 星期二機制</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">我是 Jason。平常分享 AI 工具與工作流，把重複的事情交給機器，把時間留給值得的人。有了孩子以後，我發現時間變成一種要用力爭取的東西。這份檢核表是我跟老婆自己在用的，現在交給你。</div></div>
+  </div>
+
+  <!-- 怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份表怎麼用</span>
+    <h2>分開填<br><span class="g">填完才對答案</span></h2>
+    <div class="quote">婚姻不會在某一天壞掉。它是在三百個沒有對話的晚上裡，慢慢安靜下來的。</div>
+    <div class="steps">
+      <div class="st">印兩份，或兩個人各自在自己的裝置上開這一頁</div>
+      <div class="st"><b>分開填，不要討論、不要偷看</b></div>
+      <div class="st">填完約一個時間，兩個人坐下來對答案</div>
+      <div class="st">對答案的時候只做一件事：<b>說出你為什麼這樣勾</b></div>
+      <div class="st">不辯論、不翻舊帳、不當場要求對方改</div>
+    </div>
+    <div class="insight"><div class="il">時間怎麼抓</div><div class="it">40 分鐘。孩子睡著以後，關掉電視。</div></div>
+    <div class="tools">
+      <button onclick="window.print()">列印這份表</button>
+      <button onclick="resetAll()">清空重填</button>
+    </div>
+    <div class="tipline">勾選只留在你這台裝置的瀏覽器裡，<b>不會上傳到任何地方</b>，關掉頁面就沒了。要留存就用列印。</div>
+  </div>
+
+  <!-- 第一區 -->
+  <div class="sec fade">
+    <span class="sec-tag">第一區</span>
+    <h2>日常運作</h2>
+    <div class="quote">愛不會消失。它只是被行事曆擠到最後一格。</div>
+    <div class="zone" data-zone="1" data-max="8">
+      <div class="zone-h"><span class="zn">ZONE 01</span><span class="zt">日常運作</span></div>
+      <label class="q-item"><input type="checkbox"><span>我知道這禮拜對方最煩的一件事是什麼</span></label>
+      <label class="q-item"><input type="checkbox"><span>我們每天至少有 15 分鐘是純聊天，沒有在處理事情</span></label>
+      <label class="q-item"><input type="checkbox"><span>家裡的錢怎麼分配，我們兩個都清楚</span></label>
+      <label class="q-item"><input type="checkbox"><span>上一次我們單獨出門，是在三個月內</span></label>
+      <label class="q-item"><input type="checkbox"><span>我知道對方下週的行程裡有什麼重要的事</span></label>
+      <label class="q-item"><input type="checkbox"><span>我們吵架後最長冷戰時間，在 24 小時內</span></label>
+      <label class="q-item"><input type="checkbox"><span>家事分工我們談過，而且照著做</span></label>
+      <label class="q-item"><input type="checkbox"><span>我今天有跟對方講到超過三句跟小孩無關的話</span></label>
+      <div class="zone-sum">小計 <b class="zsum">0</b> / 8</div>
+    </div>
+  </div>
+
+  <!-- 第二區 -->
+  <div class="sec fade">
+    <span class="sec-tag">第二區</span>
+    <h2>情緒安全感</h2>
+    <div class="quote">同一個屋簷下，也可能一整年沒有真正看過對方一眼。</div>
+    <div class="zone" data-zone="2" data-max="8">
+      <div class="zone-h"><span class="zn">ZONE 02</span><span class="zt">情緒安全感</span></div>
+      <label class="q-item"><input type="checkbox"><span>我心情不好的時候，第一個想講的人是他</span></label>
+      <label class="q-item"><input type="checkbox"><span>我可以在他面前哭，不用先解釋原因</span></label>
+      <label class="q-item"><input type="checkbox"><span>我知道他最近在擔心什麼</span></label>
+      <label class="q-item"><input type="checkbox"><span>他做錯事的時候，我會直接說，不用繞</span></label>
+      <label class="q-item"><input type="checkbox"><span>我不會在孩子或家人面前批評他</span></label>
+      <label class="q-item"><input type="checkbox"><span>上一次我跟他說謝謝，是在這禮拜</span></label>
+      <label class="q-item"><input type="checkbox"><span>我相信就算我變得很糟，他也不會走</span></label>
+      <label class="q-item"><input type="checkbox"><span>我們有一件事是只有我們兩個知道的</span></label>
+      <div class="zone-sum">小計 <b class="zsum">0</b> / 8</div>
+    </div>
+  </div>
+
+  <!-- 第三區 -->
+  <div class="sec fade">
+    <span class="sec-tag">第三區</span>
+    <h2>育兒分工</h2>
+    <div class="quote">孩子把兩個人綁在一起，也把兩個人推到房間的兩端。</div>
+    <div class="zone" data-zone="3" data-max="7">
+      <div class="zone-h"><span class="zn">ZONE 03</span><span class="zt">育兒分工</span></div>
+      <label class="q-item"><input type="checkbox"><span>半夜起來顧小孩這件事，我們有輪</span></label>
+      <label class="q-item"><input type="checkbox"><span>帶小孩去看醫生，兩個人都做過</span></label>
+      <label class="q-item"><input type="checkbox"><span>我知道孩子的鞋子尺寸、過敏源、老師的名字</span></label>
+      <label class="q-item"><input type="checkbox"><span>教養意見不同的時候，我們私下講，不當著孩子面</span></label>
+      <label class="q-item"><input type="checkbox"><span>我們兩個都有屬於自己、不用顧小孩的固定時間</span></label>
+      <label class="q-item"><input type="checkbox"><span>對方一個人帶小孩的時候，我不會傳訊息遙控</span></label>
+      <label class="q-item"><input type="checkbox"><span>我認得對方在崩潰邊緣的表情，而且會接手</span></label>
+      <div class="zone-sum">小計 <b class="zsum">0</b> / 7</div>
+    </div>
+  </div>
+
+  <!-- 第四區 -->
+  <div class="sec fade">
+    <span class="sec-tag">第四區</span>
+    <h2>還記得的事</h2>
+    <div class="quote">我們會忘記結婚那天的誓詞，記得的是他在急診室走廊遞來的那杯溫水。</div>
+    <div class="zone" data-zone="4" data-max="7">
+      <div class="zone-h"><span class="zn">ZONE 04</span><span class="zt">還記得的事</span></div>
+      <label class="q-item"><input type="checkbox"><span>我記得第一次約會去了哪裡</span></label>
+      <label class="q-item"><input type="checkbox"><span>我記得他當時穿什麼、講了什麼讓我笑的話</span></label>
+      <label class="q-item"><input type="checkbox"><span>我記得決定要在一起的那個瞬間</span></label>
+      <label class="q-item"><input type="checkbox"><span>我記得他第一次抱孩子的表情</span></label>
+      <label class="q-item"><input type="checkbox"><span>我還會想起某個跟他有關、但他不知道的畫面</span></label>
+      <label class="q-item"><input type="checkbox"><span>我可以說出他這輩子最驕傲的一件事</span></label>
+      <label class="q-item"><input type="checkbox"><span>我可以說出他這輩子最遺憾的一件事</span></label>
+      <div class="zone-sum">小計 <b class="zsum">0</b> / 7</div>
+    </div>
+  </div>
+
+  <!-- 對答案 -->
+  <div class="sec fade">
+    <span class="sec-tag">對答案</span>
+    <h2>分數低<br><span class="g">不代表誰有錯</span></h2>
+
+    <div class="score-card">
+      <div class="sk">TOTAL</div>
+      <div class="sv"><span id="total">0</span><span> / 30</span></div>
+      <div class="sl" id="band">先把上面四區勾完</div>
+      <div class="sd" id="advice">勾完之後，這裡會顯示你落在哪一段，以及建議怎麼做。</div>
+    </div>
+
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>分數</th><th>狀態</th><th>建議</th></tr></thead><tbody>
+      <tr data-lo="25" data-hi="30"><td>25–30</td><td>運作良好</td><td>把下面的機制排進行事曆，維持住</td></tr>
+      <tr data-lo="18" data-hi="24"><td>18–24</td><td>有磨損</td><td>挑分數最低的那一區，這個月只修那一區</td></tr>
+      <tr data-lo="12" data-hi="17"><td>12–17</td><td>需要處理</td><td>從第二區開始，情緒安全感是其他三區的地基</td></tr>
+      <tr data-lo="0" data-hi="11"><td>11 以下</td><td>建議找人談</td><td>兩個人一起去，不是誰有問題</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">對答案的三個規則</div>
+    <div class="steps">
+      <div class="st">分數低不代表誰有錯。<b>它代表最近的生活把你們推遠了。</b></div>
+      <div class="st"><b>兩個人分數差很多的那幾題，才是要談的重點。</b></div>
+      <div class="st">談完就結束，不要在同一個晚上要求任何改變。</div>
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">為什麼我會做這種東西</div>
+      <h3>把重複的事交給機器<br><span class="g">剩下的時間拿回來</span></h3>
+      <p>我平常分享的是 AI 工具與工作流。做這些的原因很簡單：工作時間變短，陪家人的時間才會變長。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 星期二 -->
+  <div class="sec fade">
+    <span class="sec-tag">星期二晚上機制</span>
+    <h2>檢核表負責讓你看見<br><span class="g">這一頁負責讓你動</span></h2>
+    <div class="quote">約會不能靠心情。心情會被工作、被小孩、被昨天沒睡飽吃掉。</div>
+
+    <div class="sub-h">做法</div>
+    <div class="steps">
+      <div class="st">挑一個固定的晚上，星期幾都可以，<b>寫進兩個人的行事曆，設重複</b></div>
+      <div class="st">孩子睡著後開始，時間 90 分鐘</div>
+      <div class="st">手機放在另一個房間，只留一台監視器</div>
+      <div class="st">這 90 分鐘不處理任何家務、帳單、教養問題</div>
+    </div>
+
+    <div class="sub-h">可以做的事（挑一個就好）</div>
+    <ul class="bul">
+      <li>看一部電影，兩個人都沒看過的</li>
+      <li>吃一頓消夜，直接開鍋那種</li>
+      <li>各自講三件這週發生、對方不知道的小事</li>
+      <li>什麼都不做，坐在沙發上發呆</li>
+    </ul>
+
+    <div class="insight"><div class="il">三個月後</div><div class="it">回來重填一次這份表。分數會告訴你這個機制有沒有用。</div></div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <div class="end-quote">那台嬰兒監視器有一天會停止使用。</div>
+    <div class="end-quote">你們大概還是會把它留在桌上，誰也不會提。</div>
+    <div class="end-quote" style="color:var(--gold);font-weight:700;">長跑不是靠愛撐住的，<br>是靠一個又一個被守住的星期二晚上。</div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">關於我</div>
+      <h2>把重複的事交給機器，<span class="g">剩下的時間給值得的人</span></h2>
+      <div class="cta-lead">我是 Jason，經營傑森所長（@jasonxtsai）。平常分享 AI 工具、工作流與自媒體變現的實作方法，也偶爾寫一些關於家庭跟時間的東西。</div>
+      <div class="gives">
+        <div class="gt">我做這些內容的原因很簡單</div>
+        <div class="gi">把重複的事交給機器</div>
+        <div class="gi">剩下的時間拿回來</div>
+        <div class="gi">給值得的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">追蹤 @jasonxtsai，讓你的工作時間變短，陪家人的時間變長</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 這份表是給兩個人一起看的工具，不是評分或診斷。分數低的時候，它指的是最近的生活，不是你們的關係本身</div>
+  </div>
+
+</div>
+
+<script>
+var zones = document.querySelectorAll('.zone');
+var rows = document.querySelectorAll('.tbl tr[data-lo]');
+function recount(){
+  var total = 0, answered = 0;
+  zones.forEach(function(z){
+    var boxes = z.querySelectorAll('input[type=checkbox]');
+    var n = 0;
+    boxes.forEach(function(b){ if(b.checked) n++; });
+    z.querySelector('.zsum').textContent = n;
+    total += n; answered += boxes.length;
+  });
+  document.getElementById('total').textContent = total;
+  var band = document.getElementById('band');
+  var advice = document.getElementById('advice');
+  var anyChecked = total > 0;
+  rows.forEach(function(r){
+    var lo = +r.dataset.lo, hi = +r.dataset.hi;
+    var hit = anyChecked && total >= lo && total <= hi;
+    r.classList.toggle('on', hit);
+    if(hit){
+      band.textContent = r.children[1].textContent;
+      advice.textContent = r.children[2].textContent;
+    }
+  });
+  if(!anyChecked){
+    band.textContent = '先把上面四區勾完';
+    advice.textContent = '勾完之後，這裡會顯示你落在哪一段，以及建議怎麼做。';
+  }
+}
+document.querySelectorAll('.q-item input').forEach(function(b){
+  b.addEventListener('change', recount);
+});
+function resetAll(){
+  document.querySelectorAll('.q-item input').forEach(function(b){ b.checked = false; });
+  recount();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+recount();
+
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：夫妻長跑檢核表——情感類 lead magnet（與其他技術型落地頁不同調，走生活面）
+· 內容：這份表怎麼用（5 步＋40 分鐘）／四區檢核表共 30 題（可勾選，每區自動小計）／對答案（總分卡＋四段分數帶表格，落在哪一段自動高亮）／對答案三規則／中段 CTA／星期二晚上機制／最後三句／關於我 CTA
+· 版型決策（與其他頁不同的地方）：
+    1. 這頁沒有任何 .cp 可複製區塊——內容不是指令而是題目，改成「可互動勾選」才是對的載體
+    2. 新增 .zone 檢核卡＋自訂金色打勾框（appearance:none 手繪 checkmark），每區底部自動算小計
+    3. 新增深色總分卡：即時總分、自動判定落在哪一段、把該段的狀態與建議寫進卡片，同時高亮對照表那一列
+    4. 新增列印樣式 @media print：隱藏 CTA／側欄／glow／工具列，檢核卡加框不跨頁斷開，對應原稿「印兩份」的用法
+    5. 新增 .quote 襯線斜體引言，承接原稿每區開頭那句話（這是本篇的靈魂，不能刪成一般內文）
+· 隱私處理：刻意不做 localStorage 保存——兩個人可能共用一台裝置，存起來會互相看到；頁面明講「不會上傳、關掉就沒了」
+· 三段 Skool CTA 語氣調整：這篇不推工具，改用「把重複的事交給機器，時間才留得給家人」的角度接回帳號主線
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「夫妻長跑檢核表」文件
+· 命名：日期前綴（2026-08-06-marriage-checklist.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatGPT 從零設定完整指南｜Chat、Work、Codex 三模式</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:460px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.mode3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 6px;}
+.mode3 .m{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:var(--r-md);padding:16px 14px;text-align:center;}
+.mode3 .m .mn{font-family:"Inter";font-weight:800;font-size:17px;color:var(--gold);}
+.mode3 .m .mw{font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.6;}
+.mode3 .m .mq{font-family:var(--serif);font-weight:700;font-size:14px;color:#2a2620;margin-top:9px;padding-top:9px;border-top:1px solid var(--line);}
+@media(max-width:560px){.mode3{grid-template-columns:1fr;}}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+
+.pnum{display:flex;align-items:baseline;gap:9px;margin:22px 0 6px;padding-top:16px;border-top:1px dashed var(--line);}
+.pnum:first-of-type{border-top:none;padding-top:4px;margin-top:8px;}
+.pnum .pn{font-family:"Inter";font-weight:800;font-size:14px;color:var(--gold);flex-shrink:0;}
+.pnum .pt{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;line-height:1.4;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;margin:20px 0 8px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--text);line-height:1.85;}
+
+/* 7 天清單 */
+.day{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 18px;margin:10px 0;}
+.day .dh{font-family:var(--serif);font-weight:900;font-size:16px;color:#2a2620;margin-bottom:8px;}
+.day .dh span{color:var(--gold);font-family:"Inter";margin-right:8px;}
+.ck{display:flex;gap:11px;align-items:flex-start;padding:7px 0;cursor:pointer;}
+.ck input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:19px;height:19px;margin-top:3px;border:2px solid var(--gold-dim);border-radius:5px;background:var(--bg2);cursor:pointer;position:relative;transition:all .18s;}
+.ck input:hover{border-color:var(--gold);}
+.ck input:checked{background:var(--gold);border-color:var(--gold);}
+.ck input:checked::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid #1a1406;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);}
+.ck span{font-size:14px;line-height:1.7;color:var(--text);}
+.ck input:checked + span{color:var(--faint);text-decoration:line-through;}
+.prog{position:sticky;top:10px;z-index:20;background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--pill);padding:11px 22px;margin:16px 0;display:flex;align-items:center;justify-content:space-between;gap:14px;}
+.prog .pt2{font-size:13px;color:rgba(255,255,255,0.72);font-weight:700;}
+.prog .pv{font-family:"Inter";font-weight:800;font-size:18px;color:var(--gold-bright);}
+.prog .bar{flex:1;height:6px;background:rgba(255,255,255,0.14);border-radius:50px;overflow:hidden;}
+.prog .bar i{display:block;height:100%;width:0;background:var(--gold);border-radius:50px;transition:width .3s;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .prog{top:50px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>設定完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>設定做好了<br><span class="g">產線還沒接</span></h4>
+  <p>個人化與專案只是地基。怎麼把 AI 接成一條真的在幫你賺錢的產線，我在 Skool 帶你做。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CHATGPT · 從零設定完整指南</div>
+    <h1>ChatGPT<br><span class="g">從零設定指南</span></h1>
+    <div class="h-sub">跟上這一輪更新　把 ChatGPT 從聊天框變成一套工作系統</div>
+    <div class="hero-sub">照著做完大約 60 到 90 分鐘。先搞清楚 Chat、Work、Codex 各自負責什麼，這一步做對，後面每一步都會變輕鬆。文件裡所有 Prompt 都可以一鍵複製，最後附一份 7 天上手清單，一天做一項就好。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">3</div><div class="l">個 · 模式分工</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">60-90</div><div class="l">分鐘 · 全部設定完</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">7</div><div class="l">天 · 上手清單</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI ＋ 自媒體變現」。我每天實測 AI 工具，把能用的流程整理成一步一步可以照做的方法。這份文件的每一個設定、每一段 Prompt，都是我自己在用的版本，你可以直接複製、直接改成你的。</div></div>
+  </div>
+
+  <!-- 三個提醒 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前</span>
+    <h2>三個提醒<br><span class="g">先講在前面</span></h2>
+    <div class="steps">
+      <div class="st"><b>OpenAI 這半年改版頻率很高</b>，選單名稱可能跟你看到的不完全一樣。每一段我都附了官方文件連結，路徑對不上就點進去查最新的。</div>
+      <div class="st"><b>有些功能綁方案。</b>我在每一段標了目前的方案限制，實際以你帳號看到的為準。</div>
+      <div class="st"><b>方案價格會變動</b>，我不在這份文件寫死數字，需要的話直接看官方定價頁。</div>
+    </div>
+    <div class="tipline">建議順序：先看 <b>Part 0</b> 搞清楚三個模式 → <b>Part 1 到 4</b> 是地基，做一次長期受用 → <b>Part 5 到 7</b> 是產出，決定你每天能省多少時間 → 最後照 <b>7 天清單</b> 一天做一項。</div>
+  </div>
+
+  <!-- Part 0 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 0 · 三個模式</span>
+    <h2>整份文件<br><span class="g">最重要的一段</span></h2>
+    <p>2026 年 7 月 9 日之後，OpenAI 把原本的 Codex 桌面 App 改成新版 ChatGPT 桌面 App，裡面同時放進三個模式。舊版桌面 App 更名為 ChatGPT Classic，還可以繼續用。</p>
+    <p>很多人下載完新版之後，還是只用同一個模式。<span class="hl">同一個任務，模式選錯，產出品質差一大截。</span></p>
+
+    <div class="mode3">
+      <div class="m"><div class="mn">Chat</div><div class="mw">對話、查詢、想法發散</div><div class="mq">你想「知道」某件事</div></div>
+      <div class="m"><div class="mn">Work</div><div class="mw">長流程、跨檔案、跨工具的知識工作</div><div class="mq">你想「拿到」某個東西</div></div>
+      <div class="m"><div class="mn">Codex</div><div class="mw">軟體工程</div><div class="mq">你想「跑起來」某個東西</div></div>
+    </div>
+
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模式</th><th>你要的東西是</th><th>典型任務</th></tr></thead><tbody>
+      <tr><td>Chat</td><td>一個答案</td><td>解釋概念、改一段文案、查資料、腦力激盪</td></tr>
+      <tr><td>Work</td><td>一份交付物</td><td>做報告、整理試算表、產簡報、建 Sites、排定期任務</td></tr>
+      <tr><td>Codex</td><td>一份能跑的程式</td><td>改 repo、跑測試、看 diff、審 PR、接終端機</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">各模式的可用範圍</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>項目</th><th>桌面 App</th><th>網頁</th><th>手機</th></tr></thead><tbody>
+      <tr><td>Chat</td><td>可用</td><td>可用</td><td>可用</td></tr>
+      <tr><td>Work</td><td>所有方案可用</td><td>Plus 以上</td><td>Plus 以上</td></tr>
+      <tr><td>Codex</td><td>可用</td><td>選不到</td><td>可從 Remote 分頁查看桌面端的對話</td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ <b>Work 與 Codex 共用同一份用量額度。</b>長任務跑得多，額度消耗會比一般對話快很多。</div>
+    <div class="links-row"><a href="https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex" target="_blank" rel="noopener">官方文件 · Work 與 Codex</a></div>
+  </div>
+
+  <!-- Part 1-4 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 - 4 · 地基</span>
+    <h2>做一次<br><span class="g">之後長期受用</span></h2>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">1</span><span class="ch-t">下載新版桌面 App<span class="en"> · 網頁版有一半功能用不到</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>桌面版能做到網頁版做不到的三件事：</b>① 讀取本機檔案與應用程式（需要你逐一授權資料夾）② 內建瀏覽器，可以直接登入網站、下載檔案、讀取頁面內容 ③ Codex 模式，網頁與手機都選不到。</div>
+        <div class="steps">
+          <div class="st">到官方下載頁取得對應作業系統的版本，支援 macOS、Windows，Linux 版目前為預覽階段</div>
+          <div class="st">安裝後登入你的帳號</div>
+          <div class="st">左上角選單選 <b>ChatGPT</b> 或 <b>Codex</b></div>
+          <div class="st">選 ChatGPT 之後，畫面上方有 <b>Chat / Work</b> 的切換鈕</div>
+          <div class="st">原本就在用 Codex App 的人，直接更新即可，它會變成新版 ChatGPT 桌面 App</div>
+        </div>
+        <div class="blk-h">第一次進去先做的三件事</div>
+        <ul class="bul">
+          <li>把 Chat 跟 Work 各開一個對話試跑，感受兩者的差別</li>
+          <li>找到左側的 Recents，Chat 與 Work 的紀錄會混在一起，先試著用篩選跟釘選</li>
+          <li>如果你主要寫程式，可以把 Codex 設成預設開啟畫面</li>
+        </ul>
+        <div class="links-row"><a href="https://openai.com/chatgpt/desktop/" target="_blank" rel="noopener">桌面 App 下載</a><a href="https://help.openai.com/en/articles/20001276-moving-to-the-new-chatgpt-desktop-app" target="_blank" rel="noopener">搬到新版說明</a></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">2</span><span class="ch-t">個人化設定<span class="en"> · 投報率最高的 20 分鐘</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">這一步決定 ChatGPT 每一次回你話的樣子。設定一次，影響之後每一則對話。路徑：<b>設定 → 個人化</b></div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>設定項</th><th>控制什麼</th><th>建議</th></tr></thead><tbody>
+          <tr><td>個性</td><td>語氣風格</td><td>選一個接近你工作情境的，不用糾結</td></tr>
+          <tr><td>自訂指令</td><td>它怎麼回你</td><td>花 20 分鐘認真寫，這裡投報率最高</td></tr>
+          <tr><td>記憶</td><td>它記得你什麼</td><td>定期進去清掉過期的資訊</td></tr>
+          <tr><td>外觀</td><td>介面長相</td><td>隨你</td></tr>
+        </tbody></table></div>
+
+        <div class="blk-h">自訂指令範本（創作者版）</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進「自訂指令」欄位</div><pre>【我是誰】
+我是一位<span class="ph">[你的身分，例如：經營 IG 與 Threads 的內容創作者]</span>，
+主要產出<span class="ph">[你的內容形式，例如：圖文輪播貼文與短影音腳本]</span>，
+受眾是<span class="ph">[你的受眾，例如：想用 AI 提升工作效率的上班族與小型創業者]</span>。
+
+【回答方式】
+1. 先給結論，再給理由。不要鋪陳。
+2. 需要多步驟的任務，用編號列出，每一步要能直接執行。
+3. 提到具體數字、日期、產品版本時，標註你的資訊來源與時間點；不確定的地方直接說不確定。
+4. 我要的是可以直接用的東西，不是概念說明。給範例、給模板、給可複製的內容。
+
+【語氣】
+直接、清楚、口語。不要客套開場，不要勵志收尾。
+中文一律使用繁體中文（台灣用語）。
+技術名詞保留英文原文，不要翻譯。
+
+【禁止】
+不要用「不是⋯而是⋯」這種對比句型。
+不要在結尾加總結性的抒情段落。
+不要用假設共鳴的問句開場。</pre></div>
+
+        <div class="blk-h">記憶要不要開</div>
+        <p style="font-size:14px;"><b>開的好處：</b>它會累積你的偏好、專案背景、慣用格式，長期下來回答越來越貼。<b>開的成本：</b>舊資訊會殘留，你三個月前的專案設定可能還在影響今天的回答。</p>
+        <div class="tipline"><b>我的做法：</b>開著，但每個月進 設定 → 個人化 → 記憶 看一次，把過期的刪掉。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">3</span><span class="ch-t">整理你的專案<span class="en"> · 用領域切，不要用任務切</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">Projects 是資料夾加上工作情境。你在專案裡開新對話，它自動帶著這個專案的檔案與指令。<b>用「你人生的領域」切，不要用「單一任務」切。</b></div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>專案名稱</th><th>放什麼</th></tr></thead><tbody>
+          <tr><td>內容</td><td>選題清單、品牌語氣規範、過往表現好的貼文</td></tr>
+          <tr><td>客戶</td><td>各客戶背景、合作條件、溝通紀錄摘要</td></tr>
+          <tr><td>學習</td><td>課程筆記、想讀的資料、讀書心得</td></tr>
+          <tr><td>生意</td><td>財務數字、產品規劃、定價思考</td></tr>
+          <tr><td>職涯</td><td>履歷、作品集、目標與檢討</td></tr>
+        </tbody></table></div>
+
+        <div class="blk-h">專案指令範本（內容專案）</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">貼進專案層級的指令欄位</div><pre>這個專案處理我所有的社群內容產出。
+
+【品牌設定】
+帳號名稱：<span class="ph">[你的帳號名]</span>
+定位：<span class="ph">[一句話定位]</span>
+受眾：<span class="ph">[受眾描述，含年齡層、職業、痛點]</span>
+平台：<span class="ph">[IG / Threads / YouTube / 其他]</span>
+
+【語氣規範】
+<span class="ph">[貼上你的語氣規則，例如：直接、口語、不說教]</span>
+
+【禁用】
+<span class="ph">[貼上你不想看到的句型與詞彙]</span>
+
+【每次產出的固定格式】
+1. 標題（3 個版本）
+2. 內文
+3. CTA
+4. 建議發布時間與理由
+
+【我會常問你的事】
+- 幫我想選題
+- 把口播稿改成貼文
+- 檢查這篇有沒有踩到我的禁用清單
+- 這篇為什麼數據不好
+
+回答前先確認你有讀過這個專案裡的品牌設定檔案。</pre></div>
+
+        <div class="insight"><div class="il">一個實用習慣</div><div class="it">每次有一篇貼文表現特別好或特別差，把它丟進對應專案，附上一行說明。三個月後，你會有一份 ChatGPT 讀得懂的個人成效資料庫。</div></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">4</span><span class="ch-t">接上你每天在用的工具<span class="en"> · 路徑已經改了</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">這一步讓 ChatGPT 讀得到你的 Gmail、雲端硬碟、行事曆、Notion。它從「一個什麼都不知道你的模型」變成「<b>一個知道你上週跟誰開會的助理</b>」。</div>
+        <div class="warn">⚠️ <b>路徑更新，很多教學還在寫舊的。</b>2026 年 7 月 9 日之後，原本的 App 目錄併入 <b>Plugin 目錄</b>。現在的路徑是 <b>設定 → Plugins</b>。Plugin 是一個安裝包，裡面可以含 Skills、Apps 或兩者；Apps 就是原本的連接器。</div>
+
+        <div class="blk-h">常見的連接器</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>工具</th><th>接了之後能做什麼</th></tr></thead><tbody>
+          <tr><td>Gmail</td><td>找信、摘要長串討論、根據信件內容起草回覆</td></tr>
+          <tr><td>Google Drive</td><td>搜尋與引用你的 Docs、Sheets、Slides</td></tr>
+          <tr><td>Google Calendar</td><td>查行程、依照行事曆安排任務</td></tr>
+          <tr><td>Outlook / Teams</td><td>同上，微軟生態的版本</td></tr>
+          <tr><td>Notion</td><td>讀取你的知識庫與資料庫</td></tr>
+          <tr><td>Slack</td><td>查頻道討論、整理決議</td></tr>
+          <tr><td>GitHub</td><td>讀 repo、查 issue</td></tr>
+          <tr><td>Dropbox / Box / SharePoint</td><td>檔案搜尋</td></tr>
+        </tbody></table></div>
+        <div class="tipline">Google Docs、Sheets、Slides 已經整併進單一的 <b>Google Drive App</b>，不再是各自獨立的連接器。</div>
+
+        <div class="blk-h">設定步驟</div>
+        <div class="steps">
+          <div class="st">進 <b>設定 → Plugins</b></div>
+          <div class="st">在目錄中找到你要的服務，點選連接</div>
+          <div class="st">完成 OAuth 授權，過程中會清楚列出它能讀什麼、能做什麼</div>
+          <div class="st">如果有 <b>Sync（同步）</b> 選項，建議打開。它會預先建立索引，之後搜尋更快更準</div>
+          <div class="st">回到對話，直接用自然語言呼叫</div>
+        </div>
+
+        <div class="blk-h">三個馬上能用的指令</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Gmail · 專案時間軸</div><pre>搜尋我的 Gmail，找出這個月所有跟<span class="ph">[專案名稱]</span>相關的信件，
+整理成一份時間軸摘要，標出目前還沒有回覆的事項，
+並列出我需要在本週處理的三件事，按急迫程度排序。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Drive × Notion · 找出資料不一致</div><pre>讀取我 Google Drive 裡的<span class="ph">[檔案名稱]</span>，
+對照我 Notion 裡<span class="ph">[資料庫名稱]</span>的內容，
+找出兩邊資訊不一致的地方，用表格列出差異，
+並註明哪一份的資料看起來比較新。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Calendar · 找出可以專注的時段</div><pre>看我這週的 Google Calendar，
+把每一場會議標上準備所需的時間，
+找出行程之間可以連續工作 90 分鐘以上的時段，
+幫我排進三件需要專注的任務。</pre></div>
+
+        <div class="warn">⚠️ <b>要注意的事：</b>連接器多半需要付費方案，Free 通常沒有；寫入類的動作（例如代你寄信）預設是關的，通常需要另外開啟；企業帳號由管理員決定哪些能開；<b>搜尋主要是關鍵字與檔名比對，不是語意搜尋</b>，你需要大概知道東西放在哪。</div>
+        <div class="links-row"><a href="https://help.openai.com/en/articles/11487775-connectors-in-chatgpt" target="_blank" rel="noopener">官方文件 · 連接器</a><a href="https://help.openai.com/en/articles/12084614-connector-use-cases-and-prompts" target="_blank" rel="noopener">使用情境與 Prompt 範例</a><a href="https://chatgpt.com/apps" target="_blank" rel="noopener">App 目錄</a></div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">地基做完了</div>
+      <h3>設定是地基<br><span class="g">產出才是重點</span></h3>
+      <p>接下來的 Work、Codex、Skill 決定你每天能省多少時間。要把它接成真的在賺錢的產線，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 5 Work -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · Work</span>
+    <h2>最多人用不好<br><span class="g">的一段</span></h2>
+    <p>Chat 的用法是問一個問題，拿一個答案。Work 的用法是給一個目標，拿一份成品。<span class="hl">你用問問題的方式去用 Work，等於開了一台卡車去買一瓶醬油。</span></p>
+
+    <div class="sub-h">一個合格的 Work 指令要有四件事</div>
+    <div class="steps">
+      <div class="st"><b>輸入</b>：它可以用哪些資料、檔案、工具</div>
+      <div class="st"><b>任務</b>：要它做什麼，分成幾個階段</div>
+      <div class="st"><b>產出</b>：交付物的形式與格式</div>
+      <div class="st"><b>標準</b>：什麼樣算做完了</div>
+    </div>
+
+    <div class="judge no"><span class="jl">✕ Chat 式的問法（Work 會給你一份很平庸的東西）</span>幫我分析我的 LinkedIn。</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">✓ Work 式的問法</div><pre>【輸入】
+我的 LinkedIn 個人檔案（我會貼上連結或截圖），
+以及我 Google Drive 裡的「作品集」資料夾。
+
+【任務】
+第一階段：分析我目前的檔案，找出定位不清楚、成果沒有量化、關鍵字缺漏的地方。
+第二階段：對照我這個產業近半年的職缺描述，找出我還沒展現的能力。
+第三階段：把上面兩項整合成一份 30 天行動計畫。
+
+【產出】
+一份試算表格式的 dashboard，欄位包含：
+行動項目 / 所屬階段 / 預估耗時 / 影響程度（高中低）/ 完成標準 / 建議週次
+
+【標準】
+每一個行動項目都要具體到我明天就能開始做。
+不要出現「優化個人品牌」這種無法執行的項目。
+總項目數控制在 15 到 20 個。</pre></div>
+
+    <div class="pnum"><span class="pn">一</span><span class="pt">內容選題資料庫</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Work · 選題資料庫</div><pre>【輸入】
+搜尋近 90 天內，<span class="ph">[你的主題領域]</span>這個領域在中文社群平台上討論度較高的話題。
+同時參考我 Notion 裡「過往貼文成效」資料庫的數據。
+
+【任務】
+1. 整理出 30 個潛在選題
+2. 每個選題標註：主題分類、預估受眾共鳴度、我是否已經寫過類似的
+3. 對照我過往成效好的貼文，找出共同的選題特徵
+4. 依據那些特徵，從 30 個裡面挑出最值得優先做的 10 個
+
+【產出】
+一份試算表，欄位：選題 / 分類 / 優先序 / 建議切入角度 / 一句話 Hook / 參考資料連結
+
+【標準】
+每個 Hook 都要能單獨成立，不用讀完整篇也看得懂在講什麼。
+資料來源要附連結，不確定的地方標註出來。</pre></div>
+
+    <div class="pnum"><span class="pn">二</span><span class="pt">競品內容拆解</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Work · 競品拆解</div><pre>【輸入】
+我會提供 3 到 5 個同領域帳號的連結。
+
+【任務】
+1. 逐一分析每個帳號的內容結構：選題方向、貼文格式、發文頻率、視覺風格
+2. 找出他們共同在做、但我沒做的事
+3. 找出他們都沒做、而且有機會做起來的空白區
+4. 針對空白區，提出 3 個我可以切入的具體內容方向
+
+【產出】
+一份簡報，一頁一個帳號的拆解，最後三頁放空白區分析與切入建議。
+
+【標準】
+分析要基於實際觀察到的內容，不要用泛用的行銷術語填充。
+每一個切入建議都要附一個具體的貼文範例標題。</pre></div>
+
+    <div class="pnum"><span class="pn">三</span><span class="pt">長影片轉多平台素材</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Work · 一稿多形式</div><pre>【輸入】
+我會貼上一份逐字稿。
+
+【任務】
+1. 抓出這份逐字稿裡資訊密度最高的 5 個段落
+2. 每個段落分別改寫成：IG 輪播貼文大綱、Threads 短文、短影音腳本
+3. 每一種形式都要符合該平台的閱讀習慣，不要一稿多投
+
+【產出】
+一份文件，用標題分成 5 個區塊，每區塊內含三種形式的成品。
+
+【標準】
+輪播貼文大綱要標明張數與每張的核心訊息。
+Threads 短文控制在 120 字以內。
+短影音腳本要包含前 3 秒的鉤子與鏡頭建議。</pre></div>
+
+    <div class="pnum"><span class="pn">四</span><span class="pt">週報與檢討</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Work · 週報</div><pre>【輸入】
+我的 Google Calendar 本週紀錄，
+以及我 Notion 裡「本週任務」資料庫。
+
+【任務】
+1. 統計我這週實際花在各類工作上的時間比例
+2. 對照我原本規劃的優先序，找出時間分配跟目標不一致的地方
+3. 列出這週未完成的項目，並判斷是因為時間不夠還是優先序被排擠
+4. 提出下週三個具體的調整建議
+
+【產出】
+一份文件，含一張時間分配的圖表。
+
+【標準】
+調整建議要具體到「把 X 改成 Y」，不要出現「提升專注力」這類建議。</pre></div>
+
+    <div class="pnum"><span class="pn">五</span><span class="pt">定期任務</span></div>
+    <p style="font-size:14px;">Work 可以排定期任務，讓它固定時間自己跑。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Work · 每週一自動跑</div><pre>每週一早上 9 點執行：
+
+搜尋上週<span class="ph">[你關注的領域]</span>的重要更新，
+來源限定官方部落格、官方文件、以及該領域主要媒體。
+
+整理成一份簡報，格式：
+- 這週最重要的 3 件事，每件 3 句話說明
+- 對我的工作可能造成的影響
+- 我這週要不要做什麼調整
+
+不確定的資訊標註出來，附上所有來源連結。</pre></div>
+
+    <div class="warn">⚠️ <b>Work 的兩個限制：</b>① <b>它會跑很久</b>，複雜任務可能跑數十分鐘，開始跑之後就去做別的事，不要盯著看 ② <b>它吃額度</b>，Work 與 Codex 共用用量，不需要交付物的任務，用 Chat 就好。</div>
+    <div class="links-row"><a href="https://openai.com/index/chatgpt-for-your-most-ambitious-work/" target="_blank" rel="noopener">官方說明 · Work</a></div>
+  </div>
+
+  <!-- Part 6 Codex -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 6 · Codex</span>
+    <h2>不寫程式的人<br><span class="g">也看這一段</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>你想要的東西</th><th>做得到嗎</th></tr></thead><tbody>
+      <tr><td>一個單頁網站</td><td>可以</td></tr>
+      <tr><td>一個小工具（計算機、表單、查詢頁）</td><td>可以</td></tr>
+      <tr><td>把重複的檔案處理自動化</td><td>可以</td></tr>
+      <tr><td>一個資料視覺化的 dashboard</td><td>可以</td></tr>
+      <tr><td>改進你手上既有的程式碼</td><td>可以</td></tr>
+      <tr><td>產出一份 PDF 報告</td><td>這個用 Work 更順</td></tr>
+      <tr><td>寫一篇文章</td><td>這個用 Chat 或 Work</td></tr>
+    </tbody></table></div>
+    <div class="tipline">判斷方式很簡單：<b>交付物是「一個會跑的軟體」就用 Codex</b>，其他都不是。</div>
+
+    <div class="sub-h">非工程師的第一個 Codex 任務</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Codex · 第一個任務</div><pre>我不會寫程式，請用最簡單的方式幫我完成，
+每一步都要告訴我要點哪裡、要輸入什麼。
+
+我想要一個單頁網頁，功能是：
+<span class="ph">[描述你的需求，例如：輸入一段文字，計算字數與預估閱讀時間]</span>
+
+需求：
+- 只要一個 HTML 檔案，我可以直接用瀏覽器打開
+- 介面簡單乾淨，手機上也能正常顯示
+- 中文介面
+
+做好之後，告訴我：
+1. 檔案存在哪裡
+2. 我要怎麼打開它
+3. 如果我想改文字或顏色，要改哪一行</pre></div>
+
+    <div class="sub-h">Codex 的實用細節</div>
+    <ul class="bul">
+      <li><b>Inline diff</b>：直接在畫面上看到改了哪幾行</li>
+      <li><b>側欄 PR 審查</b>：拉取請求可以在側邊面板審</li>
+      <li><b>多 repo 專案</b>：一個專案可以掛多個儲存庫</li>
+      <li><b>內建瀏覽器與 Computer Use</b>：它可以自己開網頁、操作介面</li>
+      <li><b>/import</b>：Codex CLI 可以匯入 Claude Code 或 Cursor 的設定與近期對話</li>
+    </ul>
+    <div class="links-row"><a href="https://learn.chatgpt.com/docs/app" target="_blank" rel="noopener">官方文件 · 桌面 App</a></div>
+  </div>
+
+  <!-- Part 7 Skill -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 7 · Skill</span>
+    <h2>一直貼同一份<br><span class="g">很長的 Prompt？</span></h2>
+    <p>那就是該做 Skill 的訊號。Skill 是一份可重複使用、可分享的工作流程，把一個任務的做法打包起來：指令、範例、參考檔案、規則，甚至可以包含程式碼。安裝之後，遇到相符的任務 ChatGPT 會自動套用，你也可以在對話裡打 <span class="hl">@</span> 直接呼叫它。</p>
+    <div class="warn">⚠️ <b>方案限制先確認：</b>Personal Skills 目前主要開放給 <b>ChatGPT Business、Enterprise、Healthcare、Edu</b> 方案。獨立的 Skills 可在桌面 App、Codex CLI、IDE 擴充功能使用；打包成 Plugin 的 Skills 則可在網頁、桌面、手機的 Chat 與 Work 使用。<b>桌面版與網頁／手機版的 Personal Skills 要各自新增，不會自動同步。</b></div>
+
+    <div class="sub-h">哪些流程適合做成 Skill</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>流程</th><th>為什麼適合</th></tr></thead><tbody>
+      <tr><td>檢查貼文是否符合品牌規範</td><td>規則固定、每次都要跑</td></tr>
+      <tr><td>把逐字稿轉成貼文</td><td>步驟固定、輸出格式固定</td></tr>
+      <tr><td>分析短影音腳本的結構</td><td>有明確的評分維度</td></tr>
+      <tr><td>整理研究資料</td><td>有固定的摘要格式</td></tr>
+      <tr><td>寫合作提案</td><td>有固定的段落結構</td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>判斷標準：</b>這件事你做過三次以上，而且每次的做法都一樣。</div>
+
+    <div class="sub-h">建立方式</div>
+    <div class="steps">
+      <div class="st">側邊欄 → <b>Plugins</b> → 切到 <b>Skills</b> 分頁</div>
+      <div class="st">點 <b>Create</b></div>
+      <div class="st">三種方式擇一：<b>Create with chat</b>（用聊的，ChatGPT 會問你問題然後幫你生）／<b>Create with editor</b>（直接寫）／<b>Upload</b>（上傳打包好的 skill 資料夾）</div>
+      <div class="st">建立後安裝，用真實任務測試幾次，再回頭修</div>
+    </div>
+    <div class="tipline">符合資格的帳號預設會有一個 <b>skill-creator</b>。你叫 ChatGPT 建立或修改 Skill 時，它會自動用這個。</div>
+
+    <div class="sub-h">用聊天建立 Skill 的起手 Prompt</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">@skill-creator</div><pre>@skill-creator
+
+我想建立一個 Skill，名稱：貼文品牌規範檢查
+
+【什麼時候該用這個 Skill】
+當我貼上一段社群貼文文案，並要求檢查、審稿、或問「這樣可以嗎」的時候。
+
+【它要做的事】
+1. 逐句檢查是否出現禁用句型（清單見下方）
+2. 檢查是否使用了簡體字
+3. 檢查技術名詞是否被誤譯成中文
+4. 檢查開頭第一句是否為問句
+5. 檢查結尾是否出現勵志或總結性抒情段落
+
+【輸出格式】
+先給一個判定：通過 / 需修改
+接著用表格列出所有問題，欄位：問題句 / 違反的規則 / 建議改法
+最後給出完整的修改版全文
+
+【禁用句型清單】
+不是⋯而是⋯
+不只是⋯更是⋯
+這不是⋯這是⋯
+真正的⋯是⋯
+最終你會發現⋯
+值得注意的是⋯
+你是否曾經⋯
+現在就開始⋯
+
+【一定要遵守】
+繁體中文（台灣用語）。
+技術名詞保留英文：ChatGPT、Codex、Skill、Prompt、Threads。
+不要改動我的原意，只改句型與用詞。</pre></div>
+
+    <div class="sub-h">SKILL.md 手寫範本</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">SKILL.md</div><pre>---
+name: 貼文品牌規範檢查
+description: 當使用者貼上社群貼文文案並要求檢查、審稿、或詢問是否可以發布時使用。檢查禁用句型、簡繁體、技術名詞翻譯與開頭結尾結構。
+---
+
+# 貼文品牌規範檢查
+
+## 什麼時候使用
+
+使用者貼上一段社群貼文，並提出下列任一要求時：
+- 幫我檢查
+- 幫我審一下
+- 這樣可以嗎
+- 有沒有踩到我的規則
+
+## 執行步驟
+
+1. 逐句掃描禁用句型清單
+2. 檢查簡體字
+3. 檢查技術名詞是否被翻譯
+4. 檢查第一句是否為問句
+5. 檢查最後一段是否為抒情總結
+
+## 禁用句型清單
+
+（在這裡列出你的完整清單）
+
+## 輸出格式
+
+### 判定
+通過 / 需修改
+
+### 問題清單
+
+| 問題句 | 違反規則 | 建議改法 |
+|---|---|---|
+
+### 修改後全文
+
+（完整輸出）
+
+## 絕對規則
+
+- 繁體中文，台灣用語
+- 技術名詞保留英文
+- 只改句型與用詞，不改原意</pre></div>
+    <div class="warn">⚠️ <b>description 欄位是最關鍵的一行。</b>它決定 ChatGPT 什麼時候會自動想到要用這個 Skill。寫得越具體、越貼近你實際說話的方式，觸發越準。</div>
+    <div class="links-row"><a href="https://help.openai.com/en/articles/20001066-skills-in-chatgpt" target="_blank" rel="noopener">官方文件 · Skills</a><a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">建立指南</a><a href="https://openai.com/academy/skills/" target="_blank" rel="noopener">OpenAI Academy 教學</a></div>
+  </div>
+
+  <!-- BONUS Pet -->
+  <div class="sec fade">
+    <span class="sec-tag">BONUS · Pet</span>
+    <h2>看起來像裝飾<br><span class="g">其實解決一個真問題</span></h2>
+    <p>Pet 是一隻動畫小夥伴，浮在桌面上顯示任務狀態。<span class="hl">你同時開了五個長任務，哪一個跑完了、哪一個在等你回覆、哪一個卡住了，掃一眼就知道。</span></p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>狀態</th><th>意思</th></tr></thead><tbody>
+      <tr><td>執行中</td><td>正在跑，你不用管</td></tr>
+      <tr><td>需要你回覆</td><td>它在等你決定</td></tr>
+      <tr><td>已完成</td><td>可以去看結果了</td></tr>
+      <tr><td>卡住了</td><td>出問題，需要你處理</td></tr>
+    </tbody></table></div>
+    <div class="tipline">多個對話同時有動靜時，它會優先顯示需要你回覆的那一個，接著是卡住的、完成的、執行中的。</div>
+
+    <div class="sub-h">開啟方式</div>
+    <div class="steps">
+      <div class="st"><b>桌面 App：</b>底部的個人資料選單 → Pets，或 設定 → Pets</div>
+      <div class="st">選一隻內建的</div>
+      <div class="st">在輸入框打 <b>/pet</b>，或用指令選單的 Wake Pet 叫它出來。要收起來再打一次 /pet</div>
+    </div>
+    <div class="tipline"><b>網頁版：</b>設定 → 個人化 → Pet → 選擇寵物。網頁版的 Pet 出現在支援的 Work 對話裡，沒有浮動視窗、沒有活動列、沒有 /pet 指令。</div>
+
+    <div class="sub-h">做一隻自己的</div>
+    <p style="font-size:14px;"><b>設定 → Pets → Create your own pet。</b>App 會自動安裝內建的 hatch-pet Skill、重新載入 Skills、然後開一個新對話。你在那個對話裡描述你想要的角色就行。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">自訂 Pet 描述</div><pre>幫我做一隻寵物。
+
+外型：<span class="ph">[描述你想要的角色，例如：一隻圓滾滾的橘色小貓，戴著一頂棒球帽]</span>
+風格：簡單、線條乾淨，縮到很小也看得清楚
+背景：透明
+
+需要下列四種狀態的動畫：
+- 執行中：專心工作的樣子
+- 需要回覆：抬頭看向使用者
+- 已完成：開心的動作
+- 卡住了：困惑的表情
+
+不要加上任何文字、logo、品牌標誌或真人形象。</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">太複雜的話叫它簡化</div><pre>把這隻寵物簡化成一個清楚的剪影，保留<span class="ph">[主要特徵]</span>，
+去掉細節裝飾。維持透明背景，不要加文字或背景場景。</pre></div>
+    <div class="tipline">自訂 Pet 存在你的電腦本機，不會同步到網頁版。做好之後回 設定 → Pets 按 <b>Refresh</b> 就能選到。如果你的作業系統開了減少動態效果，Pet 會顯示靜態圖而不是動畫。</div>
+    <div class="links-row"><a href="https://learn.chatgpt.com/docs/pets" target="_blank" rel="noopener">官方文件 · Pets</a></div>
+  </div>
+
+  <!-- 附錄 A -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 A · 模式速查</span>
+    <h2>遇到任務時<br><span class="g">照這個順序問自己</span></h2>
+    <div class="steps">
+      <div class="st"><b>這件事的產出是一個會跑的軟體嗎？</b>是 → Codex</div>
+      <div class="st"><b>這件事需要跨多個檔案或工具，而且最後要交出一份成品嗎？</b>是 → Work</div>
+      <div class="st"><b>其他所有情況</b> → Chat</div>
+    </div>
+    <div class="insight"><div class="il">不確定的時候</div><div class="it">先用 Chat 問一次，答案不夠用再升級到 Work。反過來做會浪費額度。</div></div>
+  </div>
+
+  <!-- 附錄 C 7天清單 -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 C · 7 天上手清單</span>
+    <h2>一天一項<br><span class="g">第七天你會有一套系統</span></h2>
+
+    <div class="prog"><span class="pt2">完成度</span><span class="bar"><i id="bar"></i></span><span class="pv"><span id="done">0</span> / <span id="all">0</span></span></div>
+
+    <div class="day">
+      <div class="dh"><span>Day 1</span>地基</div>
+      <label class="ck"><input type="checkbox"><span>下載新版桌面 App 並登入</span></label>
+      <label class="ck"><input type="checkbox"><span>各開一個 Chat 與 Work 對話，感受差別</span></label>
+      <label class="ck"><input type="checkbox"><span>讀完 Part 0，記住三個模式的分工</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 2</span>個人化</div>
+      <label class="ck"><input type="checkbox"><span>填寫自訂指令（用 Part 1-4 第 2 張卡的範本）</span></label>
+      <label class="ck"><input type="checkbox"><span>檢查記憶，刪掉過期的內容</span></label>
+      <label class="ck"><input type="checkbox"><span>選一個個性設定</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 3</span>專案</div>
+      <label class="ck"><input type="checkbox"><span>建立 3 到 5 個專案</span></label>
+      <label class="ck"><input type="checkbox"><span>至少一個專案寫好專案層級指令</span></label>
+      <label class="ck"><input type="checkbox"><span>把手上的參考檔案丟進對應專案</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 4</span>連接器</div>
+      <label class="ck"><input type="checkbox"><span>進 設定 → Plugins</span></label>
+      <label class="ck"><input type="checkbox"><span>連接 2 到 3 個你每天在用的工具</span></label>
+      <label class="ck"><input type="checkbox"><span>用那三個現成指令各跑一次</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 5</span>Work</div>
+      <label class="ck"><input type="checkbox"><span>挑一個你這週真的要做的任務</span></label>
+      <label class="ck"><input type="checkbox"><span>用四段式結構（輸入／任務／產出／標準）寫成指令</span></label>
+      <label class="ck"><input type="checkbox"><span>丟給 Work 跑，去做別的事</span></label>
+      <label class="ck"><input type="checkbox"><span>回來看結果，記下哪裡不夠好，修改指令再跑一次</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 6</span>Codex 或 Skill</div>
+      <label class="ck"><input type="checkbox"><span>不寫程式：用 Part 6 的範本做一個小網頁工具</span></label>
+      <label class="ck"><input type="checkbox"><span>寫程式：把一個既有 repo 接上 Codex 試跑一個小任務</span></label>
+      <label class="ck"><input type="checkbox"><span>或者：找出一份你重複貼過三次以上的 Prompt，做成 Skill</span></label>
+    </div>
+    <div class="day">
+      <div class="dh"><span>Day 7</span>收尾</div>
+      <label class="ck"><input type="checkbox"><span>設定一個 Work 定期任務</span></label>
+      <label class="ck"><input type="checkbox"><span>開一隻 Pet</span></label>
+      <label class="ck"><input type="checkbox"><span>回顧這一週省下多少時間，記錄下來</span></label>
+    </div>
+    <div class="tipline">勾選只留在你這台裝置的瀏覽器裡，<b>不會上傳到任何地方</b>，關掉頁面就沒了。</div>
+  </div>
+
+  <!-- 常見卡點 -->
+  <div class="sec fade">
+    <span class="sec-tag">常見卡點</span>
+    <h2>卡住的時候<br><span class="g">看這裡</span></h2>
+    <div class="faq"><div class="q">找不到 Work 或某個功能</div><div class="a">分階段推送，先更新 App 再看一次。網頁與手機的 Work 需要 Plus 以上方案，桌面版所有方案可用。</div></div>
+    <div class="faq"><div class="q">選單路徑跟文件寫的不一樣</div><div class="a">OpenAI 改版頻繁，Connectors 改叫 Apps、Apps 併進 Plugins 都發生在最近幾個月。點附錄 B 的官方連結查最新的。</div></div>
+    <div class="faq"><div class="q">額度消耗很快</div><div class="a">Work 與 Codex 共用用量。把不需要交付物的任務改回 Chat，消耗會明顯下降。</div></div>
+    <div class="faq"><div class="q">連接器搜不到東西</div><div class="a">同步型連接器第一次建立索引需要時間。另外它是關鍵字比對，換一組更接近檔名的關鍵字再試。</div></div>
+    <div class="faq"><div class="q">Skill 不會自動觸發</div><div class="a">description 寫得太抽象。改成貼近你實際會說的話，例如把「內容審核」改成「當使用者貼上貼文文案並問這樣可不可以的時候」。</div></div>
+    <div class="faq"><div class="q">桌面版存取本機檔案被拒</div><div class="a">需要逐一授權資料夾，不是一次全開。到設定裡找到檔案存取權限，把要用的資料夾加進去。</div></div>
+  </div>
+
+  <!-- 附錄 B -->
+  <div class="sec fade">
+    <span class="sec-tag">附錄 B · 官方連結總表</span>
+    <h2>路徑對不上<br><span class="g">就點這裡查最新的</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>用途</th><th>連結</th></tr></thead><tbody>
+      <tr><td>桌面 App 下載</td><td><a href="https://openai.com/chatgpt/desktop/" target="_blank" rel="noopener">openai.com/chatgpt/desktop</a></td></tr>
+      <tr><td>方案與定價</td><td><a href="https://openai.com/chatgpt/pricing/" target="_blank" rel="noopener">openai.com/chatgpt/pricing</a></td></tr>
+      <tr><td>Work 與 Codex 說明</td><td><a href="https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex" target="_blank" rel="noopener">help.openai.com</a></td></tr>
+      <tr><td>搬到新版桌面 App</td><td><a href="https://help.openai.com/en/articles/20001276-moving-to-the-new-chatgpt-desktop-app" target="_blank" rel="noopener">help.openai.com</a></td></tr>
+      <tr><td>桌面 App 使用文件</td><td><a href="https://learn.chatgpt.com/docs/app" target="_blank" rel="noopener">learn.chatgpt.com/docs/app</a></td></tr>
+      <tr><td>連接器（Apps）</td><td><a href="https://help.openai.com/en/articles/11487775-connectors-in-chatgpt" target="_blank" rel="noopener">help.openai.com</a></td></tr>
+      <tr><td>連接器使用情境</td><td><a href="https://help.openai.com/en/articles/12084614-connector-use-cases-and-prompts" target="_blank" rel="noopener">help.openai.com</a></td></tr>
+      <tr><td>App 目錄</td><td><a href="https://chatgpt.com/apps" target="_blank" rel="noopener">chatgpt.com/apps</a></td></tr>
+      <tr><td>Skills 說明</td><td><a href="https://help.openai.com/en/articles/20001066-skills-in-chatgpt" target="_blank" rel="noopener">help.openai.com</a></td></tr>
+      <tr><td>Skills 與 Plugins 總覽</td><td><a href="https://learn.chatgpt.com/docs/skills-and-plugins" target="_blank" rel="noopener">learn.chatgpt.com</a></td></tr>
+      <tr><td>建立 Skills</td><td><a href="https://learn.chatgpt.com/docs/build-skills" target="_blank" rel="noopener">learn.chatgpt.com</a></td></tr>
+      <tr><td>OpenAI Academy Skills 教學</td><td><a href="https://openai.com/academy/skills/" target="_blank" rel="noopener">openai.com/academy/skills</a></td></tr>
+      <tr><td>Pets</td><td><a href="https://learn.chatgpt.com/docs/pets" target="_blank" rel="noopener">learn.chatgpt.com/docs/pets</a></td></tr>
+      <tr><td>更新日誌</td><td><a href="https://learn.chatgpt.com/docs/whats-new" target="_blank" rel="noopener">learn.chatgpt.com/docs/whats-new</a></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>它們會安靜地<br><span class="g">在背景幫你省時間</span></h2>
+    <p>這份文件裡的每一個設定，第一次做都會花你一點時間。做完之後，它們會安靜地在背景幫你省時間，每一天。</p>
+    <div class="insight"><div class="il">只想先做一件事的話</div><div class="it">做 Part 1-4 第 2 張卡的自訂指令。20 分鐘，影響你之後每一則對話。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>設定做完了，<span class="g">接下來換我陪你把它接成收入</span></h2>
+      <div class="cta-lead">三個模式、專案、連接器、Skill，這些做完 ChatGPT 就從聊天框變成工作系統。但要把它接成一條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具會用、卻不知道怎麼串成工作流的你</div>
+        <div class="f">收藏了一堆設定教學，卻從來沒真的設過一次的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">設定完之後，回貼文底下留言告訴我你卡在哪一天</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件內容依據 2026 年 8 月的官方文件整理。OpenAI 改版頻率高，功能名稱、選單路徑與方案限制可能變動，實際請以官方文件與你帳號看到的為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+var cks = document.querySelectorAll('.ck input');
+function tally(){
+  var n = 0;
+  cks.forEach(function(b){ if(b.checked) n++; });
+  document.getElementById('done').textContent = n;
+  document.getElementById('all').textContent = cks.length;
+  document.getElementById('bar').style.width = (n / cks.length * 100) + '%';
+}
+cks.forEach(function(b){ b.addEventListener('change', tally); });
+tally();
+
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：ChatGPT 從零設定完整指南——輪播 DM 承接頁／lead magnet
+· 內容：三個提醒／Part0 三模式（.mode3 三欄卡＋可用範圍表）／Part1-4 地基摺疊卡（下載桌面版／個人化＋自訂指令／專案＋專案指令／連接器＋3 指令）／中段CTA／Part5 Work 四段式＋Chat vs Work 紅綠對照＋5 個 Work 指令／Part6 Codex／Part7 Skill（skill-creator prompt＋SKILL.md 範本）／BONUS Pet／附錄A 速查／附錄C 7天清單（可勾選）／常見卡點 6 題／附錄B 連結表／最後
+· 版型決策：
+    1. 新增 .mode3 三欄模式卡——Part 0 是全文最重要的一段，用表格會被當成一般資訊滑過去，改成三張並排卡片＋一句話判斷法
+    2. 附錄 C 做成可勾選＋sticky 完成度進度條（21 項），照原稿「一天一項」的用法；不做 localStorage，頁面明講關掉就沒了
+    3. Part 5 的 Chat 式問法 vs Work 式問法沿用 .judge no ＋ hero-cp 對照，這是全篇最強的教學點
+· 可複製區塊：17 個 .cp，hero-cp 6（自訂指令、專案指令、Work 對照範例、Codex 第一個任務、skill-creator、SKILL.md）
+· 內容修正（原稿貼上時黏在一起的）：
+    1. Part4 結尾「官方文件…連接器使用情境」兩條連結黏成一行，拆成獨立連結膠囊
+    2. Part7 結尾三條官方連結（Skills／建立指南／Academy）黏成一行，同上
+    3. 常見卡點「Skill 不會自動觸發」與後面的 description 說明黏在一起，拆成標題與內文
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「ChatGPT從零設定完整指南」
+· 命名：日期前綴（2026-08-06-chatgpt-setup.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

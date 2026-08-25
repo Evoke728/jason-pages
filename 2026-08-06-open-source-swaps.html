@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>退訂清單｜6 個 AI 工具的開源替代方案</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;white-space:nowrap;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.rule{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:15px 18px;margin:11px 0;}
+.rule .rh{font-family:var(--serif);font-weight:700;font-size:15px;color:#2a2620;margin-bottom:6px;}
+.rule .rh .rn{font-family:"Inter";font-weight:800;color:var(--gold);margin-right:8px;}
+.rule p{font-size:13.6px;color:var(--text);line-height:1.78;margin:6px 0 0;}
+.rule b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;transition:background .2s;}
+.links-row a:hover{background:rgba(212,144,42,0.14);}
+.diff{flex-shrink:0;font-family:var(--sans);font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.diff.d1{background:var(--ok-bg);border:1px solid var(--ok-line);color:var(--ok);}
+.diff.d2{background:rgba(212,144,42,0.12);border:1px solid var(--gold-dim);color:var(--gold);}
+.diff.d3{background:var(--no-bg);border:1px solid var(--no-line);color:var(--no);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 80px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .ch-t .en{display:block;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>省下訂閱費之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>訂閱退掉了<br><span class="g">工作流還沒接</span></h4>
+  <p>換工具只是省錢。怎麼把這些工具接成一條真的在幫你賺錢的產線，我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">開源替代方案 · 完整資料包</div>
+    <h1>退訂清單<br><span class="g">6 個開源替代方案</span></h1>
+    <div class="h-sub">貼文提到的每一個工具　安裝方式、官方連結、取捨全在這</div>
+    <div class="hero-sub">六個工具不需要一次全換。真正有效的做法是先換掉那筆你每個月看到帳單都會皺一下眉的訂閱，跑兩週，確定沒問題再換下一個。每個工具都寫了取代什麼、怎麼裝、怎麼用，以及你會失去什麼——取捨的部分沒有省略。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">6</div><div class="l">個 · 開源替代</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">件 · 換之前先確認</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">種 · 情境組合</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI × 自媒體變現」。這裡分享的東西只有兩類：能真的縮短你工作時間的 AI 工具與工作流，以及能真的讓內容被看見的自媒體方法。每一份資料在發出來之前，指令都跑過、連結都點過、授權都查過。</div></div>
+  </div>
+
+  <!-- 這份資料怎麼用 -->
+  <div class="sec fade">
+    <span class="sec-tag">這份資料怎麼用</span>
+    <h2>一次換一個<br><span class="g">從最有感的那一筆開始</span></h2>
+    <p>每個工具下面都有四個區塊。</p>
+    <ul class="bul">
+      <li><b>它取代什麼</b> — 原本你在付什麼錢</li>
+      <li><b>安裝方式</b> — 可以直接複製的指令或步驟</li>
+      <li><b>怎麼用</b> — 裝完之後第一件該做的事</li>
+      <li><b>取捨</b> — 你會失去什麼，這部分我沒有省略</li>
+    </ul>
+    <div class="tipline">建議先看完最後的<b>「總表」</b>和<b>「換之前先確認的五件事」</b>，再決定從哪一個開始。</div>
+  </div>
+
+  <!-- 六個工具 -->
+  <div class="sec fade">
+    <span class="sec-tag">六個工具</span>
+    <h2>展開任一個<br><span class="g">指令直接複製</span></h2>
+
+    <div class="acc">
+
+      <!-- 01 Handy -->
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">Handy<span class="en"> · 取代 Wispr Flow ｜ 語音輸入</span></span><span class="diff d1">難度低</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Wispr Flow。雲端語音輸入服務，需要網路連線，語音送到遠端伺服器處理。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">免費、開源、<span class="hl">完全離線</span>的語音輸入工具。按下快捷鍵、講話、放開，文字直接出現在游標所在的位置，不管你當下是在寫 email、填表單，還是在跟 AI 對話。</p>
+        <p style="font-size:14px;">用 Rust 寫成，MIT 授權。完全離線是它的架構設計，不是一個可以關掉的選項：沒有雲端模式、不需要帳號、不需要網路。支援 macOS、Windows、Linux 三個平台，同一套程式碼。</p>
+        <div class="links-row"><a href="https://github.com/cjpais/Handy" target="_blank" rel="noopener">GitHub · cjpais/Handy</a></div>
+
+        <div class="blk-h">安裝方式</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">macOS</div><pre>brew install --cask handy</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Windows</div><pre>winget install cjpais.Handy</pre></div>
+        <div class="tipline">Linux 與其他安裝方式，到 GitHub Releases 頁面下載對應的檔案。</div>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>下載語音模型。</b>首次開啟時會要你選一個 transcription model。Whisper 系列通用性最好；如果你用的是 Apple Silicon 的 Mac，Parakeet 系列在速度上有明顯優勢。模型會下載到本機，之後就不再需要網路。</div>
+          <div class="st"><b>設定快捷鍵。</b>預設是 push-to-talk（按住講、放開停）。建議選一個平常不會誤觸的組合鍵。</div>
+          <div class="st"><b>測試三種情境。</b>分別在文字編輯器、瀏覽器輸入框、以及終端機裡各試一次。有些應用程式對文字插入的支援度不同，先確認你最常用的那幾個都正常。</div>
+        </div>
+        <div class="tipline"><b>進階：</b>Handy 支援接上外部模型做文字潤飾，可以串 OpenAI、Anthropic、Groq、OpenRouter，或本機的 Ollama。要注意的是，<b>一旦接上雲端 API，語音轉出來的文字就會送出去了</b>——如果你選它就是為了完全離線，這個功能不要開。</div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn">輸出接近逐字稿。標點會加，但不會幫你把「呃」「就是那個」清掉，也不會依據你在哪個 app 調整語氣。<b>Wispr Flow 那種「講得亂七八糟、出來很漂亮」的體驗，Handy 沒有</b>，除非你自己接上潤飾模型。<br><br>如果你的使用情境是「講完直接送出」，這個落差會有感。如果你本來就會再修一輪，那影響不大。</div>
+      </div></details>
+
+      <!-- 02 anarlog -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">anarlog<span class="en"> · 取代 Granola ｜ 會議記錄</span></span><span class="diff d2">難度中</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Granola。會議記錄工具，不派機器人進會議，但轉錄與摘要在雲端處理。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">本地優先的 AI 會議記錄工具。直接擷取你電腦的系統音訊，<span class="hl">不會以參與者的身分出現在會議名單裡</span>。你在會議中隨手打的片段筆記，會後由 AI 整理成結構化的摘要。</p>
+        <p style="font-size:14px;">用 Rust + Tauri 寫成，MIT 授權。預設設定下 Whisper 轉錄在本機跑、摘要也在本機跑，唯一的對外連線是版本更新檢查。每場會議以 Markdown 檔案存在本機磁碟上。</p>
+        <div class="warn">⚠️ <b>名稱要特別注意：</b>這個專案先叫 Hyprnote，後來改名 char，現在叫 <b>anarlog</b>。原本的 hyprnote.com 現在會導向團隊的另一個產品，不是這個工具。搜尋的時候請認 anarlog 或 GitHub 上的 fastrepl 這個帳號。</div>
+        <div class="links-row"><a href="https://github.com/fastrepl/anarlog" target="_blank" rel="noopener">GitHub · fastrepl/anarlog</a><a href="https://anarlog.so/" target="_blank" rel="noopener">官網 · anarlog.so</a></div>
+
+        <div class="blk-h">安裝方式</div>
+        <p style="font-size:14px;">從官網或 GitHub Releases 下載安裝檔。支援 macOS（Apple Silicon）、Linux、Windows。</p>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>給系統音訊權限。</b>macOS 會要求螢幕錄製或音訊擷取權限，這是擷取系統聲音的必要條件。</div>
+          <div class="st"><b>下載本機模型。</b>Whisper 用於轉錄，內建的 HyprLLM 用於摘要，兩者都在本機跑。</div>
+          <div class="st"><b>改變做筆記的習慣。</b>這是最關鍵的一步，也是多數人沒做對的地方。這個工具的設計前提是「你會邊聽邊打片段」——你打「新版儀表板 - 時程有問題」，它會結合逐字稿把這句擴寫成完整的、有前後脈絡的記錄。<b>如果你整場什麼都不打，摘要品質會明顯下降。</b></div>
+          <div class="st"><b>（選用）接上更強的模型。</b>如果覺得本機摘要不夠好，可以在設定裡指定任何 OpenAI 相容的端點：OpenAI、Anthropic、Gemini、OpenRouter，或本機的 Ollama、LM Studio。接雲端模型代表逐字稿會送出去，自己權衡。</div>
+        </div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn"><b>改名造成的混亂是實質成本。</b>你搜尋教學文章時會撞到三個名字的資料，其中不少已經過時。社群討論串也散在不同名稱底下。<br><br>設定過程比 Granola 明顯多幾個步驟：權限、模型下載、筆記習慣調整。Granola 是裝完就能用，這個不是。</div>
+      </div></details>
+
+      <!-- 03 Perplexica -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">Perplexica / Vane<span class="en"> · 取代 Perplexity Pro ｜ AI 搜尋</span></span><span class="diff d3">難度高</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Perplexity Pro。AI 搜尋引擎，查詢記錄儲存在對方伺服器上。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">自架的 AI 答案引擎。你問一個問題，它先透過 SearXNG 去搜真實網路，把結果依相關性重新排序，再交給你指定的語言模型生成<span class="hl">帶引用來源</span>的答案。MIT 授權，完全免費，沒有付費方案、沒有授權金鑰、沒有席次上限。</p>
+        <div class="warn">⚠️ <b>名稱要特別注意：</b>2026 年 3 月改名為 <b>Vane</b>，GitHub repo 和 Docker image 都換成了 Vane，但工具本身完全沒變。多數人還是用 Perplexica 這個名字在搜尋。</div>
+        <div class="links-row"><a href="https://github.com/ItzCrazyKns/Perplexica" target="_blank" rel="noopener">GitHub · ItzCrazyKns/Perplexica</a></div>
+
+        <div class="blk-h">安裝方式</div>
+        <p style="font-size:14px;">需要先安裝 Docker。單一容器版本已內建 SearXNG，不需另外部署搜尋引擎：</p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製指令</button><div class="pl">單一容器啟動</div><pre>docker run -d \
+  -p 127.0.0.1:3000:3000 \
+  -v perplexica-data:/home/vane/data \
+  --name perplexica \
+  --restart unless-stopped \
+  itzcrazykns1337/vane:latest</pre></div>
+        <div class="tipline"><b>這行指令的重點：</b><b>127.0.0.1:3000</b> 這個寫法會把服務綁在本機，不會暴露到公開網路。如果你是裝在自己電腦上，維持這樣最安全。啟動大約需要 30 秒，然後開 http://localhost:3000。</div>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>跑設定精靈。</b>第一次開啟會要你選模型供應商。可選 OpenAI、Anthropic、Gemini、Groq、Ollama、LM Studio 等。想要完全免費就選 Ollama 接本機模型；想要速度和品質就接雲端 API。</div>
+          <div class="st"><b>認識三種速度模式。</b>Speed（快）、Balanced（日常）、Quality（深度研究）。Quality 模式會拉更多來源、跑更多推理，適合真的要查資料的時候用，但慢也貴。</div>
+          <div class="st"><b>用 Focus Mode 縮小範圍。</b>這是它比一般 AI 搜尋好用的地方——Academic 模式只搜學術來源、YouTube 模式只搜影片、Reddit 模式只搜討論串。查專業問題時把範圍縮掉，雜訊會少非常多。</div>
+          <div class="st"><b>設成瀏覽器搜尋引擎。</b>把下面這行加進瀏覽器的自訂搜尋引擎，之後就能從網址列直接查。</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">瀏覽器自訂搜尋引擎網址</div><pre>http://localhost:3000/?q=%s</pre></div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn"><b>模型成本要自己承擔。</b>接雲端 API 就是按 token 計費；接本機模型就是吃你的硬體。用 Ollama 跑 7B 模型的話，一台普通桌機大概 5 到 15 秒出一個答案，比 Perplexity 慢。<br><br>沒有官方手機 app。基本安裝也不含圖片生成。<br><br>要維護一個 Docker 容器。<b>不會 Docker 的話，這個是六個裡面門檻最高的。</b></div>
+      </div></details>
+
+      <!-- 04 Cline -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">Cline<span class="en"> · 取代 Cursor ｜ AI 寫程式</span></span><span class="diff d2">難度中</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Cursor。AI 程式編輯器，訂閱制，程式碼經過對方的後端。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">VS Code 的開源擴充套件，Apache-2.0 授權。<span class="hl">它不是自動補全工具，是一個 agent</span>：你描述任務，它讀你的專案結構、提出計畫、寫檔案、跑指令、看錯誤訊息、再修，每一步都要經過你按核准。</p>
+        <p style="font-size:14px;">模型完全由你決定。支援 30 多個供應商，包含 Anthropic、OpenAI、Google Gemini、AWS Bedrock、OpenRouter、DeepSeek、Mistral、Groq，以及本機的 Ollama 與 LM Studio。</p>
+        <div class="links-row"><a href="https://github.com/cline/cline" target="_blank" rel="noopener">GitHub · cline/cline</a><a href="https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev" target="_blank" rel="noopener">VS Code Marketplace</a></div>
+
+        <div class="blk-h">安裝方式</div>
+        <p style="font-size:14px;">在 VS Code 按 <span class="hl">Ctrl+Shift+X</span>（macOS：<span class="hl">Cmd+Shift+X</span>）開啟擴充套件面板，搜尋 <b>Cline</b>，發布者是 <b>saoudrizwan</b>。安裝後左側活動列會出現 Cline 圖示。</p>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>選供應商並填 key。</b>點面板右上的齒輪，設定 API Provider，貼上你的 API key。key 會存在 VS Code 的 SecretStorage 裡，不會以明文寫進設定檔。</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">接本機模型的設定（不需要 API key）</div><pre>API Provider：Ollama
+Base URL：http://localhost:11434
+Model：從偵測到的清單選，或直接輸入模型名稱
+Context Window：至少 32K</pre></div>
+        <div class="warn">⚠️ <b>Context Window 一定要調到 32K 以上，這是最多人踩的坑。</b>Agent 工作流要同時裝著計畫、多個檔案內容、和指令輸出，預設的 context 很快就滿了，模型會開始「忘記」前面在做什麼。用本機模型時，另外把設定裡的 <b>Use Compact Prompt</b> 打開，可以大幅減少系統提示佔用的空間。</div>
+        <div class="steps" style="margin-top:14px;">
+          <div class="st" style="counter-reset:none;"><b>從 Plan Mode 開始。</b>Cline 有 Plan 和 Act 兩個模式。Plan 模式下它只讀檔案、問問題、提計畫，不會動任何東西。先在這個模式下把需求講清楚，確認它理解對了，再切到 Act。<b>跳過這步直接讓它動手，是最容易產生一堆要復原的多檔案修改的做法。</b></div>
+          <div class="st"><b>建立 .clinerules。</b>在專案根目錄建一個 .clinerules 檔案，寫進這個專案的規範：用什麼框架、命名慣例、哪些目錄不要碰、測試怎麼跑。Cline 每次都會自動讀。這個檔案花十分鐘寫，之後每一次任務都省時間。</div>
+          <div class="st"><b>先跑一個小任務驗證。</b>開一個測試專案，切到 Plan Mode，輸入下面這句。它應該會回應、請求核准執行指令、然後產出結果。這一輪跑通了再交付真的工作。</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">驗證用的第一個任務</div><pre>列出這個專案的所有檔案並說明各自的用途</pre></div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn"><b>這是擴充套件，不是完整 IDE。</b>你留在 VS Code 裡，好處是所有既有設定、佈景、快捷鍵都不用動；壞處是它沒有 Cursor 那種深度整合的編輯體驗，例如整合式的 Tab 補全。<br><br><b>模型費用要自己付。</b>Cursor 是一個月固定金額，Cline 是按 token 計費。一個編碼任務大約 US$0.01 到 0.10，用量少的話比訂閱便宜很多，重度使用可能反而更貴，換之前建議先估一下自己的量。<br><br><b>本機模型跑 agent 是硬仗。</b>Agent 任務對模型的要求遠高於一般對話：要理解計畫、讀多個檔案、產出精確的工具呼叫、還要在長 context 中保持連貫。32B 以下的本機模型在長任務中常常會失去方向。實務上的建議是：例行工作（樣板碼、簡單重構、檔案搭建）用本機模型；跨檔案的架構性工作還是接雲端模型。</div>
+      </div></details>
+
+      <!-- 05 LanguageTool -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">LanguageTool<span class="en"> · 取代 Grammarly Premium ｜ 文字校對</span></span><span class="diff d1">難度低到中</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Grammarly Premium。文法校對服務，你打的每一個字都會送到對方伺服器。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">開源的文法、拼字與風格檢查工具，核心採 LGPL 2.1 授權，2005 年起持續開發至今。支援 25 種以上的語言，每種語言的規則由該語言的母語者社群維護。</p>
+        <p style="font-size:14px;">有瀏覽器擴充套件、桌面版、以及 Microsoft Word 與 LibreOffice 的外掛。也可以<span class="hl">自架成一台伺服器</span>，讓所有裝置連向它。</p>
+        <div class="links-row"><a href="https://languagetool.org/" target="_blank" rel="noopener">官網</a><a href="https://github.com/languagetool-org/languagetool" target="_blank" rel="noopener">GitHub</a><a href="https://languagetool.org/dev" target="_blank" rel="noopener">開發者頁面</a></div>
+
+        <div class="blk-h">安裝方式 · 一般使用</div>
+        <p style="font-size:14px;">直接裝瀏覽器擴充套件即可，支援 Chrome、Firefox、Safari、Edge。免費版對短文本已經很夠用。</p>
+
+        <div class="blk-h">安裝方式 · 自架伺服器</div>
+        <p style="font-size:14px;">自架的意義是：<span class="hl">你的文字完全不會離開你的機器</span>。需要 Docker。</p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">docker 直接跑</div><pre>docker pull erikvl87/languagetool
+docker run --rm -p 8010:8010 erikvl87/languagetool</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">docker compose</div><pre>services:
+  languagetool:
+    image: erikvl87/languagetool
+    ports:
+      - "8010:8010"
+    environment:
+      - Java_Xms=512m
+      - Java_Xmx=2g
+    restart: unless-stopped</pre></div>
+        <div class="tipline">啟動後在瀏覽器擴充套件的「進階設定」裡，把伺服器網址改成 http://你的位址:8010/v2。<b>注意這個 image 用的是 8010 埠</b>，跟 LanguageTool 官方預設的埠不同。</div>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>掛上 n-gram 資料集（強烈建議）。</b>沒有 n-gram 的話，它只能抓明顯的拼字和文法錯誤。掛上之後才能處理需要上下文判斷的情況，像是 there / their、your / you're 這類同音異義的誤用。英文的 n-gram 資料集大約 2GB，從 LanguageTool 官網下載，解壓到語言資料夾（例如 ./ngrams/en），然後掛載進容器。</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">掛載 n-gram 的啟動指令</div><pre>docker run --rm -it -p 8010:8010 \
+  -e langtool_languageModel=/ngrams \
+  -v <span class="ph">/你的路徑</span>/ngrams:/ngrams \
+  erikvl87/languagetool</pre></div>
+        <div class="steps" style="margin-top:14px;">
+          <div class="st" style="counter-increment:s 2;"><b>加入自訂詞彙。</b>你的品牌名、產品名、專有名詞一定會被標成錯字。花五分鐘把它們加進字典，之後的檢查結果會乾淨很多。</div>
+          <div class="st"><b>接進編輯器。</b>VS Code 和 LibreOffice 都有外掛可以連到你自架的伺服器，寫作環境不用切換。</div>
+        </div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn"><b>生成式改寫比 Grammarly 弱，這是最大的差異。</b>LanguageTool 是檢查器：它告訴你哪裡錯、建議怎麼改。Grammarly Premium 那種「幫你把整段重寫成更專業的語氣」的能力，開源版本沒有。<br><br>如果你需要的是「抓錯」，這個換得很划算。如果你依賴的是「代筆」，這個補不上。<br><br>自架版本的規則庫跟雲端付費版不完全相同，付費版有一些額外的 AI 規則。</div>
+      </div></details>
+
+      <!-- 06 Activepieces -->
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">Activepieces<span class="en"> · 取代 Zapier ｜ 流程自動化</span></span><span class="diff d3">難度高</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>取代什麼：</b>Zapier。流程自動化平台，按執行次數計費，流程與憑證都存在對方帳號裡。</div>
+
+        <div class="blk-h">這是什麼</div>
+        <p style="font-size:14px;">開源的流程自動化平台。Community Edition 採 MIT 授權，可以自架，<span class="hl">執行次數不限</span>。介面刻意做得接近 Zapier 的步驟式流程，非工程背景的人也能上手。</p>
+        <p style="font-size:14px;">整合項目稱為 pieces，全部以 TypeScript 寫成並發布到 npm。<b>它最值得注意的特性是：每一個 piece 同時也是一個 MCP server</b>，代表 Claude、Cursor 這類支援 MCP 的工具可以直接把這幾百個整合當成工具來呼叫，不用另外寫串接。</p>
+        <div class="links-row"><a href="https://www.activepieces.com/" target="_blank" rel="noopener">官網</a><a href="https://github.com/activepieces/activepieces" target="_blank" rel="noopener">GitHub</a><a href="https://www.activepieces.com/docs/install/options/docker-compose" target="_blank" rel="noopener">安裝文件</a><a href="https://www.activepieces.com/pricing" target="_blank" rel="noopener">雲端版定價</a></div>
+
+        <div class="blk-h">安裝方式</div>
+        <p style="font-size:14px;">需要 Docker、PostgreSQL、Redis。官方文件提供完整的 docker-compose 設定，建議直接照官方文件走。啟動前必須先產生兩把金鑰。</p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製指令</button><div class="pl">產生兩把金鑰</div><pre><span class="cm"># 加密金鑰（32 個十六進位字元）</span>
+openssl rand -hex 16
+
+<span class="cm"># JWT 密鑰</span>
+openssl rand -hex 32</pre></div>
+        <div class="tipline">把產出的值分別填進 <b>AP_ENCRYPTION_KEY</b> 和 <b>AP_JWT_SECRET</b>。這兩個沒設好，服務起不來。啟動後開 http://localhost:8080，建立管理員帳號。</div>
+
+        <div class="blk-h">怎麼用</div>
+        <div class="steps">
+          <div class="st"><b>從一個真的很煩的流程開始。</b>不要一開始就搬十個 Zap。挑一個你每週手動做三次以上的事情，像是新表單回覆進來就通知 Slack、新客戶進 CRM 就寄歡迎信，把它做完、跑順。</div>
+          <div class="st"><b>理解三段結構。</b>Trigger（什麼時候啟動）→ 中間步驟（AI、條件判斷、迴圈、資料轉換）→ Action（做什麼）。跟 Zapier 的心智模型幾乎一樣。</div>
+          <div class="st"><b>AI 步驟自備 key。</b>Activepieces 不對 AI 步驟另外收費，你填自己的 OpenAI、Anthropic 或 Gemini key，只付模型的 token 費用。</div>
+          <div class="st"><b>把 pieces 當 MCP 用。</b>這是它獨有的價值。在設定裡開啟 MCP，你就能讓 Claude Desktop 或 Cursor 直接呼叫「寄 Slack 訊息」「寫進 Google Sheet」這類動作，不用自己寫任何串接程式碼。</div>
+          <div class="st"><b>先做備份再依賴它。</b>自架代表資料是你的責任。PostgreSQL 一定要設定自動備份。流程本身是可匯出的 JSON，也記得定期匯出。</div>
+        </div>
+
+        <div class="blk-h">取捨</div>
+        <div class="warn"><b>整合目錄比 Zapier 小很多。</b>Activepieces 目前約 750 個 pieces，Zapier 是數千個等級。<b>換之前一定要先去官方的 pieces 清單確認你要用的服務有沒有在裡面</b>，這是最常見的踩雷點。<br><br>自架代表你要負責運行時間、重試處理、佇列監控、備份、憑證輪替。流程越關鍵，這些就越不能省。<br><br>部分企業功能（在 packages/ee 目錄底下）需要商業授權，不在 MIT 範圍內。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">六個工具講完了</div>
+      <h3>省下訂閱費是基本<br><span class="g">接成產線才是重點</span></h3>
+      <p>換工具只解決帳單。要把這些工具接成一條能省時間、能變現的產線，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 總表 -->
+  <div class="sec fade">
+    <span class="sec-tag">六個工具總表</span>
+    <h2>一張表<br><span class="g">看完全部取捨</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>工具</th><th>取代</th><th>授權</th><th>部署方式</th><th>難度</th><th>最大取捨</th></tr></thead><tbody>
+      <tr><td>Handy</td><td>Wispr Flow</td><td>MIT</td><td>桌面 app</td><td>低</td><td>沒有 AI 潤飾</td></tr>
+      <tr><td>anarlog</td><td>Granola</td><td>MIT</td><td>桌面 app</td><td>中</td><td>改名造成資訊混亂</td></tr>
+      <tr><td>Perplexica / Vane</td><td>Perplexity Pro</td><td>MIT</td><td>Docker</td><td>高</td><td>模型成本自負</td></tr>
+      <tr><td>Cline</td><td>Cursor</td><td>Apache-2.0</td><td>VS Code 擴充</td><td>中</td><td>按 token 計費</td></tr>
+      <tr><td>LanguageTool</td><td>Grammarly Premium</td><td>LGPL 2.1</td><td>擴充套件或 Docker</td><td>低到中</td><td>改寫能力較弱</td></tr>
+      <tr><td>Activepieces</td><td>Zapier</td><td>MIT（核心）</td><td>Docker</td><td>高</td><td>整合數量較少</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">只想換一個的話</div><div class="it">從 Handy 或 LanguageTool 開始。這兩個裝完就能用，不需要 Docker，也不需要改變工作習慣。</div></div>
+  </div>
+
+  <!-- 五件事 -->
+  <div class="sec fade">
+    <span class="sec-tag">換之前先確認</span>
+    <h2>五件事<br><span class="g">先確認再動手</span></h2>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">一</span>先確認你要的功能有沒有在裡面</div>
+      <p>這是最常見的失敗原因。特別是 Activepieces——<b>去 pieces 清單搜尋你每天在用的那幾個服務</b>，沒有的話這一步就不用往下走了。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">二</span>把「設定時間」算成成本</div>
+      <p>自架的工具省的是訂閱費，付出的是你的時間。一個下午的設定加上每個月一小時的維護，換算成你的時薪之後，<b>可能比訂閱還貴</b>。這個帳要自己算，而且對不同的人答案不一樣。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">三</span>先確認資料能不能搬出來</div>
+      <p>換過去之前先確認新工具能不能匯出。Activepieces 的流程是 JSON、anarlog 的筆記是 Markdown 檔案，這代表你未來要再換也走得掉。<b>這比「現在功能多不多」更重要。</b></p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">四</span>並行跑兩週再停舊的</div>
+      <p>不要當天訂完就退訂。兩個工具同時用兩週，確認新的真的接得上你的流程，再去停扣款。</p>
+    </div>
+
+    <div class="rule">
+      <div class="rh"><span class="rn">五</span>「開源」不等於「免費」，也不等於「都一樣」</div>
+      <p>授權有差別：MIT 和 Apache-2.0 幾乎沒有限制；LGPL 對修改後再散布有要求；有些專案的核心開源但企業功能另計。個人使用通常都沒問題，<b>商業使用前建議自己看一次 LICENSE 檔案</b>。</p>
+    </div>
+  </div>
+
+  <!-- 三種情境 -->
+  <div class="sec fade">
+    <span class="sec-tag">組合建議</span>
+    <h2>三種常見情境<br><span class="g">直接照著配</span></h2>
+
+    <div class="sub-h">情境一 · 我只是想少付一點錢，不想碰技術</div>
+    <p style="font-size:14px;">換 <span class="hl">Handy</span> 和 <span class="hl">LanguageTool</span> 就好。兩個都是裝完即用，沒有伺服器要顧。這兩筆訂閱一年加起來省下的金額，已經是有感的數字。</p>
+
+    <div class="sub-h">情境二 · 我的工作有保密需求，資料不能出去</div>
+    <p style="font-size:14px;"><span class="hl">Handy</span>（語音完全本機）＋ <span class="hl">anarlog</span>（會議完全本機）＋ <span class="hl">Cline 接 Ollama</span>（程式碼不外流）＋ <span class="hl">LanguageTool 自架</span>（文字不外流）。這四個組起來，敏感內容從頭到尾不離開你的機器。<b>這是這份清單裡最有價值的組合。</b></p>
+
+    <div class="sub-h">情境三 · 我要建自己的 AI 工作流</div>
+    <p style="font-size:14px;"><span class="hl">Activepieces</span> 當中樞，把它的 pieces 開成 MCP，讓 Claude 或 Cursor 直接呼叫。再接上 <span class="hl">Perplexica</span> 做內部搜尋。這個組合的門檻高，但做起來之後，整條流程都是你自己的，不受任何廠商的定價或政策變動影響。</p>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>這份清單的重點<br><span class="g">其實不是省錢</span></h2>
+    <p>省下的訂閱費是實在的，但真正的差別在於：<span class="hl">資料傳去哪、用哪個模型、記錄留多久、什麼時候會被拿去訓練</span>——這些原本是別人幫你決定的預設值，換過來之後變成你自己的選擇。</p>
+    <p>代價是你要花時間設定，而且有些功能確實會失去。上面每一個工具我都把取捨寫出來了，沒有藏。</p>
+    <div class="insight"><div class="il">怎麼開始</div><div class="it">從最有感的那一筆開始，一次換一個就好。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>訂閱退掉了，<span class="g">接下來換我陪你把工具接成生意</span></h2>
+      <div class="cta-lead">這六個換完，帳單會變輕，資料也回到你自己手上。但要把它們接成一整條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆工具清單，卻從來沒真的換過一個的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">換完之後，回貼文底下留言告訴我你先退了哪一個</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI × 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件所有安裝指令、授權資訊與官方連結，皆於製作時對照各專案官方文件與 repository 查核。開源專案更新頻繁，實際安裝前建議再對照一次官方文件</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：退訂清單 6 個開源替代方案——輪播 DM 承接頁／lead magnet（貼文列六個工具，落地頁給安裝指令、官方連結、取捨）
+· 內容：這份資料怎麼用（四區塊說明）＋六工具摺疊卡（取代什麼／這是什麼／官方連結膠囊／安裝指令／怎麼用步驟／取捨紅框）＋中段CTA＋六工具總表＋換之前先確認五件事（.rule）＋三種情境組合＋最後
+· 版型決策：摺疊卡右側加難度徽章 .diff（綠 d1 低／金 d2 中／紅 d3 高），讓使用者掃一眼就知道門檻；官方連結做成可點膠囊 .links-row a（此頁把原本純標籤的 links-row 改成連結版）；「取捨」一律用 .warn 紅框，跟正面資訊視覺區隔；五件事沿用 dashboard 頁的 .rule 元件
+· 可複製區塊：10 個 .cp（hero-cp 2 個：Perplexica 單容器啟動指令、Activepieces 產生金鑰）
+· 內容修正（相對原稿）：
+    1. LanguageTool 的 docker-compose YAML 原稿貼過來時縮排掉光（services/languagetool/ports 全部頂格、- "8010:8010" 黏在一起），照 YAML 規範補回縮排，否則複製出去不能跑
+    2. 頁尾「Instagram：@jasonxtsaiThreads：@jasonxtsai」原稿兩行黏在一起，拆成兩個帳號欄位
+· 三段 Skool CTA：前段 .side-cta（skool-side）／.top-cta（skool-top）、中段 .mid-cta（skool-mid）、後段 .cta（skool-link）→ https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「退訂清單_開源替代方案完整資料包」文件
+· 命名：日期前綴（2026-08-06-open-source-swaps.html）
+· 狀態：本機已就位，尚未 commit/push，待操盤手確認後發布
+═══════════════════════════════════════════
+-->
+</body>
+</html>

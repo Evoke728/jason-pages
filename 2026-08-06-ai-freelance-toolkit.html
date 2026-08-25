@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 接案工具箱｜7 個開源專案，從安裝到報價的完整指南</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+.warn-big{background:var(--no-bg);border:2px solid var(--no);border-radius:var(--r-md);padding:18px 20px;margin:16px 0;}
+.warn-big .wh{font-family:var(--serif);font-weight:900;font-size:16.5px;color:var(--no);margin-bottom:8px;}
+.warn-big p{font-size:14px;line-height:1.8;color:#7a3320;margin:6px 0 0;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:520px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl td.money{font-family:"Inter";font-weight:700;color:var(--gold);white-space:nowrap;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+.price{flex-shrink:0;font-family:"Inter";font-size:11.5px;font-weight:800;padding:4px 11px;border-radius:50px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);white-space:nowrap;}
+
+.sell{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:18px 20px;margin:12px 0 4px;}
+.sell .sn{font-family:var(--mono);font-size:10.5px;letter-spacing:0.14em;color:var(--gold-bright);margin-bottom:8px;}
+.sell .st2{font-family:var(--serif);font-weight:900;font-size:18px;color:#fff;margin-bottom:10px;}
+.sell .sl{font-size:13.3px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:10px;}
+.sell .si{font-size:13.3px;color:rgba(255,255,255,0.88);line-height:1.75;padding-left:18px;position:relative;margin-bottom:6px;}
+.sell .si::before{content:"\2726";color:var(--gold-bright);position:absolute;left:0;}
+.sell .sp{margin-top:14px;padding-top:12px;border-top:1px solid rgba(212,144,42,0.28);font-family:"Inter";font-weight:800;font-size:17px;color:var(--gold-bright);}
+.sell .sp em{font-style:normal;font-family:var(--sans);font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);margin-left:8px;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .price{display:none;}
+  .ch-t .en{display:block;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>接到第一件之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>工具會裝了<br><span class="g">案子還沒接</span></h4>
+  <p>裝起來只是第一步。怎麼包成服務、怎麼開口、怎麼報價，我在 Skool 帶你走完整條。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">AI 接案 · 7 個開源專案完整指南</div>
+    <h1>AI<br><span class="g">接案工具箱</span></h1>
+    <div class="h-sub">7 個開源專案　從安裝到報價的完整指南</div>
+    <div class="hero-sub">這份文件對應輪播貼文〈把 Claude 變成印鈔機〉。貼文只能放七張圖，很多細節塞不進去，所以我把安裝方式、服務設計與報價邏輯整理成這份完整版。每個工具都寫清楚：怎麼裝、Claude 怎麼接、可以包成什麼服務、交付什麼、先練什麼、有哪些坑。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 開源專案</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">步 · 從安裝到收款</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">個 · 接案用 Prompt</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI ＋ 自媒體變現」。我把自己每天在用的 AI 工具、工作流與自動化流程拆開來講，讓你少走一段摸索的路。內容以能直接套用為標準：工具怎麼裝、指令怎麼下、產出怎麼交付，都寫清楚。</div></div>
+  </div>
+
+  <!-- 先讀這一段 -->
+  <div class="sec fade">
+    <span class="sec-tag">先讀這一段</span>
+    <h2>七個專案<br><span class="g">三個共同點</span></h2>
+    <div class="steps">
+      <div class="st"><b>全部都在 GitHub 上開源</b>，不用付授權費。</div>
+      <div class="st"><b>全部都需要一個 LLM 當大腦。</b>Claude、GPT、Gemini 都可以接，這份文件以 Claude 為主要範例。</div>
+      <div class="st"><b>它們本身只是工具。</b>工具不會自己變成收入，中間要經過三個動作：裝起來、跑通一個真實案例、包成一個有價格的服務。</div>
+    </div>
+
+    <div class="warn-big">
+      <div class="wh">關於報價區間</div>
+      <p>文件裡的所有數字是我<b>依台灣接案市場的常見量級整理的參考範圍，沒有調查報告當依據</b>，實際金額會隨專案規模、產業與客戶類型變動。</p>
+      <p>你自己接過案子的話，<b>用你的實際成交價覆蓋掉我的數字。</b></p>
+    </div>
+  </div>
+
+  <!-- 七個工具總覽 -->
+  <div class="sec fade">
+    <span class="sec-tag">總覽</span>
+    <h2>七個工具<br><span class="g">對應七種服務</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>#</th><th>專案</th><th>能做什麼</th><th>對應服務</th><th>參考區間</th></tr></thead><tbody>
+      <tr><td>01</td><td>pipecat</td><td>語音對話 agent</td><td>電話客服建置</td><td class="money">NT$6–15萬 / 專案</td></tr>
+      <tr><td>02</td><td>cline</td><td>自主寫程式</td><td>網站與小工具開發</td><td class="money">NT$4–12萬 / 專案</td></tr>
+      <tr><td>03</td><td>postiz</td><td>社群排程發文</td><td>社群代營運</td><td class="money">NT$1.5–4萬 / 月</td></tr>
+      <tr><td>04</td><td>anything-llm</td><td>企業知識庫</td><td>內部 AI 導入</td><td class="money">NT$5–10萬 / 專案</td></tr>
+      <tr><td>05</td><td>crewAI</td><td>多 agent 協作</td><td>流程顧問</td><td class="money">NT$3–8萬 / 月</td></tr>
+      <tr><td>06</td><td>browser-use</td><td>瀏覽器自動化</td><td>單件流程自動化</td><td class="money">NT$1–3萬 / 件</td></tr>
+      <tr><td>07</td><td>firecrawl</td><td>網頁資料抓取</td><td>資料與名單服務</td><td class="money">NT$2–6萬 / 月</td></tr>
+    </tbody></table></div>
+    <div class="insight"><div class="il">建議順序</div><div class="it">先從 06 browser-use 開始。它的技術門檻最低、交付最快、客戶最容易理解，適合拿來練成交流程。等你接過一件、拿到第一筆錢之後，再往上做專案型的 01 到 05。</div></div>
+  </div>
+
+  <!-- 七個工具 -->
+  <div class="sec fade">
+    <span class="sec-tag">七個工具</span>
+    <h2>展開任一個<br><span class="g">安裝到報價全寫完</span></h2>
+
+    <div class="acc">
+
+      <!-- 06 browser-use 放第一個（建議先做） -->
+      <details class="ch" open><summary><span class="ch-n">06</span><span class="ch-t">browser-use<span class="en"> · 瀏覽器操作 agent ｜ 建議從這個開始</span></span><span class="price">NT$1–3萬/件</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>讓 AI 操作真實的瀏覽器。它看得懂網頁，會點按鈕、填表單、捲動、切換分頁。<b>凡是人在瀏覽器裡做的重複動作，它都能做。</b>CLI 版適合單次任務，Python 版適合寫成可重複執行的自動化程式。</div>
+        <div class="links-row"><a href="https://github.com/browser-use/browser-use" target="_blank" rel="noopener">GitHub</a><a href="https://docs.browser-use.com" target="_blank" rel="noopener">官方文件</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝（需要 Python 3.11 以上）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>uv add browser-use
+
+<span class="cm"># 或用 pip</span>
+pip install browser-use</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">.env</div><pre>BROWSER_USE_API_KEY=your-key
+<span class="cm"># ANTHROPIC_API_KEY=your-key</span></pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">第一支 agent</div><pre>import asyncio
+from browser_use import Agent, ChatBrowserUse
+
+async def main():
+    agent = Agent(
+        task="Find the number of stars of the browser-use repo",
+        llm=ChatBrowserUse(model='openai/gpt-5.5'),
+    )
+    history = await agent.run()
+
+if __name__ == "__main__":
+    asyncio.run(main())</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">已經在用 Claude Code 的話，貼這段自動裝完</div><pre>Install or upgrade browser-use to the latest stable version with uv using Python 3.12, run `browser-use skill install` to register the skill, and connect it to my browser. If setup or connection fails, follow https://github.com/browser-use/browser-harness/blob/main/install.md.</pre></div>
+        <div class="tipline">裝完重啟你的 agent，然後直接用中文告訴它要做什麼。</div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">在 llm 參數指定 Anthropic 的模型，並在 .env 提供 ANTHROPIC_API_KEY。<span class="hl">任務描述的寫法直接決定成功率，寫得越像給新人的操作指示越好。</span></p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">任務描述範本</div><pre>任務目標：
+<span class="ph">【一句話說明最終要拿到什麼】</span>
+
+起始網址：
+<span class="ph">【明確的網址】</span>
+
+操作步驟：
+1. <span class="ph">【第一個動作，包含要點哪個按鈕、按鈕上的文字是什麼】</span>
+2. <span class="ph">【第二個動作】</span>
+3. <span class="ph">【第三個動作】</span>
+
+需要擷取的資料：
+<span class="ph">【欄位一】、【欄位二】、【欄位三】</span>
+
+輸出格式：
+表格，一列一筆
+
+遇到以下狀況就停止並回報：
+- 出現登入畫面
+- 出現驗證碼
+- 找不到指定的按鈕
+- 頁面顯示錯誤訊息</pre></div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">單件流程自動化</div>
+          <div class="sl"><b>適合的客戶：</b>任何有人每天在做重複點擊的公司。實際案例方向：每天到政府網站查標案、每天下載後台報表整理成 Excel、每天到多個平台核對庫存、定期到論壇追蹤特定關鍵字。</div>
+          <div class="si">一支可重複執行的自動化腳本</div>
+          <div class="si">執行方式與排程設定</div>
+          <div class="si">失敗時的通知機制</div>
+          <div class="si">一份操作手冊</div>
+          <div class="si">三十天內的調整</div>
+          <div class="sp">NT$1–3萬 / 件<em>參考區間</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">打開你的瀏覽器歷史紀錄，找出你這個月重複打開最多次的頁面。那個流程就是你的第一個練習題。<b>自動化做完之後，計算它每次幫你省下幾分鐘、一個月執行幾次。這兩個數字就是你的報價說詞。</b></p>
+
+        <div class="warn">⚠️ 這是七個裡最容易起步的，<b>也是最容易低估的</b>。網站改版腳本就會壞掉，所以合約裡要區分「建置費」與「維護費」，不要讓客戶以為做一次可以用一輩子。<br><br><b>不要碰需要登入他人帳號、繞過驗證碼、違反網站使用條款的任務。這條線一開始就要劃清楚。</b></div>
+      </div></details>
+
+      <!-- 01 pipecat -->
+      <details class="ch"><summary><span class="ch-n">01</span><span class="ch-t">pipecat<span class="en"> · 語音對話 agent 框架</span></span><span class="price">NT$6–15萬/專案</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>把「語音進來、模型思考、語音出去」這條鏈路包成一個框架。你負責決定用哪家的語音辨識、哪個模型、哪家的語音合成，pipecat 負責把它們串起來，處理即時串流、打斷、延遲這些難搞的部分。<b>接上電話系統之後，它就是一個會講話的接待人員。</b></div>
+        <div class="links-row"><a href="https://github.com/pipecat-ai/pipecat" target="_blank" rel="noopener">GitHub</a><a href="https://docs.pipecat.ai/getting-started/quickstart" target="_blank" rel="noopener">官方快速開始</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">先裝 uv</div><pre>curl -LsSf https://astral.sh/uv/install.sh | sh</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">最快的路徑：官方 CLI 直接建專案</div><pre>uv tool install "pipecat-ai[cli]"
+pipecat init</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">想自己組的話</div><pre>uv init my-pipecat-app
+cd my-pipecat-app
+uv add pipecat-ai
+
+<span class="cm"># 需要接第三方服務時再補裝對應套件</span>
+uv add "pipecat-ai[option,...]"
+
+<span class="cm"># 用 pip 也可以</span>
+pip install pipecat-ai</pre></div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">在 pipecat 的 pipeline 裡，LLM 是可替換的一個環節。把 LLM 服務指定成 Anthropic 的 API，並在環境變數放上 ANTHROPIC_API_KEY，這個 agent 的思考層就換成 Claude 了。</p>
+        <p style="font-size:14px;">實務上我會給它一段系統提示，內容包含：這家店賣什麼、營業時間、可以預約的時段規則、遇到哪些狀況要轉真人。<span class="hl">這段提示的品質決定客戶滿不滿意，比選哪個模型影響更大。</span></p>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">24 小時 AI 電話接待建置</div>
+          <div class="sl"><b>適合的客戶：</b>牙醫診所、美髮沙龍、汽車保養廠、寵物美容、健身房。共同特徵是電話量大、內容重複、漏接一通就少一單。</div>
+          <div class="si">一組可接聽的電話號碼與語音 agent</div>
+          <div class="si">依客戶業務客製的對話腳本與系統提示</div>
+          <div class="si">預約寫入行事曆或表單的串接</div>
+          <div class="si">轉接真人的觸發規則</div>
+          <div class="si">一份通話紀錄後台</div>
+          <div class="si">兩小時教育訓練</div>
+          <div class="sp">NT$6–15萬<em>建置，另可談 NT$5,000–15,000 月維護</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">找一間你自己常去的店，把它的營業資訊寫成系統提示，做一個只會回答「營業時間」跟「怎麼預約」的版本。跑通之後你就理解整條鏈路，剩下的是往上加功能。</p>
+
+        <div class="warn">⚠️ 語音服務（辨識與合成）通常要另外付費，<b>這是你的成本，報價時要算進去</b>。中文語音的自然度差異很大，簽約前先讓客戶聽過實際錄音。另外，<b>預約類服務出錯的代價很高，一定要設計「不確定就轉真人」的規則</b>。</div>
+      </div></details>
+
+      <!-- 02 cline -->
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">cline<span class="en"> · 自主編碼 agent</span></span><span class="price">NT$4–12萬/專案</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>把鍵盤交給模型。你描述要什麼，它讀你的專案、建立檔案、寫程式、跑指令、看到報錯自己修，<b>過程你全程看得到，每一步都可以擋下來</b>。有 IDE 擴充版、終端機版，還有一個可以同時跑多個 agent 的看板版。</div>
+        <div class="links-row"><a href="https://github.com/cline/cline" target="_blank" rel="noopener">GitHub</a><a href="https://docs.cline.bot" target="_blank" rel="noopener">官方文件</a><a href="#" onclick="return false;">Apache-2.0</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">終端機版與看板版</div><pre>npm i -g cline
+
+<span class="cm"># 多 agent 看板版本</span>
+npm i -g kanban</pre></div>
+        <div class="tipline">IDE 擴充版本從 VS Code 的擴充商店搜尋 <b>Cline</b> 安裝。</div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">cline 支援多家模型供應商，在設定裡選 Anthropic 並填入 API key 即可。</p>
+        <div class="tipline"><b>實務建議：</b>規劃階段用 Opus 這類推理較強的模型，讓它先產出檔案結構與實作計畫；執行階段換成 Sonnet 這類較便宜的模型跑實作。<b>這樣做成本會低不少，品質差異不大。</b>另外，在專案根目錄放一份說明檔，寫清楚技術選型、命名規則、不能動的檔案，可以大幅減少來回修正的次數。</div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">形象網站與小工具開發</div>
+          <div class="sl"><b>適合的客戶：</b>需要官網的在地店家、需要活動報名頁的主辦單位、需要內部小工具的中小企業。</div>
+          <div class="si">完整可上線的網站或工具</div>
+          <div class="si">原始碼與部署說明</div>
+          <div class="si">網域與主機設定</div>
+          <div class="si">一次內容更新教學</div>
+          <div class="si">三十天內的小幅修改</div>
+          <div class="sp">NT$4–12萬<em>依頁數與功能複雜度</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">拿一個你熟悉的實體店家，幫它做一頁式官網：店家介紹、菜單或服務項目、地圖、營業時間、聯絡按鈕。<b>從零到部署上線，記錄你花了多久。這個時間就是你之後報價的基礎。</b></p>
+
+        <div class="warn">⚠️ agent 寫出來的程式碼你要看得懂，至少要能判斷它有沒有寫出安全問題。<b>收客戶錢的專案，交付前務必自己實際點過每一個功能。</b><br><br>有一個常見的坑：agent 為了讓程式跑起來，有時會裝一堆不必要的套件。定期檢查依賴清單。</div>
+      </div></details>
+
+      <!-- 03 postiz -->
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">postiz<span class="en"> · 社群排程與發文工具</span></span><span class="price">NT$1.5–4萬/月</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>一套可以自架的社群排程系統。你把貼文寫好、排好時間、選好平台，它照表發送，並回收成效數據。有 API，可以接 n8n、Make、Zapier 這類自動化平台。<b>自架版與官方託管版功能相同。</b></div>
+        <div class="links-row"><a href="https://github.com/gitroomhq/postiz-app" target="_blank" rel="noopener">GitHub</a><a href="https://docs.postiz.com/quickstart" target="_blank" rel="noopener">官方快速開始</a></div>
+
+        <div class="blk-h">安裝</div>
+        <p style="font-size:14px;">它是一套需要資料庫的完整應用（PostgreSQL），部署方式官方文件有完整說明，跟著走即可。技術棧：NextJS、NestJS、Prisma、Temporal，pnpm monorepo 架構。</p>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">postiz 本身不生成內容，它負責排程與發送。<span class="hl">內容在 Claude 裡產，再匯入 postiz。</span>我的做法是在 Claude 裡建一個專案，把客戶的品牌調性、禁用詞、目標受眾、過去表現好的貼文都放進去，然後一次產一個月的貼文，輸出成結構化格式，再批次匯入。</p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">一次產 30 天貼文</div><pre>你是我的社群內容規劃助手。
+
+客戶背景：
+<span class="ph">【貼上客戶的品牌介紹、產品、目標客群】</span>
+
+品牌調性：
+<span class="ph">【貼上語氣規則、禁用詞】</span>
+
+過去表現好的貼文：
+<span class="ph">【貼上 3 到 5 篇成效好的貼文全文】</span>
+
+任務：
+規劃未來 30 天的貼文，共 20 篇。
+
+規則：
+1. 依內容功能分類，標明每篇屬於哪一類（教學、案例、觀點、產品、互動）
+2. 五種類型的比例控制在教學 30%、案例 20%、觀點 20%、產品 20%、互動 10%
+3. 每篇包含：發布日期、內容類型、貼文全文、建議配圖方向
+4. 貼文全文控制在 150 字以內
+5. 不使用 hashtag
+6. 同一週內不出現重複的開場句型
+
+輸出格式：
+用表格輸出，欄位為 日期 / 類型 / 貼文全文 / 配圖方向</pre></div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">社群內容代營運</div>
+          <div class="sl"><b>適合的客戶：</b>有產品但沒人管社群的中小企業、忙到沒空發文的專業服務業（診所、律師、設計工作室）。</div>
+          <div class="si">每月 20 篇貼文企劃與文案</div>
+          <div class="si">排程設定與自動發送</div>
+          <div class="si">每月一份成效報告</div>
+          <div class="si">每季一次策略調整會議</div>
+          <div class="sp">NT$1.5–4萬 / 月<em>參考區間</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">先幫自己的帳號跑一個月。你會親身遇到平台授權掉線、圖片尺寸不合、某個平台 API 限制這些狀況，<b>這些經驗在客戶面前很值錢</b>。</p>
+
+        <div class="warn">⚠️ 各平台的 API 授權會過期，需要定期重新連結，<b>這件事要寫進服務說明</b>，避免客戶以為是你的疏失。<br><br>代營運最大的風險在內容審核。<b>合約裡明確寫上「客戶需在發布前確認」的機制，並保留確認紀錄。</b></div>
+      </div></details>
+
+      <!-- 04 anything-llm -->
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">anything-llm<span class="en"> · 私有知識庫與 agent 平台</span></span><span class="price">NT$5–10萬/專案</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>讓你把一堆文件丟進去，變成一個可以對話的知識庫。支援多工作區、多使用者權限、排程任務、no-code agent 流程建構，也支援 MCP。<b>桌面版適合單人使用；Docker 版才有多使用者與權限管理，接客戶案子要用 Docker 版。</b></div>
+        <div class="links-row"><a href="https://github.com/Mintplex-Labs/anything-llm" target="_blank" rel="noopener">GitHub</a><a href="https://docs.anythingllm.com" target="_blank" rel="noopener">官方文件</a><a href="https://anythingllm.com/download" target="_blank" rel="noopener">桌面版下載</a></div>
+
+        <div class="blk-h">安裝（Docker 版）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">pull image</div><pre>docker pull mintplexlabs/anythingllm</pre></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">啟動（Linux / macOS）</div><pre>export STORAGE_LOCATION=$HOME/anythingllm && \
+mkdir -p $STORAGE_LOCATION && \
+touch "$STORAGE_LOCATION/.env" && \
+docker run -d --rm -p 3001:3001 \
+--cap-add SYS_ADMIN \
+-v ${STORAGE_LOCATION}:/app/server/storage \
+-v ${STORAGE_LOCATION}/.env:/app/server/.env \
+-e STORAGE_DIR="/app/server/storage" \
+mintplexlabs/anythingllm</pre></div>
+        <div class="tipline">跑起來之後開瀏覽器進 http://localhost:3001。Linux 環境如果需要連到主機上的其他服務，docker run 要加上 <b>--add-host=host.docker.internal:host-gateway</b></div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">在設定裡把 LLM Provider 選成 Anthropic，填入 API key，選擇模型。<span class="hl">導入案子的關鍵在文件整理，工具本身很簡單。</span>我的順序是這樣：</p>
+        <div class="steps">
+          <div class="st">先跟客戶開一次會，列出他們每天被問最多的二十個問題</div>
+          <div class="st">針對這二十個問題去找對應的文件</div>
+          <div class="st">文件清理過再上傳（去掉過期版本、掃描檔先轉文字）</div>
+          <div class="st">建立工作區，一個部門一個工作區</div>
+          <div class="st">用那二十個問題測試回答品質</div>
+          <div class="st">調整系統提示直到答案可用</div>
+        </div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">企業內部知識庫導入</div>
+          <div class="sl"><b>適合的客戶：</b>新人流動率高的服務業、有大量 SOP 的製造業、客服團隊、內部規章複雜的公司。</div>
+          <div class="si">部署完成的私有知識庫</div>
+          <div class="si">文件整理與分類建議</div>
+          <div class="si">依部門建立的工作區與權限設定</div>
+          <div class="si">常見問題測試報告</div>
+          <div class="si">兩小時教育訓練</div>
+          <div class="si">一份文件維護 SOP</div>
+          <div class="sp">NT$5–10萬<em>導入，另可談 NT$8,000–20,000 月維護</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">把你自己所有的筆記、專案文件、過去寫過的內容全部丟進去，建一個「我的第二大腦」。用一個月，你會很清楚它什麼問題答得好、什麼問題會胡說。<b>這些認知就是你在客戶面前的專業。</b></p>
+
+        <div class="warn">⚠️ <b>客戶的文件如果本身就過期、矛盾、沒人維護，知識庫的答案只會複製這些問題。</b>文件品質是專案成敗的關鍵，這件事要在報價前就跟客戶講清楚，並把「文件整理」列為獨立的收費項目。<br><br>資料隱私要寫進合約。哪些文件可以進系統、模型 API 的資料處理方式，都要事先說明。</div>
+      </div></details>
+
+      <!-- 05 crewAI -->
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">crewAI<span class="en"> · 多 agent 協作框架</span></span><span class="price">NT$3–8萬/月</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>讓你定義一組有分工的 agent。每個 agent 有角色、目標、可用工具，它們之間會交接任務。你可以把一個複雜流程拆成研究員、分析師、撰稿人、審稿人，讓它們依序處理。</div>
+        <div class="links-row"><a href="https://github.com/crewAIInc/crewAI" target="_blank" rel="noopener">GitHub</a><a href="#" onclick="return false;">MIT 授權</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝與建立專案</div><pre>uv pip install crewai
+
+<span class="cm"># 要含額外工具的版本</span>
+uv pip install 'crewai[tools]'
+
+<span class="cm"># 建立新專案</span>
+crewai create crew &lt;project_name&gt;</pre></div>
+        <div class="tipline">它會產生一個包含 <b>agents.yaml</b> 與 <b>tasks.yaml</b> 的專案結構，agent 的角色與任務都寫在這兩個 YAML 檔裡。</div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">在專案的 .env 放入 ANTHROPIC_API_KEY，在 agent 設定裡指定 Anthropic 的模型。</p>
+        <div class="tipline"><b>成本控制的做法：</b>不需要每個 agent 都用最貴的模型。研究與整理類的 agent 用便宜的模型，需要判斷與最終產出的 agent 才用強模型。<b>一個四 agent 的流程這樣配置，成本可以降下來很多。</b></div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">業務流程 AI 化顧問</div>
+          <div class="sl"><b>適合的客戶：</b>有固定重複流程但人力吃緊的團隊。例如每週要產出市場報告的行銷部門、要處理大量申請文件的行政部門、要做競品追蹤的產品團隊。</div>
+          <div class="si">現有流程訪談與拆解報告</div>
+          <div class="si">一套可執行的 agent 流程</div>
+          <div class="si">執行結果的人工審核機制</div>
+          <div class="si">月度流程優化與調整</div>
+          <div class="si">使用量與成本報告</div>
+          <div class="sp">NT$3–8萬 / 月<em>顧問月費，首次建置可另收 NT$3–8萬</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">挑一個你自己每週都要做的事，例如整理產業新聞。拆成三個 agent：搜集、篩選、寫成摘要。跑通之後你會理解 agent 分工的邏輯，<b>也會發現哪些環節其實不需要 agent</b>。</p>
+
+        <div class="warn">⚠️ <b>多 agent 流程的失敗模式很隱蔽。它不會報錯，它會產出一份看起來很完整但內容錯誤的東西。</b>所以每一條你交付給客戶的流程，都要有人工審核的節點。<br><br>不要把 agent 數量當成賣點。能用兩個 agent 解決的事，用五個只會讓成本變高、除錯變難。</div>
+      </div></details>
+
+      <!-- 07 firecrawl -->
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">firecrawl<span class="en"> · 網頁資料抓取 API</span></span><span class="price">NT$2–6萬/月</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它在做什麼：</b>把網頁變成乾淨的、模型讀得懂的資料。它處理輪替代理、速率限制、需要執行 JavaScript 才顯示的內容，輸出成 markdown 或結構化 JSON，也能解析網頁上的 PDF 與 DOCX。<b>有雲端 API，也可以自架。</b></div>
+        <div class="links-row"><a href="https://github.com/firecrawl/firecrawl" target="_blank" rel="noopener">GitHub</a><a href="https://docs.firecrawl.dev" target="_blank" rel="noopener">官方文件</a><a href="https://docs.firecrawl.dev/contributing/self-host" target="_blank" rel="noopener">自架指南</a></div>
+
+        <div class="blk-h">安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Python / Node</div><pre>pip install firecrawl-py
+
+<span class="cm"># Node</span>
+npm install firecrawl</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">裝成 agent 可用的 skill，一行搞定</div><pre>npx -y firecrawl-cli@latest init --all --browser</pre></div>
+        <div class="tipline">裝完重啟你的 agent。官方說明它可以搭配 Claude Code 等工具使用。</div>
+
+        <div class="blk-h">Claude 怎麼接</div>
+        <p style="font-size:14px;">firecrawl 提供 MCP server，可以接進任何支援 MCP 的客戶端。</p>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">MCP 設定</div><pre>{
+  "mcpServers": {
+    "firecrawl-mcp": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "<span class="ph">fc-YOUR_API_KEY</span>"
+      }
+    }
+  }
+}</pre></div>
+        <div class="tipline">接好之後，Claude 就能自己去抓網頁資料再處理，不用你手動複製貼上。</div>
+
+        <div class="sell">
+          <div class="sn">可以賣什麼</div>
+          <div class="st2">產業資料監測與名單建置</div>
+          <div class="sl"><b>適合的客戶：</b>需要追蹤競品價格的電商、需要開發客戶名單的 B2B 業務團隊、需要監測產業動態的行銷部門。</div>
+          <div class="si">定期更新的結構化資料表</div>
+          <div class="si">資料欄位定義與來源說明</div>
+          <div class="si">異動通知（例如價格變動超過門檻就發信）</div>
+          <div class="si">每月一次的資料品質檢查</div>
+          <div class="sp">NT$2–6萬 / 月<em>依資料量與更新頻率</em></div>
+        </div>
+
+        <div class="blk-h">先練這個</div>
+        <p style="font-size:14px;">選一個你有興趣的產業，抓三十家公司的官網資訊，整理成一張表：公司名、產品線、聯絡方式、最近一次更新日期。<b>做完你會發現真正花時間的是資料清理跟去重，抓取本身很快。這個認知會讓你的報價更準。</b></p>
+
+        <div class="warn">⚠️ 抓取要遵守網站的使用條款與 robots.txt，<b>有些網站明確禁止自動化抓取，接案前要確認</b>。<br><br><b>個資的部分要特別小心。</b>收集聯絡資訊涉及個資法規範，這件事要在合約裡處理清楚，必要時建議客戶諮詢法務。<br><br>雲端 API 是按用量計費的，這是你的變動成本，報價時記得算進去並設定用量上限。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">工具講完了</div>
+      <h3>工具不會自己<br><span class="g">變成收入</span></h3>
+      <p>中間還有三個動作：裝起來、跑通一個真實案例、包成一個有價格的服務。第三個最難，我在 Skool 帶你走完。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 四個步驟 -->
+  <div class="sec fade">
+    <span class="sec-tag">從安裝到收款</span>
+    <h2>四個步驟<br><span class="g">把工具變成收入</span></h2>
+
+    <div class="sub-h">步驟一 · 先跑通一個真實案例</div>
+    <p style="font-size:14px;">選一個工具，用在你自己身上，跑到真的可用為止。記錄三件事：<b>花了多少時間、遇到哪些坑、省下多少工時</b>。</p>
+    <div class="tipline">這三個數字之後全部用得到：<b>時間變成你的報價基礎，坑變成你的專業說詞，省下的工時變成客戶的購買理由。</b></div>
+
+    <div class="sub-h">步驟二 · 把它寫成一個服務</div>
+    <p style="font-size:14px;">服務跟工具的差別在於，<span class="hl">服務有明確的交付清單、時程與售後範圍</span>。</p>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">服務設計 Prompt</div><pre>你是我的接案顧問。
+我要把一個 AI 工具包裝成可以販售的服務。
+
+工具：
+<span class="ph">【工具名稱與它能做的事】</span>
+
+我已經完成的實測：
+<span class="ph">【描述你自己跑通的案例、花了多久、省下多少時間】</span>
+
+目標客戶：
+<span class="ph">【產業、公司規模、你認為他們的痛點】</span>
+
+任務：
+幫我設計這個服務的完整方案，包含以下段落。
+
+1. 服務名稱（三個版本，一個功能導向、一個結果導向、一個痛點導向）
+2. 一句話說明（讓非技術背景的老闆三秒內聽懂）
+3. 交付清單（列出五到八項具體可驗收的產出）
+4. 時程規劃（從簽約到交付的階段與天數）
+5. 售後範圍（包含什麼、不包含什麼，各列三項）
+6. 三個定價方案（基礎、標準、進階，說明差異在哪）
+7. 客戶最可能提出的五個疑慮，以及對應的回答
+
+規則：
+不要使用「賦能」「數位轉型」這類抽象詞
+每一項交付內容都要具體到客戶能判斷有沒有做到</pre></div>
+
+    <div class="sub-h">步驟三 · 找到第一個客戶</div>
+    <p style="font-size:14px;">第一個客戶通常來自你已經認識的人。列出你認識的、有公司的人，逐一想「他公司裡有沒有人在做重複的事」。</p>
+    <div class="insight"><div class="il">開口的方式</div><div class="it">不要賣工具，講結果。「我做了一個東西，可以幫你把每天早上那件事變成自動的，要不要看一下」比「我學會了 AI 自動化」有效得多。</div></div>
+    <div class="tipline">第一個案子可以做得便宜，甚至免費，換取一份可以公開的案例與見證。<b>案例是你接第二個案子的槓桿。</b></div>
+
+    <div class="sub-h">步驟四 · 報價與簽約</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">報價 Prompt</div><pre>你是我的報價助手。
+
+案子背景：
+<span class="ph">【客戶產業、公司規模、他們現在怎麼做這件事】</span>
+
+我要交付的內容：
+<span class="ph">【貼上你的交付清單】</span>
+
+我預估的工作時間：
+<span class="ph">【建置幾小時、後續維護每月幾小時】</span>
+
+客戶目前的成本：
+<span class="ph">【現在做這件事花多少人力、多少時間、多少錢】</span>
+
+任務：
+1. 計算這個案子的成本結構，包含我的工時、API 費用、第三方服務費用
+2. 提出三個定價方案與各自的報價
+3. 寫一段報價說明，重點放在客戶省下的成本，不要只講技術
+4. 列出報價單應該包含的所有條款，特別是：
+   - 修改次數的上限
+   - 維護範圍與不包含的項目
+   - 網站改版或平台 API 變動時的處理方式
+   - 付款節點
+5. 列出這個案子最可能出問題的三個地方，以及合約裡該怎麼寫
+
+輸出成一份可以直接寄給客戶的報價單草稿。</pre></div>
+  </div>
+
+  <!-- 五個坑 -->
+  <div class="sec fade">
+    <span class="sec-tag">五個常見的坑</span>
+    <h2>這五個<br><span class="g">先避開</span></h2>
+    <div class="warn"><b>一、工具裝了七個，一個都沒跑通。</b><br>七個工具不需要全部學。挑一個，做到能收錢，再學第二個。</div>
+    <div class="warn"><b>二、把 API 成本當成零。</b><br>模型、語音、資料抓取都是按用量計費。接案前先估算月成本，並在合約裡設定用量上限。</div>
+    <div class="warn"><b>三、交付一次就結束。</b><br>網站會改版、API 會變、平台會調整規則。你的服務要包含維護，這是穩定收入的來源，也是保護你自己的方式。</div>
+    <div class="warn"><b>四、用技術詞跟客戶溝通。</b><br>老闆不在意你用了幾個 agent。他在意的是每個月省下多少人力成本、少漏接多少通電話。把技術翻譯成他的語言。</div>
+    <div class="warn"><b>五、跳過人工審核。</b><br>AI 產出的東西要有人看過再交付。這一步省不得，它是你的專業保險。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>差別不在工具<br><span class="g">在有沒有人把它包成服務</span></h2>
+    <p>這份文件裡的七個工具，全部都在 GitHub 上放很久了。差別在有沒有人把它裝起來、跑通、包成一個有價格的服務。</p>
+    <div class="insight"><div class="il">今天就做這件事</div><div class="it">裝一個，跑一件，收第一筆。剩下的六個之後再說。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>工具會裝了，<span class="g">接下來換我陪你把它接成案子</span></h2>
+      <div class="cta-lead">這七個裝起來不難。難的是包成服務、開口談、報得出價、簽得下來。這一段不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼賣的你</div>
+        <div class="f">收藏了一堆工具清單，卻從來沒收過一筆錢的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">接到第一件之後，回貼文底下留言告訴我你用的是哪一個工具</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件所有安裝指令與工具說明皆核對自各專案官方 README 與文件。工具會持續更新，實際操作時請以官方最新文件為準。<b>文件中的報價區間為市場參考值，非調查數據</b></div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：AI 接案工具箱——對應輪播〈把 Claude 變成印鈔機〉的 DM 承接頁／lead magnet
+· 內容：先讀這一段（三個共同點＋報價免責 warn-big）／七工具總覽表（含參考區間）／七個摺疊卡／中段CTA／從安裝到收款四步驟（含 2 個接案 Prompt）／五個常見的坑／最後
+· 版型決策：
+    1. 新增 .sell 深色「可以賣什麼」卡——這是本篇跟其他工具文最大的差別（不只教安裝，是教賣），每張卡裡放服務名／適合客戶／交付清單／報價，深色底跟上方的技術內容區隔開
+    2. 摺疊卡頭右側加 .price 報價膠囊，讓人不展開也看得到量級；手機版隱藏避免標題擠壓
+    3. 卡片順序刻意不照編號：把 06 browser-use 排第一並預設展開，因為原稿的「建議順序」就是先從它開始，照編號排會讓讀者先撞到門檻最高的 pipecat
+    4. 報價免責用 warn-big 擋在總覽表之前——公開頁面提到金額，這段不能被滑過去
+· 可複製區塊：16 個 .cp，hero-cp 6（browser-use 任務範本、postiz 30 天貼文、anything-llm 啟動、firecrawl MCP、服務設計 Prompt、報價 Prompt）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「AI接案工具箱_7個開源專案完整指南」
+· 命名：日期前綴（2026-08-06-ai-freelance-toolkit.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

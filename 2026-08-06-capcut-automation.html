@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>讓 Claude 幫你剪 CapCut｜完整實戰手冊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+.warn-big{background:var(--no-bg);border:2px solid var(--no);border-radius:var(--r-md);padding:18px 20px;margin:16px 0;}
+.warn-big .wh{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--no);margin-bottom:8px;}
+.warn-big p{font-size:14px;line-height:1.8;color:#7a3320;margin:6px 0 0;}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:480px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.mono td:first-child{font-family:var(--mono);color:var(--gold);font-size:12.5px;white-space:nowrap;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+
+.pnum{display:flex;align-items:baseline;gap:9px;margin:22px 0 6px;padding-top:16px;border-top:1px dashed var(--line);}
+.pnum:first-of-type{border-top:none;padding-top:4px;margin-top:8px;}
+.pnum .pn{font-family:"Inter";font-weight:800;font-size:14px;color:var(--gold);flex-shrink:0;}
+.pnum .pt{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;line-height:1.4;}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .ch-t .en{display:block;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>剪片自動化了<br><span class="g">產線還沒接</span></h4>
+  <p>省下剪片時間只是開始。怎麼把整條內容產線接起來、讓它幫你賺錢，我在 Skool 帶你做。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CAPCUT × CLAUDE · 完整實戰手冊</div>
+    <h1>讓 Claude<br><span class="g">幫你剪 CapCut</span></h1>
+    <div class="h-sub">從安裝到可複製的 Prompt　一份文件跑完整條流程</div>
+    <div class="hero-sub">網路上關於「Claude 可以剪 CapCut」的說法，有一半是錯的。這份文件先把能做與不能做劃清楚，再給你三條路線的差別、完整安裝步驟、8 個可直接複製的 Prompt，以及一張疑難排解表。每一步我都自己跑過，包含跑不起來的那幾步。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">3</div><div class="l">條 · 路線</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">11</div><div class="l">個 · MCP 工具</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">8</div><div class="l">個 · 可複製 Prompt</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI ＋ 自媒體變現」。我的內容只講一件事：怎麼用 AI 把內容產出的時間壓下來，然後把省下來的時間換成收入。工具會過時，工作流不會，所以我每次拆解都會把原理講清楚，讓你在工具改版之後還知道怎麼調整。</div></div>
+  </div>
+
+  <!-- 先讀這段 -->
+  <div class="sec fade">
+    <span class="sec-tag">先讀這段</span>
+    <h2>三件事<br><span class="g">先釘在腦子裡</span></h2>
+    <p>這一段會幫你省下兩小時。看完還想裝，這份文件對你有用；看完覺得麻煩，那你已經省下兩小時了，這也算收穫。</p>
+
+    <div class="warn-big">
+      <div class="wh">一、這不是外掛</div>
+      <p>CapCut 沒有開放時間軸的公開 API，所以<b>沒有任何工具能即時操作 CapCut 的介面</b>。實際運作方式是：Claude 呼叫 MCP server，server 在你硬碟上生成一個 CapCut 草稿資料夾，你把它複製進 CapCut 的草稿目錄，打開就是排好的時間軸。</p>
+    </div>
+
+    <div class="warn-big">
+      <div class="wh">二、輸出那一步它做不了</div>
+      <p>CapCut 沒有指令列的 export 功能。<b>算圖、輸出成品，最後還是你自己按。</b></p>
+    </div>
+
+    <div class="warn-big">
+      <div class="wh">三、草稿格式沒有官方文件</div>
+      <p>這些工具都是逆向工程社群做出來的。<b>CapCut 一改版就可能整套失效。</b>把它當成會壞的工具，不要當成生產環境的核心。</p>
+    </div>
+  </div>
+
+  <!-- Part 1 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 三條路線</span>
+    <h2>很多人裝錯<br><span class="g">是因為一開始就選錯</span></h2>
+    <p>這三條路解決的是完全不同的問題。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th></th><th>路線一：組草稿</th><th>路線二：砍廢話</th><th>路線三：純 ffmpeg</th></tr></thead><tbody>
+      <tr><td>核心專案</td><td>CapCutAPI / VectCutAPI</td><td>capcut-ai-editor</td><td>各種 ffmpeg MCP</td></tr>
+      <tr><td>解決什麼</td><td>從零把時間軸排出來</td><td>把已錄好的口播修乾淨</td><td>純檔案層級的切剪轉檔</td></tr>
+      <tr><td>適合誰</td><td>批量產片、模板化內容</td><td>口播型創作者</td><td>工程背景、要完全掌控</td></tr>
+      <tr><td>需要 CapCut 嗎</td><td>需要（打開草稿）</td><td>需要（先跑自動字幕）</td><td>不需要</td></tr>
+      <tr><td>能輸出成品嗎</td><td>不能</td><td>不能</td><td>能</td></tr>
+      <tr><td>安裝難度</td><td>中高</td><td>中</td><td>低</td></tr>
+    </tbody></table></div>
+    <ul class="bul">
+      <li>你每週要出十支結構一樣的短影音 → <b>路線一</b></li>
+      <li>你錄一鏡到底的口播，剪掉停頓最花時間 → <b>路線二</b></li>
+      <li>你只想批次轉檔、切片段、壓字幕 → <b>路線三</b></li>
+      <li>你想全部都要 → <b>路線一和路線二可以同時裝，它們互不干擾</b></li>
+    </ul>
+    <div class="tipline">這份文件詳細講路線一和路線二。路線三工具太雜，選擇因人而異，Part 7 給你評估的方向。</div>
+  </div>
+
+  <!-- 兩條路線安裝 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · Part 3 · 安裝</span>
+    <h2>展開你要走的那條<br><span class="g">指令直接複製</span></h2>
+
+    <div class="acc">
+
+      <!-- 路線一 -->
+      <details class="ch" open><summary><span class="ch-n">路線一</span><span class="ch-t">從零組草稿<span class="en"> · CapCutAPI / VectCutAPI</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>這條路線在做什麼：</b>用程式碼生成一個結構正確的 CapCut／剪映草稿檔。你透過 MCP 讓 Claude 呼叫這些功能，Claude 就能替你把整條時間軸寫出來。底層是 sun-guannan 的開源專案，Apache-2.0 授權。</div>
+        <div class="warn">⚠️ 這個專案原本叫 <b>CapCutAPI</b>，後來改名 <b>VectCutAPI</b>，網路上兩個名字都會看到，指的是同一件事。</div>
+        <div class="links-row"><a href="https://github.com/sun-guannan/CapCutAPI" target="_blank" rel="noopener">GitHub · CapCutAPI</a><a href="https://github.com/sun-guannan/VectCutAPI" target="_blank" rel="noopener">GitHub · VectCutAPI</a></div>
+
+        <div class="blk-h">它提供的 11 個 MCP 工具</div>
+        <div class="tblwrap"><table class="tbl mono"><thead><tr><th>工具</th><th>功能</th></tr></thead><tbody>
+          <tr><td>create_draft</td><td>建立草稿，指定寬高與 fps</td></tr>
+          <tr><td>add_video</td><td>加影片軌，含轉場、變速、音量</td></tr>
+          <tr><td>add_audio</td><td>加音訊軌，含音量與淡入淡出</td></tr>
+          <tr><td>add_image</td><td>加圖片素材與動畫</td></tr>
+          <tr><td>add_text</td><td>加文字，含字型、顏色、陰影</td></tr>
+          <tr><td>add_subtitle</td><td>匯入 SRT 字幕並套樣式</td></tr>
+          <tr><td>add_effect</td><td>套視覺特效</td></tr>
+          <tr><td>add_sticker</td><td>加貼紙與貼紙動畫</td></tr>
+          <tr><td>add_video_keyframe</td><td>加關鍵影格動畫</td></tr>
+          <tr><td>get_video_duration</td><td>讀取素材長度</td></tr>
+          <tr><td>save_draft</td><td>存成草稿資料夾</td></tr>
+        </tbody></table></div>
+
+        <div class="blk-h">環境需求（動手前先確認這五樣）</div>
+        <ul class="bul">
+          <li>Python 3.10 以上（部分版本標示需要 3.8.20，<b>以 repo 的 README 為準</b>）</li>
+          <li>ffmpeg，已安裝且加進系統環境變數</li>
+          <li>CapCut 桌面版（國際版或中國版剪映都可以）</li>
+          <li>Claude Desktop 或 Claude Code</li>
+          <li>硬碟至少 2GB 可用空間</li>
+        </ul>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">檢查 ffmpeg 有沒有裝好</div><pre>ffmpeg -version
+
+<span class="cm"># macOS 沒裝的話</span>
+brew install ffmpeg</pre></div>
+
+        <div class="blk-h">Step 1 · clone 專案</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">clone</div><pre>git clone https://github.com/sun-guannan/CapCutAPI.git
+cd CapCutAPI
+
+<span class="cm"># 網址失效的話改用改名後的</span>
+git clone https://github.com/sun-guannan/VectCutAPI.git
+cd VectCutAPI</pre></div>
+
+        <div class="blk-h">Step 2 · 建立虛擬環境</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">建立與啟動</div><pre>python -m venv venv-capcut
+
+<span class="cm"># macOS / Linux</span>
+source venv-capcut/bin/activate
+
+<span class="cm"># Windows</span>
+venv-capcut\Scripts\activate</pre></div>
+
+        <div class="blk-h">Step 3 · 安裝依賴</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">兩行都要跑</div><pre>pip install -r requirements.txt
+pip install -r requirements-mcp.txt</pre></div>
+        <div class="warn">⚠️ 第二行是 <b>MCP 協定支援，跳過的話 Claude 接不上</b>。</div>
+
+        <div class="blk-h">Step 4 · 設定檔</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">複製範例設定</div><pre>cp config.json.example config.json
+
+<span class="cm"># Windows</span>
+copy config.json.example config.json</pre></div>
+        <div class="tipline">打開 config.json，多數情況預設值就能跑，先不用改。</div>
+
+        <div class="blk-h">Step 5 · 測試 server 起得來</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">測試</div><pre>python mcp_server.py</pre></div>
+        <div class="tipline">沒有噴錯就代表環境對了。按 <b>Ctrl+C</b> 關掉，接下來要交給 Claude 啟動。</div>
+
+        <div class="blk-h">接上 Claude Desktop</div>
+        <div class="cp"><div class="pl">設定檔位置</div><pre class="art">macOS：
+~/Library/Application Support/Claude/claude_desktop_config.json
+
+Windows：
+%APPDATA%\Claude\claude_desktop_config.json</pre></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製設定</button><div class="pl">claude_desktop_config.json</div><pre>{
+  "mcpServers": {
+    "capcut-api": {
+      "command": "python3",
+      "args": ["mcp_server.py"],
+      "cwd": "<span class="ph">/你的路徑</span>/CapCutAPI",
+      "env": {
+        "PYTHONPATH": "<span class="ph">/你的路徑</span>/CapCutAPI",
+        "DEBUG": "0"
+      }
+    }
+  }
+}</pre></div>
+        <div class="steps">
+          <div class="st"><b>cwd</b> 換成你 clone 下來的實際路徑</div>
+          <div class="st"><b>PYTHONPATH</b> 跟 cwd 填一樣的路徑</div>
+          <div class="st">Windows 的路徑要用<b>雙反斜線</b>，例如 C:\\Users\\你的名字\\CapCutAPI</div>
+        </div>
+        <div class="warn">⚠️ 改完存檔，<b>完全關閉 Claude Desktop 再重開</b>。不是關視窗，是整個程式退出。</div>
+
+        <div class="blk-h">接上 Claude Code（更短）</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">一行接上</div><pre>claude mcp add capcut-api -- python3 <span class="ph">/你的路徑</span>/CapCutAPI/mcp_server.py</pre></div>
+
+        <div class="blk-h">驗證有沒有接上</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">重開 Claude 之後直接問它</div><pre>列出你目前可以使用的 CapCut 相關工具。</pre></div>
+        <div class="tipline">它應該要列出 create_draft、add_video 那一串。列不出來就是沒接上，往下看疑難排解。</div>
+
+        <div class="blk-h">拿到草稿之後怎麼辦</div>
+        <p style="font-size:14px;">Claude 呼叫 save_draft 之後，會在 server 的目錄下生成一個 <span class="hl">dfd_</span> 開頭的資料夾。<b>這個資料夾要手動複製到 CapCut 的草稿目錄。</b></p>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Windows 草稿目錄</div><pre>C:\Users\你的名字\AppData\Local\CapCut\User Data\Projects\com.lveditor.draft</pre></div>
+        <div class="tipline">快速打開：按 <b>Win + R</b>，貼上 %LocalAppData%\CapCut\User Data\Projects\com.lveditor.draft</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">macOS 草稿目錄</div><pre>~/Movies/CapCut/User Data/Projects/com.lveditor.draft</pre></div>
+        <div class="tipline">快速打開：Finder → 前往 → 前往檔案夾 → 貼上路徑。複製完<b>重開 CapCut</b>，草稿就會出現在首頁專案列表。如果你在 CapCut 設定裡改過儲存路徑，以你改過的為準。</div>
+      </div></details>
+
+      <!-- 路線二 -->
+      <details class="ch"><summary><span class="ch-n">路線二</span><span class="ch-t">砍掉錄壞的段落<span class="en"> · SmartCut</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>它的邏輯很聰明：</b>不去分析音訊波形，改去讀 CapCut 自己生成的自動字幕。字幕代表有人在講話，字幕之間的空隙代表沒人講話，超過一秒的空隙就砍掉。更好用的是<b>重複偵測</b>：同一句話你錄了三次，它會判斷這是重錄，把前面兩次刪掉，留最後一次。</div>
+        <p style="font-size:14px;">本機跑，不需要 API key。想加強重複偵測的準確度，可以選填 OPENAI_API_KEY 讓 GPT 幫忙判斷。</p>
+        <div class="links-row"><a href="https://github.com/mrbuslov/capcut-ai-editor" target="_blank" rel="noopener">GitHub · mrbuslov/capcut-ai-editor</a></div>
+
+        <div class="blk-h">Step 1 · clone 並建立環境</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">clone 與虛擬環境</div><pre>git clone https://github.com/mrbuslov/capcut-ai-editor.git
+cd capcut-ai-editor
+python -m venv venv
+
+<span class="cm"># macOS / Linux</span>
+source venv/bin/activate
+
+<span class="cm"># Windows</span>
+venv\Scripts\activate</pre></div>
+
+        <div class="blk-h">Step 2 · 安裝</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>pip install -e .</pre></div>
+
+        <div class="blk-h">Step 3 · 接上 Claude</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製設定</button><div class="pl">claude_desktop_config.json</div><pre>{
+  "mcpServers": {
+    "smartcut": {
+      "command": "<span class="ph">/你的路徑</span>/capcut-ai-editor/venv/bin/python",
+      "args": ["-m", "smartcut.server"]
+    }
+  }
+}</pre></div>
+        <div class="tipline">Windows 的 command 路徑是 C:\\你的路徑\\capcut-ai-editor\\venv\\Scripts\\python.exe</div>
+        <div class="warn">⚠️ 如果你路線一已經加過 capcut-api，就把 smartcut 這個區塊<b>加在同一個 mcpServers 物件裡面，用逗號隔開</b>，不要開第二個檔案。</div>
+
+        <div class="blk-h">使用流程（順序不能錯）</div>
+        <div class="steps">
+          <div class="st">錄好影片，匯入 CapCut</div>
+          <div class="st">在 CapCut 裡跑一次自動字幕：<b>文字 → 自動字幕</b></div>
+          <div class="st"><b>先備份專案資料夾</b></div>
+          <div class="st"><b>完全關閉 CapCut</b></div>
+          <div class="st">在 Claude 裡下指令</div>
+          <div class="st">重開 CapCut，檢查它剪的地方對不對</div>
+        </div>
+
+        <div class="warn-big">
+          <div class="wh">⚠️ 這裡有個必須注意的事</div>
+          <p><b>SmartCut 會直接修改你的專案，不會另存一份。</b>跑之前先把整個專案資料夾複製一份出來。這一步跳過的話，剪壞了沒得救。</p>
+          <p>備份方式：到上面提到的草稿目錄，找到你的專案資料夾（名稱是一串數字），整個複製一份到桌面。</p>
+        </div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">裝好了，接下來是用法</div>
+      <h3>工具會壞<br><span class="g">工作流不會</span></h3>
+      <p>省下剪片時間只是開始。怎麼把整條「內容 → 流量 → 收入」的產線接起來，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 4 Prompt 庫 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 4 · Prompt 庫</span>
+    <h2>整份文件<br><span class="g">最實用的地方</span></h2>
+    <p>以下每個 Prompt 都可以直接複製貼進 Claude。方括號 <span class="hl">[ ]</span> 裡的內容換成你自己的。</p>
+
+    <div class="pnum"><span class="pn">4-1</span><span class="pt">基礎：建立一支直式短影音</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">建立草稿</div><pre>用 CapCut 工具幫我建立一個新草稿。
+
+規格：
+- 尺寸 1080x1920
+- fps 30
+
+素材：
+- 主影片路徑：<span class="ph">[/Users/你的名字/Videos/口播.mp4]</span>
+
+請執行：
+1. 建立草稿
+2. 讀取這支影片的長度，告訴我幾秒
+3. 把影片放進去，從 0 秒開始
+4. 存成草稿
+
+存完之後告訴我草稿資料夾的完整路徑。</pre></div>
+
+    <div class="pnum"><span class="pn">4-2</span><span class="pt">加字幕：SRT 匯入並套樣式</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">加字幕</div><pre>在剛才那個草稿裡加上字幕。
+
+SRT 檔路徑：<span class="ph">[/Users/你的名字/Videos/口播.srt]</span>
+
+字幕樣式：
+- 字型大小 48
+- 字體顏色 #FFFFFF
+- 加黑色描邊
+- 位置在畫面底部往上 20%
+
+加完存草稿。</pre></div>
+
+    <div class="pnum"><span class="pn">4-3</span><span class="pt">開場標題：前三秒的鉤子字卡</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">開場字卡</div><pre>在草稿的最前面加一段標題文字。
+
+文字內容：<span class="ph">[三個工具，讓你不用再自己剪片]</span>
+出現時間：0 到 3 秒
+字型大小：72
+顏色：#FFFFFF
+位置：畫面正中央
+加一個淡入動畫
+
+加完存草稿。</pre></div>
+
+    <div class="pnum"><span class="pn">4-4</span><span class="pt">批量：一次產出多支同結構影片</span></div>
+    <div class="tipline">這個是<b>路線一最值錢的用法</b>。</div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">批量產片</div><pre>我要批量產出 5 支結構相同的短影音。
+
+共同規格：
+- 1080x1920，30fps
+- 每支開頭 0 到 3 秒放標題文字，字型 72，白色，置中
+- 每支結尾最後 3 秒放固定 CTA 文字「追蹤 @jasonxtsai」，字型 48，白色，底部
+
+各別素材（影片路徑 / 標題文字）：
+1. <span class="ph">[/path/video1.mp4]</span> / <span class="ph">[標題一]</span>
+2. <span class="ph">[/path/video2.mp4]</span> / <span class="ph">[標題二]</span>
+3. <span class="ph">[/path/video3.mp4]</span> / <span class="ph">[標題三]</span>
+4. <span class="ph">[/path/video4.mp4]</span> / <span class="ph">[標題四]</span>
+5. <span class="ph">[/path/video5.mp4]</span> / <span class="ph">[標題五]</span>
+
+請一支一支建立草稿並存檔，每存好一支就回報進度。
+全部完成後，列出 5 個草稿資料夾的路徑。</pre></div>
+
+    <div class="pnum"><span class="pn">4-5</span><span class="pt">SmartCut：智慧剪輯口播</span></div>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">SmartCut 智慧剪輯</div><pre>用 SmartCut 處理我的 CapCut 專案。
+
+專案名稱：<span class="ph">[我的專案名稱]</span>
+
+請執行：
+1. 讀取這個專案的自動字幕
+2. 找出所有超過 1 秒的靜音空隙
+3. 找出重複的 take，保留最後一次
+4. 在動手之前，先把你要刪掉的段落列給我看，包含時間碼
+
+我確認之後你再執行。</pre></div>
+    <div class="warn">⚠️ <b>這個 Prompt 的關鍵在最後兩行。</b>讓它先列清單再執行，你才有機會攔截誤判。</div>
+
+    <div class="pnum"><span class="pn">4-6</span><span class="pt">SmartCut：只砍靜音，不動重複段落</span></div>
+    <p style="font-size:14px;">有些內容重複是刻意的（例如重複強調），這時候要限縮它的動作：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">只砍靜音</div><pre>用 SmartCut 處理專案 <span class="ph">[專案名稱]</span>。
+
+只做一件事：把超過 <span class="ph">[1.5]</span> 秒的靜音空隙剪掉。
+不要碰重複的段落，我那些是故意重複的。
+
+先列出你要剪的時間碼給我確認。</pre></div>
+
+    <div class="pnum"><span class="pn">4-7</span><span class="pt">診斷：草稿在 CapCut 打不開時</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">診斷草稿</div><pre>我把 dfd_ 資料夾複製到 CapCut 草稿目錄了，但 CapCut 裡看不到。
+
+請幫我確認：
+1. 這個草稿資料夾裡應該要有哪些檔案
+2. 檢查我複製過去的那個資料夾結構對不對
+3. 素材檔的路徑引用是絕對路徑還是相對路徑
+
+草稿資料夾路徑：<span class="ph">[貼上路徑]</span></pre></div>
+
+    <div class="pnum"><span class="pn">4-8</span><span class="pt">進階：關鍵影格做縮放動畫</span></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">關鍵影格</div><pre>在草稿的 <span class="ph">[5]</span> 到 <span class="ph">[8]</span> 秒，幫主影片加一個緩慢推進的效果。
+
+用關鍵影格做：
+- 第 5 秒：縮放 100%
+- 第 8 秒：縮放 115%
+
+加完存草稿。</pre></div>
+  </div>
+
+  <!-- Part 5 疑難排解 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · 疑難排解</span>
+    <h2>跑不起來的時候<br><span class="g">照這張表查</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>症狀</th><th>可能原因</th><th>怎麼解</th></tr></thead><tbody>
+      <tr><td>Claude 看不到 MCP 工具</td><td>設定檔路徑寫錯</td><td>確認 cwd 是絕對路徑，Windows 用雙反斜線</td></tr>
+      <tr><td>Claude 看不到 MCP 工具</td><td>沒有完全重啟</td><td>整個關閉 Claude 程式再開，不是關視窗</td></tr>
+      <tr><td>Claude 看不到 MCP 工具</td><td>少裝 MCP 依賴</td><td>補跑 pip install -r requirements-mcp.txt</td></tr>
+      <tr><td>呼叫工具就報錯</td><td>ffmpeg 沒進 PATH</td><td>跑 ffmpeg -version 驗證</td></tr>
+      <tr><td>草稿產生了但 CapCut 看不到</td><td>資料夾放錯位置</td><td>確認是放在 com.lveditor.draft 底下</td></tr>
+      <tr><td>草稿產生了但 CapCut 看不到</td><td>CapCut 沒重開</td><td>完全關閉 CapCut 再開</td></tr>
+      <tr><td>草稿打得開但素材是黑的</td><td>素材路徑失效</td><td>草稿只存路徑引用，素材不能搬走或改名</td></tr>
+      <tr><td>SmartCut 存不進去</td><td>CapCut 開著</td><td>關掉 CapCut 再跑，避免自動存檔覆蓋</td></tr>
+      <tr><td>整套突然全壞</td><td>CapCut 改版換格式</td><td>到 repo 的 Issues 看有沒有人回報，等作者更新</td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">兩個常見誤解</div>
+    <div class="judge no"><span class="jl">✕ 誤解一</span>以為草稿裡包含影片檔。草稿只是一份說明書，記錄「哪個時間點播放哪個路徑的檔案」，素材本身不在裡面。所以你不能把素材搬走、改名，或把草稿複製到另一台電腦就期待它能用。</div>
+    <div class="judge no"><span class="jl">✕ 誤解二</span>以為可以叫 Claude 輸出成品。沒有辦法。CapCut 沒有指令列輸出的功能。要全自動輸出，得走 ffmpeg 那條路，但那就不是 CapCut 了。</div>
+  </div>
+
+  <!-- Part 6 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 6 · 什麼情況不要用</span>
+    <h2>不想讓你裝完<br><span class="g">才發現不適合</span></h2>
+
+    <div class="sub-h">不建議使用的情況</div>
+    <div class="judge no"><span class="jl">✕ 別裝</span>你一週剪不到兩支片。安裝與排錯的時間會超過它替你省下的時間。</div>
+    <div class="judge no"><span class="jl">✕ 別裝</span>你的內容每支結構都不一樣。這套的價值在重複，不在創意。</div>
+    <div class="judge no"><span class="jl">✕ 別裝</span>你完全沒碰過終端機。這不是點兩下就能裝的東西，中間卡住的機率不低。</div>
+    <div class="judge no"><span class="jl">✕ 別裝</span>你在接客戶案子，交期不能延。工具會壞，壞的時候你沒有備案。</div>
+
+    <div class="sub-h">適合使用的情況</div>
+    <div class="judge ok"><span class="jl">✓ 可以裝</span>你有固定的影片模板，每週要出好幾支。</div>
+    <div class="judge ok"><span class="jl">✓ 可以裝</span>你錄一鏡到底的口播，剪停頓佔掉你大半時間。</div>
+    <div class="judge ok"><span class="jl">✓ 可以裝</span>你已經在用 Claude Code，多裝一個 MCP 對你不是門檻。</div>
+    <div class="judge ok"><span class="jl">✓ 可以裝</span>你願意接受它偶爾壞掉，壞掉的時候手動剪也不會死。</div>
+  </div>
+
+  <!-- Part 7 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 7 · 連結總表</span>
+    <h2>所有專案<br><span class="g">與官方文件</span></h2>
+
+    <div class="sub-h">路線一相關</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名稱</th><th>說明</th><th>連結</th></tr></thead><tbody>
+      <tr><td>CapCutAPI</td><td>底層核心專案，Python，Apache-2.0</td><td><a href="https://github.com/sun-guannan/CapCutAPI" target="_blank" rel="noopener">GitHub</a></td></tr>
+      <tr><td>VectCutAPI</td><td>同一專案，改名後的新名稱</td><td><a href="https://github.com/sun-guannan/VectCutAPI" target="_blank" rel="noopener">GitHub</a></td></tr>
+      <tr><td>capcut-mcp-server</td><td>TypeScript 版 MCP 封裝</td><td><a href="https://github.com/Atx-Guy/capcut-mcp-server" target="_blank" rel="noopener">GitHub</a></td></tr>
+      <tr><td>capcut-mcp-server-extended</td><td>加了排版預設與 talking head 模板的分支</td><td><a href="https://github.com/MigueDuque/capcut-mcp-server-extended" target="_blank" rel="noopener">GitHub</a></td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">路線二相關</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名稱</th><th>說明</th><th>連結</th></tr></thead><tbody>
+      <tr><td>capcut-ai-editor</td><td>SmartCut，讀字幕砍靜音與重複 take</td><td><a href="https://github.com/mrbuslov/capcut-ai-editor" target="_blank" rel="noopener">GitHub</a></td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">其他值得看的</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>名稱</th><th>說明</th><th>連結</th></tr></thead><tbody>
+      <tr><td>capcut-mcp（Elixir 版）</td><td>直接讀寫 CapCut 本機草稿 JSON</td><td><a href="https://github.com/burnshall-ui/capcut-mcp" target="_blank" rel="noopener">GitHub</a></td></tr>
+      <tr><td>capcut-mcp（JmsLdrn）</td><td>用複製既有草稿範本的方式產生合法 JSON，有備份與驗證機制</td><td><a href="https://github.com/JmsLdrn/capcut-mcp" target="_blank" rel="noopener">GitHub</a></td></tr>
+    </tbody></table></div>
+
+    <div class="sub-h">官方文件</div>
+    <div class="links-row"><a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP 官方文件</a><a href="https://docs.claude.com" target="_blank" rel="noopener">Claude Code 文件</a><a href="https://ffmpeg.org/download.html" target="_blank" rel="noopener">ffmpeg 下載</a></div>
+
+    <div class="sub-h">路線三：ffmpeg 系 MCP 的挑選方向</div>
+    <p style="font-size:14px;">這類專案很多，我不列具體名單，因為汰換太快。挑的時候看三件事：</p>
+    <div class="steps">
+      <div class="st"><b>最近三個月有沒有 commit。</b>沒有就別裝。</div>
+      <div class="st"><b>README 有沒有寫清楚它做不到什麼。</b>只寫優點的通常沒實測過。</div>
+      <div class="st"><b>有沒有處理錯誤回報。</b>ffmpeg 的錯誤訊息很長，包不好的話 Claude 會看不懂。</div>
+    </div>
+    <div class="tipline">到 GitHub 搜尋 <b>ffmpeg mcp server</b>，用上面三點篩選。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>這份文件<br><span class="g">會過期</span></h2>
+    <p>CapCut 一改版，上面某些步驟就會失效。所以比起照抄步驟，我更希望你記住那個結構。</p>
+    <div class="insight"><div class="il">記住這一句就夠</div><div class="it">AI 不會直接操作軟體介面，它是在產生軟體看得懂的檔案。想通這一點，之後不管是剪映、Premiere 還是 DaVinci，你都知道該去找什麼樣的工具。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>剪片省下來了，<span class="g">接下來換我陪你把它變成收入</span></h2>
+      <div class="cta-lead">這套裝完，重複性的剪輯工作會少掉一大塊。但要把省下的時間變成一條真的在賺錢的內容產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆自動化教學，卻從來沒真的跑通一次的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">裝完之後，回貼文底下留言告訴我你走的是哪一條路線</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件由傑森所長整理。所有安裝步驟以各專案 repo 的 README 為最終依據，遇到衝突以官方 README 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：CapCut 剪輯自動化實戰手冊——輪播 DM 承接頁／lead magnet
+· 內容：先讀這段（三個 warn-big 破除誤解）／Part1 三路線比較表／Part2-3 兩條安裝路線摺疊卡／中段CTA／Part4 Prompt 庫 8 個／Part5 疑難排解表＋兩個誤解／Part6 適不適合（紅綠 judge 各 4 條）／Part7 連結總表＋ffmpeg 挑選三準則／最後
+· 版型決策：
+    1. 新增 .warn-big（粗紅框大標）——這篇的「三件事先釘在腦子裡」是全文最重要的段落，用一般 tipline 會被滑過去，做成三張紅框卡擋在 Part1 之前
+    2. Part6「適不適合」用 .judge no/ok 紅綠條列，比原稿的兩段清單更好掃
+    3. SmartCut 的備份警告在流程步驟後再用 warn-big 重複一次（原稿也用 blockquote 特別標，這是不可逆操作，刻意保留視覺重量）
+· 可複製區塊：24 個 .cp，hero-cp 5（兩份 claude_desktop_config.json、批量產片、SmartCut 智慧剪輯）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「CapCut-Claude-剪輯自動化實戰手冊」
+· 命名：日期前綴（2026-08-06-capcut-automation.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

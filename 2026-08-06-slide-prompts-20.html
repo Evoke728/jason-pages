@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>20 個簡報 Prompt 完整清單｜把一份文件變成一整套能上台的簡報</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:460px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+
+.pnum{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:22px 0 6px;padding-top:16px;border-top:1px dashed var(--line);}
+.pnum:first-of-type{border-top:none;padding-top:4px;margin-top:8px;}
+.pnum .pn{font-family:"Inter";font-weight:800;font-size:14px;color:var(--gold);flex-shrink:0;}
+.pnum .pt{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;line-height:1.4;}
+.where{font-family:var(--mono);font-size:10.5px;font-weight:500;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.where.chat{background:rgba(74,124,63,0.09);border:1px solid var(--ok-line);color:var(--ok);}
+.where.studio{background:rgba(212,144,42,0.13);border:1px solid var(--gold-dim);color:var(--gold);}
+.where.cfg{background:rgba(200,70,40,0.07);border:1px solid var(--no-line);color:var(--no);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>簡報做完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>簡報做出來了<br><span class="g">產線還沒接</span></h4>
+  <p>省下排版時間只是開始。怎麼把整條內容產線接起來，我在 Skool 帶你做。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">GEMINI NOTEBOOK · 20 個簡報 PROMPT</div>
+    <h1>20 個<br><span class="g">簡報 Prompt</span></h1>
+    <div class="h-sub">把一份文件，變成一整套能上台的簡報</div>
+    <div class="hero-sub">從骨架、視覺、資訊圖表到講稿，四組共 20 個 Prompt。每一個都標明該貼在 Chat 面板還是 Studio 自訂欄——<b>貼錯地方就沒效果</b>，這是最多人卡住的地方。附三個進階技巧與七個實際限制。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">20</div><div class="l">個 · Prompt</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">組 · 依流程分</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">8</div><div class="l">步 · 標準流程</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">我是 Jason，專注在「AI ＋ 自媒體變現」。我每天在做的事很單純：把新出的 AI 工具真的用過一輪，挑出能省時間、能換成收入的那幾個，然後把用法拆成你今天就能照做的步驟。這裡不談概念，只給可以直接複製貼上的東西。</div></div>
+  </div>
+
+  <!-- 開始之前 -->
+  <div class="sec fade">
+    <span class="sec-tag">開始之前</span>
+    <h2>一件你<br><span class="g">需要先知道的事</span></h2>
+    <div class="warn">⚠️ <b>NotebookLM 現在叫 Gemini Notebook。</b>Google 在 2026 年 7 月 16 日正式改名，同一個產品、同一個團隊、同一批筆記本，只是換了名字跟藍紫色的新 logo。7 月底網址也搬到 <b>notebook.google.com</b>，舊網址會自動轉址，你原本的連結跟書籤都還能用。<br><br>這份清單統一寫 <b>Gemini Notebook</b>。你在網路上看到別人講 NotebookLM，指的是同一個東西。</div>
+
+    <div class="sub-h">工具與連結</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>工具</th><th>在這套流程裡負責什麼</th></tr></thead><tbody>
+      <tr><td><a href="https://notebook.google.com" target="_blank" rel="noopener">Gemini Notebook</a></td><td>主力。讀你的文件、產出簡報、逐頁修改</td></tr>
+      <tr><td><a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a></td><td>修單張投影片的圖、生封面圖</td></tr>
+      <tr><td><a href="https://slides.google.com" target="_blank" rel="noopener">Google Slides</a></td><td>匯出後做最後排版微調</td></tr>
+      <tr><td><a href="https://www.canva.com" target="_blank" rel="noopener">Canva</a></td><td>換字體、套品牌色、加 logo</td></tr>
+      <tr><td><a href="https://claude.ai" target="_blank" rel="noopener">Claude</a></td><td>寫講稿、把簡報改成長文或貼文</td></tr>
+      <tr><td><a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a></td><td>補做圖表、算數據</td></tr>
+    </tbody></table></div>
+    <div class="links-row"><a href="https://support.google.com/gemininotebook/answer/16757456" target="_blank" rel="noopener">官方 Slide Deck 說明文件</a></div>
+  </div>
+
+  <!-- 貼在哪 -->
+  <div class="sec fade">
+    <span class="sec-tag">最重要的一張表</span>
+    <h2>Prompt 貼錯地方<br><span class="g">就沒效果</span></h2>
+    <p>Gemini Notebook 有三個面板。先把這張表記起來。</p>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>面板</th><th>位置</th><th>貼什麼</th></tr></thead><tbody>
+      <tr><td>Sources</td><td>左側</td><td>上傳 PDF、Google Docs、網址、YouTube 連結、EPUB</td></tr>
+      <tr><td>Chat</td><td>中間</td><td><b>長 Prompt。</b>要它先幫你想結構、選視覺、寫標題的都放這</td></tr>
+      <tr><td>Studio</td><td>右側</td><td><b>短 Prompt。</b>點 Slide Deck 旁邊的鉛筆 icon，那個自訂欄位</td></tr>
+    </tbody></table></div>
+    <div class="tipline">下面每個 Prompt 我都用色標標了位置：<span class="where chat">貼在 Chat</span> <span class="where studio">貼在 Studio</span> <span class="where cfg">貼在 Configure Chat</span></div>
+
+    <div class="sub-h">標準操作流程</div>
+    <div class="steps">
+      <div class="st">到 notebook.google.com 建立新筆記本，上傳你的來源文件</div>
+      <div class="st">點 Chat 面板上方的 <b>Configure Chat</b>，貼上 Prompt 20（一次設定，之後每個輸出都吃這個設定）</div>
+      <div class="st">在 Chat 面板用 Prompt 02 到 07 先把結構、標題、視覺想清楚</div>
+      <div class="st">到 Studio 面板點 Slide Deck 旁的鉛筆 icon，貼上 Prompt 01 或 08、10、19</div>
+      <div class="st">選 Detailed Deck 或 Presenter Slides，選輸出語言為繁體中文，選長度</div>
+      <div class="st">等生成（通常要幾分鐘，這段時間可以繼續做別的）</div>
+      <div class="st">用 Prompt 17 做健檢，用 Revise 功能逐頁修</div>
+      <div class="st">用 Prompt 18 生講稿，匯出 PDF 或 PPTX</div>
+    </div>
+  </div>
+
+  <!-- 20 個 prompt -->
+  <div class="sec fade">
+    <span class="sec-tag">20 個 Prompt</span>
+    <h2>展開任一組<br><span class="g">Prompt 直接複製</span></h2>
+
+    <div class="acc">
+
+      <!-- 第一組 -->
+      <details class="ch" open><summary><span class="ch-n">01-05</span><span class="ch-t">把文件變成簡報骨架<span class="en"> · 第一組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+
+        <div class="pnum"><span class="pn">01</span><span class="pt">把文件變成簡報</span><span class="where studio">貼在 Studio</span></div>
+        <div class="tipline"><b>什麼時候用：</b>整套流程的起手式。你手上有一份報告、一篇長文、一份研究，需要在幾天內變成能講的東西。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">01 · 起手式</div><pre>分析我上傳的所有來源，產出一份 12 頁的簡報。
+
+要求：
+1. 每一頁只講一個主訊息，標題直接寫出結論，不要寫成主題標籤
+2. 每頁 3 到 5 個支撐點，每個支撐點不超過 20 字
+3. 依照「問題 → 分析 → 解法 → 證據 → 結論」的順序安排
+4. 每一頁的內容都必須來自我上傳的來源，不要補充來源以外的資訊
+5. 輸出語言：繁體中文（台灣用語）</pre></div>
+        <div class="tipline"><b>微調：</b>頁數不要一開始就設太多。12 頁生完看骨架，覺得哪一段太薄再叫它拆。</div>
+
+        <div class="pnum"><span class="pn">02</span><span class="pt">先用設計師的腦袋想</span><span class="where chat">貼在 Chat</span></div>
+        <div class="tipline"><b>什麼時候用：</b>這份簡報要給客戶或主管看，你不想第一版就歪掉。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">02 · 設計規劃表</div><pre>你現在的角色是簡報設計總監。
+
+在產出任何投影片之前，先幫我做一份設計規劃表。針對我上傳的來源，列出建議的每一頁，每一頁包含以下五欄：
+
+| 頁次 | 這頁的目標 | 核心訊息（一句話） | 建議版面 | 建議視覺類型 |
+
+規則：
+- 「這頁的目標」只能填：說明、說服、決策、教學，四選一
+- 「核心訊息」必須是一個完整句子，不是名詞片語
+- 「建議版面」寫出文字與視覺的比例，例如「左文右圖，文字佔 40%」
+- 「建議視覺類型」寫出具體形式，例如「折線圖」「流程圖」「單張大圖」「無視覺，純文字」
+- 如果某一頁你判斷可以刪掉或跟別頁合併，在最後另外列出並說明理由
+
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>最後那條「可以刪掉的頁」是這個 Prompt 最有用的部分。<b>多數簡報的問題是頁數太多。</b></div>
+
+        <div class="pnum"><span class="pn">03</span><span class="pt">把文章寫成故事</span><span class="where chat">貼在 Chat</span></div>
+        <div class="tipline"><b>什麼時候用：</b>來源是一篇論述型長文、一份白皮書、一篇部落格。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">03 · 七段敘事線</div><pre>把我上傳的來源重新組織成一條敘事線，用來當作簡報的內容骨架。
+
+順序固定為七段：
+1. 注意：一個具體的場景或現象，讓聽眾覺得跟自己有關
+2. 問題：這個現象造成什麼實際的損失或困擾
+3. 成因：為什麼會這樣，講清楚機制
+4. 分析：目前常見的做法是什麼，各自的極限在哪
+5. 解法：來源裡提出的方法
+6. 證據：支持這個方法的數據、案例或引述
+7. 結論：讀者看完應該記得的一句話
+
+每一段寫 100 到 150 字，並在段末標註這一段適合佔幾頁投影片。
+
+所有內容只能來自我上傳的來源。如果某一段來源裡沒有足夠資訊，直接寫「來源不足」，不要自行補充。
+
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>「來源不足」那條很重要，這樣你會知道哪裡需要再補資料，<b>而不是拿到一份看起來很完整但其實有一半是編的內容</b>。</div>
+
+        <div class="pnum"><span class="pn">04</span><span class="pt">砍掉多餘的字</span><span class="where chat">貼在 Chat</span></div>
+        <div class="tipline"><b>什麼時候用：</b>初版生完，發現每一頁都像 Word 文件。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">04 · 瘦身</div><pre>檢查我這份簡報的每一頁，執行以下瘦身規則：
+
+1. 每頁只保留一個主訊息，其餘內容移到講稿
+2. 支撐點上限 3 個，超過的合併或刪除
+3. 每個支撐點上限 15 字
+4. 標題上限 20 字
+5. 任何一頁如果同時在講兩件事，拆成兩頁
+
+輸出格式：用表格呈現「原本內容 → 修改後 → 移到講稿的部分」
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>被砍掉的內容不要丟，全部收進講稿。<b>上台時講出來的資訊量不會變少，只是不出現在螢幕上。</b></div>
+
+        <div class="pnum"><span class="pn">05</span><span class="pt">寫出讓人停下來的標題</span><span class="where chat">貼在 Chat</span></div>
+        <div class="tipline"><b>什麼時候用：</b>骨架定了，要把每頁標題重寫一遍。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">05 · 標題三版本</div><pre>把我這份簡報每一頁的標題重寫。
+
+現在的標題多半是主題標籤（例如「市場分析」），我要的是直接把該頁結論講出來的標題（例如「三成客戶在第一週就流失」）。
+
+每一頁給我 3 個版本：
+- 版本 A：陳述結論，用具體數字
+- 版本 B：點出反差，用對照結構
+- 版本 C：指出後果，說明如果忽略會發生什麼
+
+每個標題不超過 20 字。所有數字必須來自我上傳的來源，不要編造。
+
+輸出格式：表格，欄位為「頁次 | 原標題 | 版本 A | 版本 B | 版本 C」
+輸出語言：繁體中文</pre></div>
+      </div></details>
+
+      <!-- 第二組 -->
+      <details class="ch"><summary><span class="ch-n">06-10</span><span class="ch-t">視覺與設計<span class="en"> · 第二組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+
+        <div class="pnum"><span class="pn">06</span><span class="pt">每頁都選對視覺</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">06 · 視覺選型</div><pre>針對我這份簡報的每一頁，建議最適合的視覺呈現方式。
+
+每頁給我以下四項：
+1. 視覺類型：從「長條圖、折線圖、圓餅圖、流程圖、時間軸、對照表、單張示意圖、純文字」中選一個
+2. 選擇理由：一句話說明為什麼這個訊息適合這種呈現
+3. 擺放位置：上／下／左／右，以及佔版面的比例
+4. 如果這頁不需要視覺，直接寫「不需要」並說明理由
+
+規則：整份簡報裡「不需要視覺」的頁數至少要有兩頁。每一頁都塞圖會讓重點消失。
+
+輸出格式：表格
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>最後那條「至少兩頁不需要視覺」是刻意加的。<b>AI 預設會想把每一頁都填滿。</b></div>
+
+        <div class="pnum"><span class="pn">07</span><span class="pt">生成 AI 圖片 Prompt</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">07 · 生圖 Prompt 產生器</div><pre>針對我指定的投影片，寫出可以直接使用的 AI 生圖 Prompt。
+
+每個 Prompt 必須包含以下八項，缺一不可：
+1. Subject：畫面主體是什麼
+2. Setting：場景與環境
+3. Style：風格（例如 flat vector illustration、editorial photography、isometric 3D）
+4. Lighting：光線方向與氛圍
+5. Color palette：具體色碼，最多三個顏色
+6. Composition：構圖，以及留白區域在哪
+7. Aspect ratio：比例
+8. Negative：不要出現什麼（例如 no text、no watermark）
+
+Prompt 用英文輸出，其餘說明用繁體中文。
+每張圖給我兩個版本：一個寫實風、一個插畫風。</pre></div>
+        <div class="tipline"><b>微調：</b>第 6 項「留白區域在哪」很關鍵。<b>生出來的圖如果沒有留白，你之後沒地方壓字。</b></div>
+
+        <div class="pnum"><span class="pn">08</span><span class="pt">極簡高質感</span><span class="where studio">貼在 Studio</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">08 · 極簡風格</div><pre>產出一份極簡風格的簡報。
+
+設計要求：
+- 大量留白，每頁文字覆蓋率不超過 40%
+- 每頁只有一個視覺焦點
+- 字級對比明確：標題明顯大於內文，中間不要有太多層級
+- 配色不超過三個顏色，其中一個是背景色
+- 不使用陰影、漸層、裝飾線條、立體效果
+- 圖表只保留必要的軸線與標籤，移除格線與邊框
+
+輸出語言：繁體中文（台灣用語）</pre></div>
+
+        <div class="pnum"><span class="pn">09</span><span class="pt">建立品牌設計系統</span><span class="where chat">Chat 或 Studio</span></div>
+        <div class="tipline"><b>這一招需要兩個動作：</b>① 把你的品牌指南（色碼、字體、logo 使用規則）做成 PDF 或 Google Doc，<b>上傳到 Sources 面板當作一個來源</b> ② 再貼下面這段。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">09 · 綁定品牌指南</div><pre>我已經上傳了一份品牌指南作為來源。
+
+產出任何內容時，都必須遵循該份品牌指南裡的色彩、字體與設計規範。
+
+具體要求：
+- 主色與輔色直接使用指南裡的色碼
+- 標題與內文的字體階層依照指南設定
+- 圖表配色只能從指南的色票裡挑
+- 不要使用指南以外的顏色
+
+如果指南裡沒有規定某個項目，選擇最接近指南整體調性的做法，並在最後告訴我你做了哪些判斷。
+
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>這招對 Slide Deck、Infographic、Report 三種輸出都有效，<b>設定一次就好</b>。</div>
+
+        <div class="pnum"><span class="pn">10</span><span class="pt">讓簡報自己說故事</span><span class="where studio">貼在 Studio</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">10 · 敘事結構</div><pre>用敘事結構產出簡報，不要用章節式的資訊排列。
+
+結構：
+- 前三頁：從一個具體場景切入，帶出問題，並說明忽略這個問題的代價
+- 中段：一層一層拆解成因，每一頁都比前一頁更深入
+- 後段：提出解法，附上來源裡的證據
+- 最後一頁：一句話總結，以及聽眾下一步該做什麼
+
+規則：
+- 不要出現「議程」「大綱」「目錄」這類頁面
+- 每一頁的結尾都要讓人想看下一頁
+- 所有內容來自我上傳的來源
+
+輸出語言：繁體中文（台灣用語）</pre></div>
+      </div></details>
+
+      <!-- 第三組 -->
+      <details class="ch"><summary><span class="ch-n">11-15</span><span class="ch-t">資訊視覺化<span class="en"> · 第三組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+
+        <div class="pnum"><span class="pn">11</span><span class="pt">把數字變成畫面</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">11 · 數據盤點</div><pre>從我上傳的來源裡，找出所有具體數據。
+
+針對每一個數據，給我：
+1. 數字本身，以及它出自哪一份來源、哪一段
+2. 這個數字代表什麼（一句話）
+3. 建議呈現方式：放大的粗體數字／長條圖／折線圖／圓餅圖／不建議視覺化
+4. 如果建議做成圖表，說明 X 軸與 Y 軸分別放什麼
+
+規則：
+- 只列出來源裡真的有的數字，不要推算、不要估計
+- 如果某個數字在來源裡沒有標明統計期間或樣本，特別標註「缺少脈絡」
+- 依照重要性排序，最有說服力的排最前面
+
+輸出格式：表格
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>「缺少脈絡」那條會救你。<b>上台被問「這數字哪來的」的時候，你會慶幸有先標出來。</b></div>
+
+        <div class="pnum"><span class="pn">12</span><span class="pt">做左右對照比較</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">12 · 對照表</div><pre>把我要比較的兩個對象做成對照表。
+
+比較對象：<span class="ph">[填入 A 與 B]</span>
+
+要求：
+1. 先列出 5 到 7 個比較維度，每個維度都必須是會影響決策的項目
+2. 每個維度下，A 與 B 各寫一句話，不超過 20 字
+3. 在每個維度標註「差異程度」：大／中／小
+4. 最後把「差異程度為大」的維度單獨拉出來，這幾項是真正影響選擇的地方
+5. 給出一句話的建議，並說明這個建議在什麼前提下成立
+
+規則：所有比較內容必須來自我上傳的來源。來源沒提到的維度，標註「來源未涵蓋」。
+
+輸出格式：表格
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>第 4 步是重點。<b>多數對照表列了十幾項，但真正影響決定的只有兩三項。</b></div>
+
+        <div class="pnum"><span class="pn">13</span><span class="pt">把流程畫出來</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">13 · 流程圖結構</div><pre>把我上傳來源裡的流程，整理成可以畫成流程圖的結構。
+
+輸出格式：
+步驟編號 → 步驟名稱（不超過 8 字）→ 一句話說明（不超過 25 字）→ 建議 icon（用文字描述）
+
+規則：
+1. 步驟總數控制在 4 到 6 個。超過的話，把細節收進子步驟
+2. 每個步驟名稱用動詞開頭
+3. 如果流程中有分歧點（會依條件走不同路徑），另外標註出來
+4. 如果流程中有需要等待或外部依賴的環節，標註「等待點」
+
+最後告訴我這個流程適合橫向排列還是縱向排列，以及理由。
+
+輸出語言：繁體中文</pre></div>
+
+        <div class="pnum"><span class="pn">14</span><span class="pt">視覺化時間軸</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">14 · 時間軸</div><pre>從我上傳的來源裡，抓出所有帶時間點的事件，做成時間軸。
+
+每個節點包含：
+1. 時間（越精確越好，如果來源只寫到年份就寫年份）
+2. 事件名稱（不超過 10 字）
+3. 為什麼這件事重要（一句話）
+4. 重要程度：高／中／低
+
+規則：
+- 節點總數控制在 4 到 7 個。次要事件合併或省略
+- 只列出來源裡有明確時間標示的事件，沒有時間的不要放進來
+- 如果時間跨度很不平均（例如前三個節點都在同一年，最後一個隔了五年），提醒我這件事，並建議是否要調整軸線比例
+
+輸出格式：表格
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>「時間跨度不平均」的提醒很實用。<b>等距排列的時間軸常常會誤導觀眾對節奏的判斷。</b></div>
+
+        <div class="pnum"><span class="pn">15</span><span class="pt">講一個真實案例</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">15 · 案例五段結構</div><pre>從我上傳的來源裡找出案例，用以下五段結構整理：
+
+1. 背景：這是誰，在什麼情況下
+2. 問題：他們遇到什麼具體困難，造成什麼損失
+3. 行動：他們做了什麼，分幾個步驟
+4. 結果：發生什麼改變，附上來源裡的具體數字
+5. 學到什麼：這個案例可以推廣到哪些情況，以及在哪些情況下不適用
+
+規則：
+- 每一段不超過 80 字
+- 「結果」這段的數字必須來自來源，沒有數字就寫「來源未提供量化結果」
+- 第 5 段的「不適用情況」不能省略
+
+如果來源裡有多個案例，先列出清單讓我挑，不要一次全部展開。
+
+輸出語言：繁體中文</pre></div>
+        <div class="tipline"><b>微調：</b>「不適用情況」是我每次都會加的一條。<b>案例講得太完美反而不可信。</b></div>
+      </div></details>
+
+      <!-- 第四組 -->
+      <details class="ch"><summary><span class="ch-n">16-20</span><span class="ch-t">收尾與品質控管<span class="en"> · 第四組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+
+        <div class="pnum"><span class="pn">16</span><span class="pt">鎖定核心重點</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">16 · 必記重點</div><pre>從我上傳的來源與這份簡報裡，挑出 5 到 7 個「聽眾一週後還應該記得」的重點。
+
+每一個重點包含：
+1. 一句話陳述（不超過 25 字）
+2. 支持這句話的證據（來自來源，標明出處）
+3. 一個具體例子
+
+排序規則：依照「如果只能記得一件事」的重要性排序。
+
+篩選規則：
+- 只保留會影響行動或決策的內容
+- 背景資訊、定義、歷史沿革一律排除
+- 如果兩個重點在講同一件事，合併
+
+最後告訴我：如果只能留三個，你會留哪三個，為什麼。
+
+輸出語言：繁體中文</pre></div>
+
+        <div class="pnum"><span class="pn">17</span><span class="pt">幫簡報做健檢</span><span class="where chat">貼在 Chat</span></div>
+        <div class="tipline"><b>什麼時候用：</b>上台前一天。</div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">17 · 逐頁健檢</div><pre>你現在的角色是簡報審查員。逐頁檢查我這份簡報，每一頁給出以下評分與建議。
+
+評分項目（每項 1 到 5 分）：
+1. 版面：留白是否足夠，視覺重心是否清楚
+2. 清楚度：不看講稿的人能不能懂這一頁
+3. 文字量：是否超過建議上限
+4. 視覺適當性：這個圖表形式適不適合這個訊息
+5. 與前後頁的一致性：字級、配色、版面邏輯是否連貫
+
+每一頁的輸出格式：
+頁次 | 五項分數 | 總分 | 最需要改的一項 | 具體怎麼改（寫成可以直接執行的動作）
+
+最後給我：
+- 整份簡報的平均分
+- 分數最低的三頁，以及建議優先處理的順序
+- 有沒有哪兩頁其實可以合併，或哪一頁可以直接刪掉
+
+輸出語言：繁體中文</pre></div>
+        <div class="tipline">拿到結果後，用 Studio 面板裡的 <b>Revise</b> 功能逐頁修。點進 Slide Deck，選 Revise，在每一頁輸入修改指令，它會重新生成一份新的 deck。</div>
+
+        <div class="pnum"><span class="pn">18</span><span class="pt">為現場簡報優化</span><span class="where chat">貼在 Chat</span></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">18 · 螢幕版 ＋ 講稿版</div><pre>把我這份簡報改成適合現場口頭簡報的版本。
+
+針對每一頁，給我兩個東西：
+
+A. 螢幕版：
+- 標題不超過 15 字
+- 條列不超過 3 點，每點不超過 10 字
+- 標註哪些內容應該從螢幕上移除
+
+B. 講稿版：
+- 30 到 60 秒的口播稿，字數約 150 到 250 字
+- 用口語寫，不要書面語
+- 開頭一句話要接得住上一頁的結尾
+- 結尾一句話要帶到下一頁
+- 標註哪一句話是這一頁的重點，講的時候要放慢
+
+規則：從螢幕上砍掉的內容，全部收進講稿，資訊不能流失。
+
+輸出語言：繁體中文（台灣口語）</pre></div>
+        <div class="tipline"><b>這是我用最多的一個。</b>生成 Presenter Slides 模式的簡報，再搭配這個 Prompt 產講稿，基本上就可以直接上台。</div>
+
+        <div class="pnum"><span class="pn">19</span><span class="pt">打造有說服力的提案</span><span class="where studio">貼在 Studio</span></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">19 · 提案九段結構</div><pre>產出一份提案型簡報，結構固定為九個段落：
+
+1. 問題：現在發生什麼事
+2. 後果：不處理會怎樣，用具體損失表達
+3. 洞見：一個大多數人沒注意到的關鍵
+4. 解法：具體要做什麼
+5. 效益：做了之後會得到什麼，量化
+6. 證據：支持這個解法的數據或案例
+7. 案例：一個已經這樣做的實例
+8. 建議：我建議的具體方案
+9. 行動呼籲：對方下一步要做什麼決定
+
+規則：
+- 第 2 段跟第 5 段必須有數字，數字來自我上傳的來源
+- 第 9 段必須是一個明確的動作，不是「請大家考慮」
+- 全部九段控制在 12 到 15 頁
+
+輸出語言：繁體中文（台灣用語）</pre></div>
+
+        <div class="pnum"><span class="pn">20</span><span class="pt">成為你的長期設計夥伴</span><span class="where cfg">Configure Chat</span></div>
+        <div class="warn">⚠️ <b>這一個放的位置比較特別：</b>在 Chat 面板上方找到 <b>Configure Chat</b>（設定圖示），選 Custom，把下面這段貼進去。<b>建立筆記本的第一件事就做這個。</b></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">20 · 長期設定（一次設定，全部輸出都吃）</div><pre>你是我的簡報設計長期夥伴。往後在這個筆記本裡的所有輸出，一律遵守以下規則。
+
+內容規則：
+1. 所有內容只能來自我上傳的來源。來源不足時直接說明，不要補充來源以外的資訊
+2. 引用數字時標明出處在哪一份來源
+3. 對於有爭議或來源之間互相矛盾的地方，主動指出來
+
+表達規則：
+4. 標題直接寫結論，不要寫成主題標籤
+5. 每個投影片頁面只講一件事
+6. 一律使用繁體中文（台灣用語），不使用簡體字
+7. 專有名詞與工具名稱保留英文原文
+
+設計規則：
+8. 留白優先，寧可多一頁也不要塞滿一頁
+9. 配色不超過三色
+10. 圖表只保留必要元素
+
+工作方式：
+11. 產出任何東西之前，先用三句話說明你的規劃，讓我確認
+12. 如果我的指令有模糊的地方，先問我，不要自行假設</pre></div>
+        <div class="tipline"><b>微調：</b>第 11 條會讓它每次都先跟你對一下方向，<b>省掉很多重生的時間</b>。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">20 個都在上面了</div>
+      <h3>Prompt 是零件<br><span class="g">工作流才是機器</span></h3>
+      <p>這 20 個讓你把一份文件變成能上台的簡報。要把整條內容產線接起來，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 三個進階技巧 -->
+  <div class="sec fade">
+    <span class="sec-tag">三個進階技巧</span>
+    <h2>會不會用<br><span class="g">差在這三件事</span></h2>
+
+    <div class="sub-h">技巧一 · Detailed Deck 跟 Presenter Slides 要選對</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>模式</th><th>特性</th><th>什麼時候選</th></tr></thead><tbody>
+      <tr><td>Detailed Deck</td><td>完整文字與細節，單獨閱讀就能看懂</td><td>要寄給人看、放進郵件、當作交付文件</td></tr>
+      <tr><td>Presenter Slides</td><td>乾淨的視覺加關鍵講點，用來輔助口頭表達</td><td>你要站在台上講，簡報只是背景</td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ <b>選錯的話，後面用再多 Prompt 修都會很卡。</b>上台用 Detailed Deck，觀眾會低頭讀螢幕而不是聽你講。</div>
+
+    <div class="sub-h">技巧二 · 用 Revise 逐頁修，不要整份重生</div>
+    <p style="font-size:14px;">點進 Studio 面板裡的 Slide Deck，選 <span class="hl">Revise</span>，在每一頁輸入你的修改指令。常用的逐頁指令：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">四句常用的逐頁指令</div><pre>把這一頁的條列從 5 點減到 3 點，被刪掉的內容移到講稿
+
+這一頁的圖表換成長條圖，X 軸放年份，Y 軸放金額
+
+這一頁的標題改成直接說出結論，不要用主題標籤的寫法
+
+這一頁的配色改成 #1B2430 為主、#3D6DF0 為輔，移除其他顏色</pre></div>
+    <div class="tipline">另外，點 Slide Deck 標題旁邊的三點選單，選 <b>View custom prompt</b>，可以看到它當初是用什麼 Prompt 生成的。<b>這招很好用，你可以拿它自己寫的 Prompt 回頭改。</b></div>
+
+    <div class="sub-h">技巧三 · 來源的挑選比 Prompt 更重要</div>
+    <div class="insight"><div class="il">這件事決定八成的品質</div><div class="it">Gemini Notebook 的輸出品質，八成取決於你丟了什麼進去。</div></div>
+    <ul class="bul">
+      <li><b>Google Docs、Sheets、Slides 是活的來源。</b>你改了原檔，可以在 Gemini Notebook 裡重新抓取最新版本</li>
+      <li><b>PDF 是靜態上傳。</b>上傳當下是什麼就是什麼，原檔改了不會同步</li>
+      <li><b>三到五份高相關來源，效果好過二十份雜訊。</b>來源太多會稀釋訊號，產出的東西會變得空泛</li>
+      <li><b>來源數量上限依照你的 Google AI 方案而不同。</b>免費跟付費的額度差很多，實際數字請看官方說明頁，Google 有在調整</li>
+    </ul>
+  </div>
+
+  <!-- 不同 AI 的分工 -->
+  <div class="sec fade">
+    <span class="sec-tag">工具分工</span>
+    <h2>這套流程<br><span class="g">不是只用一個工具</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>階段</th><th>用什麼</th><th>為什麼</th></tr></thead><tbody>
+      <tr><td>讀文件、抓重點</td><td>Gemini Notebook</td><td>回答綁定你上傳的來源，可以點回原文查證</td></tr>
+      <tr><td>產簡報骨架</td><td>Gemini Notebook（Studio → Slide Deck）</td><td>直接出 deck，不用自己排</td></tr>
+      <tr><td>修單張投影片的圖</td><td>Gemini</td><td>把該頁存成圖片，丟進 Gemini 用生圖工具改，再放回去</td></tr>
+      <tr><td>換字體、套品牌色、加 logo</td><td>Canva</td><td>匯出 PPTX 後進 Canva 做最後美化</td></tr>
+      <tr><td>最終排版微調</td><td>Google Slides</td><td>匯出 PPTX 或 PDF，進 Slides 調間距</td></tr>
+      <tr><td>寫講稿、改成長文或貼文</td><td>Claude</td><td>同一份內容改成不同格式的長文比較穩</td></tr>
+      <tr><td>補算數據、做額外圖表</td><td>ChatGPT</td><td>需要臨時算一組數字或做圖時</td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>匯出格式：</b>Slide Deck 可以下載成 PDF，也支援 PPTX 匯出。要進 Canva 或 PowerPoint 的話選 PPTX。</div>
+  </div>
+
+  <!-- 限制 -->
+  <div class="sec fade">
+    <span class="sec-tag">使用前要知道的限制</span>
+    <h2>先講清楚<br><span class="g">免得你踩坑</span></h2>
+    <div class="warn"><b>生成要等。</b>Slide Deck 通常要跑幾分鐘。這段時間可以繼續在筆記本裡做別的事，不用盯著。</div>
+    <div class="warn"><b>會出錯。</b>Google 官方自己就標註 Slide Deck 是 AI 生成的，可能有視覺或事實上的錯誤。<b>數字、日期、人名一定要自己核對一遍。</b></div>
+    <div class="warn"><b>視覺自由度有限。</b>它產出的版面是它的模板，你能調的範圍不像 Canva 那麼大。想要完全客製，匯出 PPTX 之後再處理。</div>
+    <div class="warn"><b>新功能是分階段開放的。</b>像 code execution 這類比較新的能力，目前是先給高階方案跟部分企業帳號，一般帳號可能還看不到。<b>看不到不代表你設定錯了。</b></div>
+    <div class="warn"><b>繁體中文要明講。</b>每個 Prompt 都寫了「輸出語言：繁體中文（台灣用語）」，<b>這行不要刪</b>。不寫的話有機率跑出簡體字或中國用語。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>先從三個<br><span class="g">開始用</span></h2>
+    <p>這 20 個 Prompt 我建議你先從三個開始：<span class="hl">Prompt 20</span>（一次設定好規則）、<span class="hl">Prompt 01</span>（生出第一版）、<span class="hl">Prompt 17</span>（做健檢）。</p>
+    <div class="insight"><div class="il">怎麼開始</div><div class="it">這三個跑一輪，你就會知道這套流程能幫你省掉多少時間。剩下的 17 個，等你遇到具體問題再回來翻。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>簡報做出來了，<span class="g">接下來換我陪你把它接成產線</span></h2>
+      <div class="cta-lead">這 20 個 Prompt 讓你把一份文件變成能上台的簡報。要把它接成一條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具會用、卻不知道怎麼串成工作流的你</div>
+        <div class="f">收藏了一堆 Prompt，卻從來沒真的跑完一輪的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">跑完之後，回貼文底下留言告訴我哪一個 Prompt 最有感</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件由傑森所長整理。工具功能與方案內容可能隨 Google 更新而變動，操作細節請以<a href="https://support.google.com/gemininotebook/answer/16757456" target="_blank" rel="noopener">官方說明頁</a>為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：20 個簡報 Prompt——輪播 DM 承接頁／lead magnet
+· 內容：開始之前（NotebookLM 改名 Gemini Notebook 警語＋工具連結表）／最重要的一張表（三面板貼在哪＋8 步標準流程）／四組 20 個 Prompt 摺疊卡／中段CTA／三個進階技巧／工具分工表／五個限制／最後
+· 版型決策：
+    1. 新增 .where 位置色標（綠=Chat／金=Studio／紅=Configure Chat）掛在每個 Prompt 標題旁——原稿反覆強調「貼錯地方就沒效果」，用文字標會被滑過去，做成色標才擋得住
+    2. Prompt 20 的 Configure Chat 位置特殊，額外用 warn 再說一次
+    3. 「來源挑選比 Prompt 更重要」拉成 insight，這是全篇最反直覺的一句
+· 可複製區塊：21 個 .cp（hero-cp 5：#01 起手式、#17 健檢、#18 講稿、#20 長期設定、Revise 四句）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「20個簡報Prompt完整清單_傑森所長」
+· 命名：日期前綴（2026-08-06-slide-prompts-20.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

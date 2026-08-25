@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 個 Skill，把 Claude 的設計品味裝回去</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:460px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.mono td:last-child{font-family:var(--mono);font-size:11.5px;color:var(--dim);}
+.tbl.cmd td:first-child{font-family:var(--mono);color:var(--gold);white-space:nowrap;font-size:12.5px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+.links-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 4px;}
+.links-row a{font-family:var(--mono);font-size:11px;color:var(--gold);background:var(--card2);border:1px solid var(--gold-dim);border-radius:50px;padding:3px 11px;}
+.who{flex-shrink:0;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.who.official{background:var(--ok-bg);border:1px solid var(--ok-line);color:var(--ok);}
+.who.community{background:rgba(212,144,42,0.13);border:1px solid var(--gold-dim);color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11.5px;line-height:1.7;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+
+.judge{border-radius:12px;padding:11px 14px;margin:7px 0;font-size:13.6px;line-height:1.72;}
+.judge.no{background:var(--no-bg);border:1px solid var(--no-line);color:#7a3320;}
+.judge.ok{background:var(--ok-bg);border:1px solid var(--ok-line);color:#2f5228;}
+.judge .jl{font-weight:700;font-size:11.5px;letter-spacing:0.05em;display:block;margin-bottom:4px;}
+.judge.no .jl{color:var(--no);}
+.judge.ok .jl{color:var(--ok);}
+
+.combo{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 18px;margin:12px 0;}
+.combo .cn{font-family:var(--mono);font-size:11px;letter-spacing:0.12em;color:var(--gold);margin-bottom:6px;}
+.combo .ct{font-family:var(--serif);font-weight:900;font-size:17px;color:#2a2620;margin-bottom:10px;}
+.combo .fl{font-family:var(--mono);font-size:12px;line-height:2;color:var(--text);}
+.combo .fl b{color:var(--gold);font-weight:500;}
+.combo p{font-size:13.4px;color:var(--dim);line-height:1.78;margin:10px 0 0;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+  .who{display:none;}
+  .ch-t .en{display:block;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>裝完之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>品味裝回去了<br><span class="g">判斷還是你的</span></h4>
+  <p>Skill 把輸出從「一眼是 AI」拉到「像資深的人做的」。要往哪走還是你決定，我在 Skool 帶你練。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE 設計 SKILLS · 完整清單</div>
+    <h1>7 個 Skill<br>把 Claude 的<span class="g">設計品味裝回去</span></h1>
+    <div class="h-sub">在寫下第一行 code 之前，先把設計方向鎖死</div>
+    <div class="hero-sub">Claude 生出來的介面一眼就看得出是 AI 做的。Inter 字體、紫色漸層、卡片包卡片、標題上面永遠有一個圓角方塊 icon。<b>這不是模型能力不足造成的，是因為訓練資料的統計中心就長這樣</b>，沒有人給方向的時候，它會回到中間值。每一個都附安裝指令、原始 repo、實際呼叫方式，以及踩過的雷。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">7</div><div class="l">個 · 設計 Skill</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">3</div><div class="l">種 · 情境組合</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">個 · 常見踩雷</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">我是 Jason，經營「傑森所長」，專注在「AI × 自媒體變現」。我把 AI 工具實際測過、拆解成可以直接套用的工作流，然後把過程公開。<b>所有我發出去的東西，都是我自己在用的東西。沒在用的我不會寫。</b></div></div>
+  </div>
+
+  <!-- 前置 -->
+  <div class="sec fade">
+    <span class="sec-tag">使用前</span>
+    <h2>三個<br><span class="g">前置動作</span></h2>
+
+    <div class="sub-h">1 · 先確認你有 skills CLI</div>
+    <p style="font-size:14px;">大部分 skill 都透過同一個 CLI 安裝。它是 npx 執行的，不用預先安裝，確認 Node.js 環境可用即可。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">確認 Node</div><pre>node -v</pre></div>
+
+    <div class="sub-h">2 · 決定安裝範圍</div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>範圍</th><th>安裝位置</th><th>適用情況</th></tr></thead><tbody>
+      <tr><td>專案層級（預設）</td><td>.claude/skills/</td><td>只有這個專案要用</td></tr>
+      <tr><td>全域</td><td>~/.claude/skills/</td><td>每個專案都想用</td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>設計類的 skill 建議裝全域</b>，加上 <b>-g</b> 參數。</div>
+
+    <div class="sub-h">3 · 裝完一定要重開 Claude Code</div>
+    <div class="warn">⚠️ <b>Skill 是在 Claude Code 啟動時載入的。</b>你在已經開著的 session 裡裝了新 skill，它看不到。<b>這是最多人卡住的地方。裝完關掉重開。</b></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">確認有載入</div><pre>列出你目前可以使用的所有 skills</pre></div>
+  </div>
+
+  <!-- 七個 skill -->
+  <div class="sec fade">
+    <span class="sec-tag">七個 Skill</span>
+    <h2>展開任一個<br><span class="g">安裝指令直接複製</span></h2>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">frontend-design<span class="en"> · 基礎美學方向</span></span><span class="who official">Anthropic 官方</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>在寫 code 之前，強制 Claude 先決定三件事：這個東西的目的、受眾、以及要走哪一種美學方向（brutalist、maximalist、retro-futuristic、luxury、playful 等）。方向決定之後才開始寫。<br><br>它同時<b>封鎖了一批預設選項</b>：Inter、系統字體堆疊、紫色到藍色漸層、卡片網格。這些是模型的預設反射動作，擋掉之後它才會去找別的解法。</div>
+        <div class="tipline">Skill 裡面有一條規則我很喜歡：<b>要求它每次至少冒一個能被說明理由的美學風險。</b></div>
+        <div class="links-row"><a href="https://github.com/anthropics/skills" target="_blank" rel="noopener">GitHub · anthropics/skills</a></div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx skills add anthropics/skills --skill frontend-design -g
+
+<span class="cm"># 也可以用 plugin 方式安裝整個 marketplace</span>
+/plugin marketplace add anthropics/skills</pre></div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">怎麼用</div><pre>用 frontend-design skill，幫我做一個線上課程的 landing page。
+主題是給上班族的 AI 工具課，受眾是 28 到 40 歲、有預算但沒時間的人。
+先跟我說你選的美學方向跟理由，我確認之後再寫 code。</pre></div>
+
+        <div class="warn">⚠️ <b>它是「地板」，不是天花板。</b>它會讓輸出從「一看就是 AI」變成「看起來像資深工程師做的」，<b>離「這個設計有觀點」還有一段距離</b>。要跨那一段，往下看 02 跟 04。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">design-taste-frontend<span class="en"> · 行銷頁品味層</span></span><span class="who community">社群</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>這個 skill 常被叫做 taste-skill，那是 repo 的名字。repo 裡面現在預設的 skill 名稱是 <b>design-taste-frontend</b>（v2 改寫版），舊版保留為 taste-skill-v1。</div>
+        <div class="tblwrap"><table class="tbl"><thead><tr><th>旋鈕</th><th>控制什麼</th><th>調高的效果</th></tr></thead><tbody>
+          <tr><td>variance</td><td>版面變化度</td><td>非對稱排版、破格構圖</td></tr>
+          <tr><td>motion</td><td>動態量</td><td>進場動畫、捲動觸發</td></tr>
+          <tr><td>density</td><td>資訊密度</td><td>每個畫面塞更多內容</td></tr>
+        </tbody></table></div>
+        <p style="font-size:14px;">預設值偏向表現力強的方向。它會先讀你的 brief，判斷這是什麼類型的頁面、給誰看、要什麼語氣，然後自己決定旋鈕的位置，<b>開始寫之前會用一句話跟你講它的判斷</b>。守備範圍寫得很明確：landing page、作品集、改版。<b>後台介面、設定頁那類東西它不管。</b></p>
+        <div class="links-row"><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener">GitHub · Leonxlnx/taste-skill</a></div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx skills add Leonxlnx/taste-skill --skill design-taste-frontend -g
+
+<span class="cm"># 需要舊版</span>
+npx skills add Leonxlnx/taste-skill --skill taste-skill-v1 -g</pre></div>
+        <div class="tipline">同一個 repo 裡還有幾個兄弟 skill，包含 brutalist、minimalist、image-to-code、redesign，以及第 05 個的 brandkit。</div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">怎麼用（它一觸發就會先講判斷，那個時候可以修正）</div><pre>用 design-taste-frontend，做一個攝影師的個人作品集首頁。
+變化度拉高，動態中等，密度壓低。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">品牌調性保守的話，直接在 brief 裡寫出來</div><pre>這是給金融業客戶的頁面，信任感優先，不要太跳。</pre></div>
+
+        <div class="warn">⚠️ <b>它的 SKILL.md 是單一大檔，八十幾 KB、一千兩百多行，而且每次觸發整份載入。</b>這是實打實的 context 成本，每一次都要付。<br><br>跟其他 skill 的設計哲學相反：多數重量級 skill 會做成薄索引、需要時才載入細節，<b>這個押注在「規則要一起讀才有意義」</b>。你的專案 context 很吃緊的話，這件事要納入考慮。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">remotion-best-practices<span class="en"> · 程式化影片</span></span><span class="who official">Remotion 官方</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>Remotion 是用 React 寫程式來產生影片的框架，<b>沒有時間軸編輯器，你寫元件，動畫就是 state 隨時間變化</b>。Claude 對 Remotion 的原生知識偏淺，常在 interpolation 曲線、音訊裁切、composition 結構這幾個地方寫錯。<br><br>這個 skill 由 Remotion 團隊自己維護，載入三十幾份規則檔，涵蓋動畫、音訊、素材、字幕、圖表、文字、轉場、composition 管理，還有 Three.js 和 React Three Fiber 做的 3D 場景。<b>採用薄索引架構，只在需要的時候載入對應的規則檔，比較省 context。</b></div>
+        <div class="links-row"><a href="https://github.com/remotion-dev/skills" target="_blank" rel="noopener">GitHub</a><a href="https://www.remotion.dev/docs/ai/claude-code-plugin" target="_blank" rel="noopener">官方文件</a></div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝與更新</div><pre>npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices -g
+
+<span class="cm"># 更新規則</span>
+npx remotion skills update</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">用 slash command 呼叫</div><pre>/remotion-best-practices 做一支 20 秒的產品介紹影片，
+畫面是儀表板數字往上跑，配一段淡入淡出的轉場，最後出 logo。</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">或在 prompt 裡指名</div><pre>用 remotion-best-practices，把這份 CSV 做成長條圖競賽動畫，
+30fps，輸出 1080x1920 直式，給 Reels 用。</pre></div>
+        <div class="tipline">用 <b>bun create video</b> 開新的 Remotion 專案時，它會主動問你要不要一併裝 skill。<b>這個 skill 守備範圍很窄，不做程式化影片的話沒有理由裝。</b></div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">impeccable<span class="en"> · 設計總監，23 個指令</span></span><span class="who community">Paul Bakaus</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>前面三個是「開始之前給方向」，<b>這一個是「做完之後進場修」</b>。它的角色是設計總監，底下有 23 個單字指令，每一個對應一種 AI 生成介面的典型失敗模式。<b>你用一個字下指令，取代寫一長段描述。</b><br><br>維護者是 Paul Bakaus（jQuery UI 作者、前 Google Chrome DevTools PM），Apache 2.0 授權。</div>
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>做什麼</th></tr></thead><tbody>
+          <tr><td>/impeccable audit</td><td>無障礙、效能、響應式品質檢查</td></tr>
+          <tr><td>/impeccable critique</td><td>UX 檢視：層級、清晰度、情緒共鳴</td></tr>
+          <tr><td>/impeccable polish</td><td>出貨前最後一輪：對齊、間距、細節</td></tr>
+          <tr><td>/impeccable distill</td><td>砍掉沒有存在必要的複雜度</td></tr>
+          <tr><td>/impeccable bolder</td><td>太安全太無聊的設計，加強力道</td></tr>
+          <tr><td>/impeccable quieter</td><td>太吵太用力的設計，收斂</td></tr>
+          <tr><td>/impeccable typeset</td><td>修字體選擇、層級、字級</td></tr>
+          <tr><td>/impeccable colorize</td><td>給單色介面加策略性的顏色</td></tr>
+          <tr><td>/impeccable animate</td><td>加有目的的動態</td></tr>
+          <tr><td>/impeccable delight</td><td>加值得記住的小驚喜</td></tr>
+          <tr><td>/impeccable harden</td><td>錯誤處理、國際化、邊界情況</td></tr>
+          <tr><td>/impeccable clarify</td><td>修 UX 文案、標籤、錯誤訊息</td></tr>
+        </tbody></table></div>
+        <div class="insight"><div class="il">它最重要的設計：brand 模式與 product 模式分流</div><div class="it">行銷頁、作品集、編輯型內容走 brand，設計本身就是產品；後台、儀表板、內部工具走 product，設計服務產品。兩者的判斷標準相反，多數 skill 把它們混在一起處理，這個分開。</div></div>
+        <div class="tipline">除了 LLM 判斷之外，它還帶幾十條<b>確定性的偵測規則</b>，跑起來不需要呼叫模型也不需要 API key。</div>
+        <div class="links-row"><a href="https://github.com/pbakaus/impeccable" target="_blank" rel="noopener">GitHub</a><a href="https://impeccable.style" target="_blank" rel="noopener">impeccable.style</a></div>
+
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝與初始化</div><pre>npx impeccable install
+
+<span class="cm"># 裝完在 Claude Code 裡跑一次初始化</span>
+/impeccable init
+
+<span class="cm"># 用 skills CLI 安裝也可以</span>
+npx skills add pbakaus/impeccable --skill impeccable -g</pre></div>
+        <div class="warn">⚠️ <b>init 不能跳過。</b>init 會問你這個介面屬於 brand 還是 product，然後寫出 <b>PRODUCT.md</b>，記錄受眾、品牌語氣、反面參考、色彩、字體、元件。後面每一個指令都會讀這份檔案。<b>沒有 PRODUCT.md，所有指令都會回到通用輸出，等於白裝。</b></div>
+
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">常用指令可以釘成獨立捷徑</div><pre>/impeccable pin audit</pre></div>
+        <div class="tipline">釘完之後 <b>/audit</b> 就能直接用，不必每次打全名。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">實際的迭代節奏</div><pre>/impeccable critique landing
+
+<span class="cm"># 看它列出問題，再針對性下指令</span>
+/impeccable typeset landing
+/impeccable arrange landing
+/impeccable polish landing</pre></div>
+        <div class="tipline">它有一個很好的預設行為：<b>context 不足的時候會停下來問你，不會硬猜</b>。第一次用會覺得囉唆，那正是它跟一般 prompt 的差別。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">brandkit<span class="en"> · 品牌識別系統</span></span><span class="who community">社群</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>組出一整套可以拿去提案的品牌識別板：logo 概念、色彩系統、字體、mockup。<b>它的順序是先想品牌的意義，再處理美感</b>，所以產出的東西有內在一致性，後續你做任何素材都能對回同一套系統。跟第 02 個住在同一個 repo，共用同一套反 AI 味的判斷邏輯。</div>
+        <div class="links-row"><a href="https://github.com/Leonxlnx/taste-skill" target="_blank" rel="noopener">GitHub · Leonxlnx/taste-skill</a></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx skills add Leonxlnx/taste-skill --skill brandkit -g</pre></div>
+        <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">怎麼用（給它品牌的核心概念，不要只給形容詞）</div><pre>用 brandkit，幫我做一套個人品牌識別。
+
+品牌名：起點學院
+定位：教一般人用 AI 做內容變現
+受眾：想做自媒體但完全沒經驗的上班族
+核心概念：起點，不是終點。第一步比完美重要。
+
+輸出：logo 概念三個方向、色彩系統、字體配對、社群貼文 mockup。</pre></div>
+        <div class="warn">⚠️ 它輸出的是<b>識別板，是提案用的視覺提案，不是可以直接拿去印刷的向量檔</b>。你會拿到方向跟規範，實作還是要進 Figma 或 Illustrator。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">06</span><span class="ch-t">canvas-design<span class="en"> · 海報平面設計</span></span><span class="who official">Anthropic 官方</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>做靜態平面作品，輸出 .png 或 .pdf。海報、封面、單頁圖像。<br><br><b>它的運作分兩階段，這是它跟一般 AI 生圖最大的差別：</b>第一階段先生成一份<b>設計哲學文件</b>（.md），給這套美學命名，例如「Brutalist Joy」「Chromatic Silence」，然後用四到六段文字說明這個美學透過形式、空間、色彩、構圖如何展現。第二階段才根據那份哲學去畫。<b>所以出來的東西有內在邏輯，不是隨機的風格拼貼。</b></div>
+        <div class="tipline">它還有一個設計：會把主題當成<b>埋在作品裡的隱性線索</b>，懂的人會感覺到，不懂的人單純看到一幅好構圖。字體從 skill 自帶的 canvas-fonts 目錄取用。<b>元素重疊或超出畫布邊界，它視為不可接受的失敗，會重做。</b></div>
+        <div class="links-row"><a href="https://github.com/anthropics/skills/tree/main/skills/canvas-design" target="_blank" rel="noopener">GitHub</a></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝</div><pre>npx skills add anthropics/skills --skill canvas-design -g</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">怎麼用</div><pre>用 canvas-design，做一張演講活動海報。
+
+主題：AI 時代的內容生產
+場地：台北，室內，兩百人
+語氣：專業但不冷硬
+輸出 A3 直式 PDF。
+
+先給我設計哲學，我確認方向再畫。</pre></div>
+        <div class="warn">⚠️ 它<b>明確拒絕複製既有藝術家的作品</b>，避免版權問題。你要求「做成某某人的風格」，它會改用原創的美學方向來達成類似效果。另外，<b>輸出以視覺為主、文字為輔，大約九比一</b>，要放大量文字的排版檔這個 skill 不適合。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">07</span><span class="ch-t">animate<span class="en"> · 介面動態</span></span><span class="who community">impeccable 的一部分</span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>做什麼：</b>分析一個既有介面，<b>找出「應該要有動態但目前是硬切」的地方，然後只在那些地方加</b>。它處理進場動態、狀態變化、按鈕回饋、hover 效果。</div>
+        <div class="insight"><div class="il">它的核心原則</div><div class="it">挑一個招牌時刻。全部都動的介面反而沒有重點，這個 skill 會主動抵抗那種傾向。</div></div>
+        <div class="tipline">它同時強制幾件事：尊重使用者的 <b>prefers-reduced-motion</b> 設定、<b>只用 transform 和 opacity 來保 60fps</b>、把行動裝置的效能預算納入判斷。</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">安裝（裝了 impeccable 就有）</div><pre>npx impeccable install
+
+<span class="cm"># 也可以單獨安裝</span>
+npx skills add pbakaus/impeccable --skill animate -g</pre></div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">怎麼用</div><pre>/impeccable animate checkout
+
+<span class="cm"># 釘成捷徑之後可以直接用 /animate</span>
+/impeccable pin animate</pre></div>
+        <div class="warn">⚠️ 用之前<b>要先跑過 /impeccable init</b>，它需要讀 PRODUCT.md 才知道這個介面的調性。</div>
+        <div class="tipline">想要完全獨立、不依賴 impeccable 的動態 skill，另一個選擇是 Emil Kowalski 的版本：<b>npx skills add delphi-ai/animate-skill --skill animate -g</b>。那一套把「退場要比進場快」「只用 transform 和 opacity」這類原則寫成規則，路線接近但獨立運作。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">七個都講完了</div>
+      <h3>禁用字體清單是止血帶<br><span class="g">設計品味來自理解限制</span></h3>
+      <p>這些 skill 把輸出從「一眼是 AI」拉到「像資深的人做的」。剩下那一段是判斷力，我在 Skool 帶你練。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- 三種情境 -->
+  <div class="sec fade">
+    <span class="sec-tag">怎麼組合</span>
+    <h2>裝七個全開不是好主意<br><span class="g">context 會被吃光</span></h2>
+    <p>按情境挑。</p>
+
+    <div class="combo">
+      <div class="cn">情境 A</div>
+      <div class="ct">做行銷頁、作品集、landing page</div>
+      <div class="fl"><b>frontend-design</b>（地板）<br>↓<br><b>design-taste-frontend</b>（品味層，變化度拉高）<br>↓<br><b>/impeccable critique</b>（做完之後找問題）<br>↓<br><b>/impeccable animate</b>（挑一個招牌時刻）<br>↓<br><b>/impeccable polish</b>（出貨前）</div>
+    </div>
+
+    <div class="combo">
+      <div class="cn">情境 B</div>
+      <div class="ct">做後台、儀表板、內部工具</div>
+      <div class="fl"><b>frontend-design</b>（地板）<br>↓<br><b>/impeccable init</b> → 選 product 模式<br>↓<br><b>/impeccable arrange</b>（版面節奏）<br>↓<br><b>/impeccable clarify</b>（UX 文案跟錯誤訊息）<br>↓<br><b>/impeccable audit</b>（無障礙跟響應式）</div>
+      <p><b>跳過 design-taste-frontend。</b>它的守備範圍是行銷頁，用在設定頁只會製造噪音。</p>
+    </div>
+
+    <div class="combo">
+      <div class="cn">情境 C</div>
+      <div class="ct">做品牌識別跟平面素材</div>
+      <div class="fl"><b>brandkit</b>（先定出識別系統）<br>↓<br><b>canvas-design</b>（用那套系統做海報、封面）</div>
+      <p>需要影片素材再加 <b>remotion-best-practices</b>。</p>
+    </div>
+  </div>
+
+  <!-- 常見踩雷 -->
+  <div class="sec fade">
+    <span class="sec-tag">常見踩雷</span>
+    <h2>五個<br><span class="g">先避開</span></h2>
+    <div class="warn"><b>裝完沒重開。</b>Skill 在 Claude Code 啟動時載入，已經開著的 session 看不到新裝的東西。</div>
+    <div class="warn"><b>沒跑 /impeccable init。</b>沒有 PRODUCT.md，23 個指令全部回到通用輸出。</div>
+    <div class="warn"><b>同時裝太多重量級 skill。</b>design-taste-frontend 一次載入八十幾 KB，加上其他幾個大 skill，你的 context 剩不到多少給實際的專案檔案。<b>挑一個當基底就好。</b></div>
+    <div class="warn"><b>以為 skill 會自己啟動。</b>多數 skill 是靠描述關鍵字自動觸發的，觸發率不是百分之百。<b>重要的任務直接在 prompt 裡指名 skill 名稱，最保險。</b></div>
+    <div class="warn"><b>用 skill 取代判斷。</b>這些 skill 把輸出從「一眼是 AI」拉到「看起來像資深的人做的」。<b>要往哪個方向走、值不值得冒那個險，決定權還是在你手上。</b></div>
+  </div>
+
+  <!-- 快速查表 -->
+  <div class="sec fade">
+    <span class="sec-tag">快速查表</span>
+    <h2>七個 Skill<br><span class="g">一張表帶走</span></h2>
+    <div class="tblwrap"><table class="tbl mono"><thead><tr><th>Skill</th><th>用途</th><th>安裝指令</th></tr></thead><tbody>
+      <tr><td>frontend-design</td><td>基礎美學方向</td><td>npx skills add anthropics/skills --skill frontend-design -g</td></tr>
+      <tr><td>design-taste-frontend</td><td>行銷頁品味層</td><td>npx skills add Leonxlnx/taste-skill --skill design-taste-frontend -g</td></tr>
+      <tr><td>remotion-best-practices</td><td>程式化影片</td><td>npx skills add https://github.com/remotion-dev/skills --skill remotion-best-practices -g</td></tr>
+      <tr><td>impeccable</td><td>設計總監，23 個指令</td><td>npx impeccable install</td></tr>
+      <tr><td>brandkit</td><td>品牌識別系統</td><td>npx skills add Leonxlnx/taste-skill --skill brandkit -g</td></tr>
+      <tr><td>canvas-design</td><td>海報平面設計</td><td>npx skills add anthropics/skills --skill canvas-design -g</td></tr>
+      <tr><td>animate</td><td>介面動態</td><td>npx skills add pbakaus/impeccable --skill animate -g</td></tr>
+    </tbody></table></div>
+    <div class="tipline">四個官方維護（Anthropic 兩個、Remotion 一個、Paul Bakaus 的 impeccable 為開源專案），<b>全部免費</b>。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>這七個<br><span class="g">我都實際跑過專案</span></h2>
+    <p>清單裡的雷都是我自己踩出來的。AI 工具更新很快，這份清單反映的是我寫的時候的狀態。<span class="hl">指令有變動的話，以各個 repo 的 README 為準，連結我都放在上面了。</span></p>
+    <div class="insight"><div class="il">這份清單真正在講的事</div><div class="it">禁用字體清單是止血帶，設計品味來自理解限制。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>品味裝回去了，<span class="g">接下來換我陪你把它變成產出</span></h2>
+      <div class="cta-lead">這七個 skill 讓 Claude 做出來的東西不再一眼看得出是 AI。但要把它接成一整條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">工具裝得起來、卻不知道怎麼接成系統的你</div>
+        <div class="f">收藏了一堆清單，卻從來沒真的裝起來的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">裝完之後，回貼文底下留言告訴我你先裝了哪一個</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ AI 工具更新很快，這份清單反映的是撰寫當下的狀態。指令有變動時，以各個 repo 的 README 為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：7 個設計 Skill——輪播 DM 承接頁／lead magnet
+· 內容：開場（為什麼 AI 介面一眼看得出來）／使用前三個前置動作／七個 Skill 摺疊卡／中段CTA／三種情境組合／五個常見踩雷／快速查表／最後
+· 版型決策：
+    1. 新增 .who 維護者徽章（綠=官方／金=社群），因為這七個裡官方與社群各半，來源會影響信任判斷
+    2. 情境組合用 .combo 直式流程（箭頭換行），三種情境各一張——這是本篇最實用的部分，不能塞進內文
+    3. impeccable 的 23 個指令做成 .tbl.cmd 金色等寬表
+    4. 五個踩雷全部用 warn 紅框並列，不用一般清單
+· 可複製區塊：16 個 .cp（hero-cp 2：impeccable 安裝與 init、brandkit 實際 Prompt）
+· 三段 Skool CTA：前段 .side-cta／.top-cta、中段 .mid-cta、後段 .cta → https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「Claude設計SKILLS完整清單」
+· 命名：日期前綴（2026-08-06-claude-design-skills.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>50 組 Claude 隱藏指令｜完整整合包</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D4902A; --gold-bright:#E8A94A; --gold-dim:rgba(212,144,42,0.30);
+  --bg:#F4F1EA; --bg2:#FBF8F2; --card:#FFFFFF; --card2:#FAF6EE;
+  --code:#12161f; --code-tx:#e6eaf2;
+  --text:#2c2a26; --dim:#6d6a62; --faint:#a8a39a;
+  --line:rgba(0,0,0,0.12);
+  --ok:#4a7c3f; --ok-bg:rgba(74,124,63,0.07); --ok-line:rgba(74,124,63,0.25);
+  --no:#b1431f; --no-bg:rgba(200,70,40,0.06); --no-line:rgba(200,70,40,0.22);
+  --r-md:16px; --r-lg:22px; --pill:50px;
+  --bounce:400ms cubic-bezier(0.34,1.56,0.64,1);
+  --serif:"Noto Serif TC",serif; --sans:"Noto Sans TC","Inter",sans-serif; --mono:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);color:var(--text);line-height:1.85;overflow-x:hidden;
+  background:var(--bg);
+  background-image:radial-gradient(118% 54% at 50% 0%, rgba(212,144,42,0.16) 0%, rgba(212,144,42,0.05) 34%, rgba(244,241,234,0) 62%);
+  background-attachment:fixed;}
+.glow{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.g1{position:absolute;width:min(60vw,680px);height:min(60vw,680px);border-radius:50%;background:radial-gradient(circle, rgba(212,144,42,0.13), rgba(212,144,42,0));top:-18%;right:-14%;filter:blur(20px);}
+.g2{position:absolute;width:min(50vw,560px);height:min(50vw,560px);border-radius:50%;background:radial-gradient(circle, rgba(212,178,120,0.12), rgba(212,178,120,0));bottom:-14%;left:-12%;filter:blur(22px);}
+.wrap{max-width:720px;margin:0 auto;position:relative;min-height:100vh;}
+.js .fade{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease;}
+.fade.vis{opacity:1;transform:translateY(0);}
+a{color:var(--gold);text-decoration:none;word-break:break-all;}
+
+.top-cta{display:none;}
+.top-cta a{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#1a1406;font-weight:800;font-size:13.5px;padding:11px 16px;text-align:center;letter-spacing:0.02em;}
+.top-cta .tc-em{font-weight:900;}
+
+.side-cta{display:none;}
+@media(min-width:1120px){
+  .side-cta{display:block;position:fixed;top:130px;right:max(24px,calc((100vw - 720px)/2 - 268px));width:236px;z-index:30;background:linear-gradient(165deg,var(--card) 0%,var(--card2) 100%);border:1px solid var(--gold-dim);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:20px 20px 22px;box-shadow:0 10px 34px rgba(120,90,30,0.13);}
+  .side-cta .sk-k{font-family:var(--mono);font-size:10px;letter-spacing:0.16em;color:var(--gold);margin-bottom:10px;font-weight:500;}
+  .side-cta h4{font-family:var(--serif);font-weight:900;font-size:17px;line-height:1.5;color:#2a2620;margin-bottom:9px;}
+  .side-cta h4 .g{color:var(--gold);}
+  .side-cta p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:16px;}
+  .side-cta a{display:block;text-align:center;background:var(--gold);color:#1a1406;font-weight:900;font-size:14px;padding:12px 14px;border-radius:var(--pill);box-shadow:0 6px 18px rgba(212,144,42,0.26);transition:transform var(--bounce);}
+  .side-cta a:hover{transform:translateY(-2px);}
+}
+
+.hero{position:relative;z-index:1;padding:64px 30px 40px;}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:22px;font-weight:500;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1.36;margin-bottom:16px;color:#2a2620;}
+.hero h1 .g{color:var(--gold);}
+.hero .h-sub{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold);margin-bottom:16px;}
+.hero-sub{font-size:15px;color:var(--dim);line-height:1.85;margin-bottom:26px;}
+.divider{width:46px;height:3px;background:var(--gold);margin-bottom:26px;}
+.stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat .n{font-family:"Inter";font-weight:800;font-size:30px;color:var(--gold);line-height:1;}
+.stat .l{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:0.04em;}
+.stat-op{font-size:20px;color:var(--faint);font-weight:300;}
+.author-card{margin-top:28px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:var(--r-md);padding:16px 20px;position:relative;z-index:1;}
+.author-card .a{font-weight:700;color:var(--gold);font-size:15px;}
+.author-card .b{font-size:13px;color:var(--dim);margin-top:5px;line-height:1.75;}
+
+.sec{position:relative;z-index:1;padding:38px 30px;border-top:1px solid var(--line);}
+.sec-tag{display:inline-block;background:rgba(212,144,42,0.14);color:var(--gold);font-size:12px;font-weight:700;padding:5px 15px;border:1px solid var(--gold-dim);border-radius:var(--pill);margin-bottom:16px;letter-spacing:0.05em;}
+.sec h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.42;margin-bottom:14px;color:#2a2620;}
+.sec h2 .g{color:var(--gold);}
+.sec>p{font-size:15px;color:var(--text);line-height:1.9;margin-bottom:14px;}
+.sec>p .hl{color:var(--gold);font-weight:500;}
+.sub-h{font-family:var(--serif);font-weight:700;font-size:15.5px;color:var(--gold);margin:20px 0 8px;}
+
+.insight{background:var(--card2);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:20px 22px;margin:18px 0;}
+.insight .il{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin-bottom:9px;}
+.insight .it{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.7;color:#2a2620;}
+
+.tipline{font-size:13.5px;color:var(--dim);line-height:1.75;border-left:2px solid var(--gold-dim);padding-left:14px;margin:13px 0 2px;}
+.tipline b{color:var(--gold);}
+.warn{background:var(--no-bg);border:1px solid var(--no-line);border-radius:12px;padding:12px 15px;margin:13px 0 2px;font-size:13.3px;line-height:1.7;color:#7a3320;}
+.warn b{color:var(--no);}
+
+.tblwrap{overflow-x:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:var(--r-md);}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:440px;}
+.tbl th{background:rgba(212,144,42,0.12);color:var(--gold);font-weight:700;text-align:left;padding:10px 13px;border-bottom:2px solid var(--gold-dim);white-space:nowrap;}
+.tbl td{padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--text);line-height:1.6;}
+.tbl td:first-child{font-weight:700;color:#2a2620;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl.cmd td:first-child{font-family:var(--mono);color:var(--gold);font-weight:700;white-space:nowrap;font-size:12.5px;}
+
+.bul{margin:8px 0 2px;}
+.bul li{list-style:none;position:relative;padding-left:20px;font-size:14px;line-height:1.74;color:var(--text);margin-bottom:8px;}
+.bul li::before{content:"\2726";position:absolute;left:0;color:var(--gold);}
+.bul li b{color:var(--gold);}
+
+.steps{margin:12px 0 4px;counter-reset:s;}
+.steps .st{display:flex;gap:11px;margin-bottom:11px;font-size:14px;line-height:1.72;color:var(--text);}
+.steps .st::before{counter-increment:s;content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#1a1406;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.steps .st b{color:var(--gold);}
+
+.acc{display:flex;flex-direction:column;gap:10px;}
+details.ch{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;}
+details.ch[open]{border-color:var(--gold-dim);box-shadow:0 4px 18px rgba(120,90,30,0.07);}
+details.ch summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:13px;padding:16px 18px;user-select:none;}
+details.ch summary::-webkit-details-marker{display:none;}
+.ch-n{flex-shrink:0;min-width:34px;height:30px;padding:0 9px;border-radius:8px;background:rgba(212,144,42,0.14);border:1px solid var(--gold-dim);color:var(--gold);font-family:var(--mono);font-weight:500;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.ch-t{flex:1;font-weight:700;font-size:14.5px;color:var(--text);line-height:1.4;}
+.ch-t .en{font-weight:400;color:var(--dim);font-size:12.5px;}
+.ch-mk{flex-shrink:0;width:22px;height:22px;position:relative;}
+.ch-mk::before,.ch-mk::after{content:"";position:absolute;background:var(--gold);border-radius:2px;transition:transform .25s ease;}
+.ch-mk::before{top:10px;left:4px;width:14px;height:2px;}
+.ch-mk::after{top:4px;left:10px;width:2px;height:14px;}
+details.ch[open] .ch-mk::after{transform:rotate(90deg);opacity:0;}
+.ch-body{padding:6px 18px 18px;border-top:1px solid var(--line);}
+.ch-body p{font-size:14px;line-height:1.82;color:var(--text);margin:10px 0;}
+.ch-body p .hl{color:var(--gold);font-weight:500;}
+.blk-h{font-size:11.5px;font-weight:700;color:var(--gold);letter-spacing:0.06em;margin:16px 0 6px;}
+.pos{background:rgba(212,144,42,0.08);border:1px solid var(--gold-dim);border-radius:12px;padding:11px 14px;margin:10px 0 2px;font-size:13.6px;line-height:1.72;color:var(--text);}
+.pos b{color:var(--gold);}
+
+.cp{background:var(--code);border:1px solid var(--gold-dim);border-radius:var(--r-md);padding:16px 16px;margin:10px 0 2px;position:relative;}
+.cp .pl{font-family:var(--mono);font-size:10.5px;letter-spacing:0.08em;color:var(--gold-bright);margin-bottom:11px;max-width:calc(100% - 90px);}
+.cp pre{font-family:var(--mono);font-size:12px;line-height:1.85;color:var(--code-tx);white-space:pre-wrap;word-break:break-word;}
+.cp pre.art{white-space:pre;overflow-x:auto;font-size:11px;line-height:1.55;}
+.cp .cm{color:#8a94a6;}
+.cp .ph{color:var(--gold-bright);}
+.cp .sl{color:var(--gold-bright);font-weight:500;}
+.copy-btn{position:absolute;top:11px;right:11px;background:rgba(212,144,42,0.16);border:1px solid var(--gold);color:var(--gold-bright);font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:50px;cursor:pointer;transition:all .2s;letter-spacing:0.03em;z-index:2;}
+.copy-btn:hover{background:var(--gold);color:#1a1406;}
+.copy-btn.done{background:var(--gold);color:#1a1406;}
+.hero-cp{border:2px solid var(--gold);box-shadow:0 10px 34px rgba(120,90,30,0.16);}
+.hero-cp .copy-btn{font-size:12px;padding:7px 16px;background:var(--gold);color:#1a1406;}
+.hero-cp .copy-btn:hover{background:var(--gold-bright);}
+
+.faq{margin:6px 0;}
+.faq .q{font-family:var(--serif);font-weight:700;font-size:15.5px;color:#2a2620;margin:20px 0 8px;}
+.faq .q::before{content:"Q";color:var(--gold);font-family:"Inter";font-weight:800;margin-right:8px;}
+.faq .a{font-size:14px;color:var(--text);line-height:1.85;}
+
+.mid-cta{position:relative;z-index:1;margin:0 30px;padding:30px 0;}
+.mid-card{background:linear-gradient(160deg,#15110b 0%,#241a0e 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:28px 26px;text-align:center;position:relative;overflow:hidden;}
+.mid-card .mk{font-family:var(--mono);font-size:11px;letter-spacing:0.16em;color:var(--gold-bright);margin-bottom:12px;font-weight:500;}
+.mid-card h3{font-family:var(--serif);font-weight:900;font-size:21px;line-height:1.5;color:#fff;margin-bottom:10px;}
+.mid-card h3 .g{color:var(--gold-bright);}
+.mid-card p{font-size:13.5px;color:rgba(255,255,255,0.72);line-height:1.8;margin-bottom:20px;}
+.mid-card .skbtn{font-size:16px;padding:14px 38px;}
+
+.cta{position:relative;z-index:1;padding:46px 30px 54px;border-top:3px solid var(--gold-dim);}
+.cta-card{background:linear-gradient(160deg, var(--card) 0%, var(--card2) 100%);border:1px solid var(--gold-dim);border-radius:var(--r-lg);padding:32px 26px;}
+.cta-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.2em;color:var(--gold);margin-bottom:14px;font-weight:500;}
+.cta-card h2{font-family:var(--serif);font-weight:900;font-size:24px;line-height:1.45;margin-bottom:10px;color:#2a2620;}
+.cta-card h2 .g{color:var(--gold);}
+.cta-lead{font-size:14.5px;color:var(--dim);line-height:1.85;margin-bottom:22px;}
+.fit{margin:18px 0;}
+.fit .f{display:flex;gap:10px;font-size:14px;line-height:1.7;margin-bottom:10px;color:var(--text);}
+.fit .f::before{content:"\2714";color:var(--gold);font-weight:700;flex-shrink:0;}
+.gives{background:rgba(212,144,42,0.07);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 20px;margin:20px 0;}
+.gives .gt{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:0.05em;margin-bottom:12px;}
+.gives .gi{font-size:14px;line-height:1.75;margin-bottom:9px;padding-left:20px;position:relative;color:var(--text);}
+.gives .gi::before{content:"\2726";color:var(--gold);position:absolute;left:0;}
+.btn-wrap{text-align:center;margin-top:26px;}
+.skbtn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1406;border-radius:var(--pill);padding:17px 46px;font-weight:900;font-size:18px;box-shadow:0 8px 28px rgba(212,144,42,0.28);transition:transform var(--bounce),box-shadow var(--bounce);position:relative;overflow:hidden;cursor:pointer;text-decoration:none;}
+.skbtn:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(212,144,42,0.40);}
+.skbtn:active{transform:translateY(0);}
+.skbtn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45),transparent);transform:skewX(-25deg);animation:shine 3.4s ease-in-out infinite;}
+@keyframes shine{0%{left:-100%;}22%{left:160%;}100%{left:160%;}}
+.btn-note{margin-top:14px;font-size:12.5px;color:var(--dim);text-align:center;}
+
+.footer{position:relative;z-index:1;padding:24px 30px 46px;text-align:center;}
+.footer .fa{font-style:italic;font-size:14px;color:var(--gold);font-weight:700;}
+.footer .fc{font-size:11px;color:var(--faint);margin-top:8px;letter-spacing:0.05em;line-height:1.7;}
+
+@media(max-width:680px){
+  .top-cta{display:block;position:fixed;top:0;left:0;right:0;z-index:40;box-shadow:0 2px 12px rgba(0,0,0,0.12);}
+  body{padding-top:42px;}
+  .hero{padding-top:48px;}
+  .hero h1{font-size:28px;}
+  .sec h2{font-size:21px;}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.className+=' js';</script>
+<div class="glow"><div class="g1"></div><div class="g2"></div></div>
+
+<div class="top-cta">
+  <a href="https://www.skool.com/d11-lab/about" id="skool-top" target="_blank" rel="noopener">
+    <span>設定檔裝好之後 →</span><span class="tc-em">加入 奇點研究所 × D11</span>
+  </a>
+</div>
+
+<aside class="side-cta">
+  <div class="sk-k">NEXT STEP</div>
+  <h4>指令設好了<br><span class="g">工作流還沒接</span></h4>
+  <p>50 組縮寫幫你省下重打的時間。怎麼把 AI 接成一條會賺錢的產線，我在 Skool 帶你。</p>
+  <a href="https://www.skool.com/d11-lab/about" id="skool-side" target="_blank" rel="noopener">加入 奇點研究所 × D11</a>
+</aside>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="kicker">CLAUDE · 50 組指令完整整合包</div>
+    <h1>50 組<br><span class="g">Claude 隱藏指令</span></h1>
+    <div class="h-sub">一次設定，長期使用　打一個斜線就切換輸出格式與思考方式</div>
+    <div class="hero-sub">把這份文件的設定檔貼進 Claude，之後 <b>/brief</b> 就等於「三到五行、不要前言、不要總結」。一天要重打二十次的格式要求，壓縮成四個字元。這份文件給你完整設定檔、四種安裝方式、50 組指令對照表，以及移植到 ChatGPT 與 Gemini 的做法。</div>
+    <div class="divider"></div>
+    <div class="stats">
+      <div class="stat"><div class="n">50</div><div class="l">組 · 指令</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">5</div><div class="l">大 · 分類</div></div>
+      <div class="stat-op">·</div>
+      <div class="stat"><div class="n">4</div><div class="l">種 · 安裝方式</div></div>
+    </div>
+    <div class="author-card"><div class="a">傑森所長 @jasonxtsai</div><div class="b">專注在「AI ＋ 自媒體變現」。我把自己每天實際在用的 AI 工具、Prompt、工作流拆開來寫，讓一般人不用寫程式也能把 AI 接進自己的內容生產跟工作流程裡。所有內容都經過實測，不轉貼未經查證的資訊。</div></div>
+  </div>
+
+  <!-- Part 1 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 1 · 先搞懂這是什麼</span>
+    <h2>它們不是<br><span class="g">Claude 的內建功能</span></h2>
+    <p>先把這件事講清楚，因為網路上很多文章沒有寫。</p>
+    <p>Claude 的聊天介面（claude.ai、手機 App）<span class="hl">沒有官方的 slash command 系統</span>。你現在直接打 <b>/ghost 解釋量子糾纏</b>，Claude 不會知道 /ghost 代表「只給答案不解釋」。它會猜，猜對的機率不高，而且每次結果不一樣。</p>
+    <p>這 50 組指令的本質，是<span class="hl">你自己定義給 Claude 的縮寫系統</span>。你先把對照表交給它，它就會照著執行。</p>
+
+    <div class="sub-h">為什麼這樣做值得</div>
+    <p style="font-size:14px;">一般人下 Prompt 的痛點在於，同樣的格式要求每次都要重打一遍：</p>
+    <div class="cp"><div class="pl">你一天可能打二十次的那段話</div><pre>請用最多五行回答，不要前言，不要總結，直接給結論</pre></div>
+    <div class="insight"><div class="il">這套系統唯一的價值來源</div><div class="it">改成 /brief 之後，同樣的效果，四個字元。一次設定，把幾十種常用的輸出要求壓縮成一個字。</div></div>
+
+    <div class="sub-h">Claude Code 的使用者要注意</div>
+    <p style="font-size:14px;">Claude Code 是 Anthropic 的終端機工具，它<b>有</b>官方的 slash command 系統，而且清單完全不同。其中有兩個名稱會撞到。</p>
+    <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>Claude Code 官方用途</th><th>本文件定義</th></tr></thead><tbody>
+      <tr><td>/debug</td><td>開啟 session debug log，診斷執行環境問題</td><td>找出程式錯誤</td></tr>
+      <tr><td>/security-review</td><td>掃描 branch diff 的安全漏洞</td><td>本文件用的是 /security</td></tr>
+    </tbody></table></div>
+    <div class="warn">⚠️ 在 Claude Code 裡打 <b>/debug</b>，會執行官方那個，不是本文件定義的。官方完整清單在文末的資源連結。</div>
+  </div>
+
+  <!-- Part 2 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 2 · 四種安裝方式</span>
+    <h2>按照可靠度排序<br><span class="g">方式 A 最推薦</span></h2>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">A</span><span class="ch-t">Claude Project 自訂指令<span class="en"> · 最推薦</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>適合誰：</b>所有人。這是預設答案。設定一次，該 Project 底下所有對話永久生效。</div>
+        <div class="steps">
+          <div class="st">打開 claude.ai</div>
+          <div class="st">左側選單點「Projects」，建立一個新 Project，命名為「指令模式」或你習慣的名字</div>
+          <div class="st">進入 Project 後，找到「Project instructions」或「自訂指令」欄位</div>
+          <div class="st">複製 Part 3 的完整設定檔，整段貼進去</div>
+          <div class="st">儲存</div>
+          <div class="st">在這個 Project 裡開新對話，打下面這句測試</div>
+        </div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">標準測試題</div><pre>/brief 說明什麼是 RAG</pre></div>
+        <div class="tipline"><b>測試通過的標準：</b>Claude 直接給你三到五行的答案，沒有前言、沒有總結、沒有跟你解釋它套用了什麼模式。如果它回你「好的，我會用簡短模式回答」然後才開始講，代表設定檔沒吃到，回去確認有沒有存檔。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">B</span><span class="ch-t">自訂風格 Style<span class="en"> · 跨所有對話生效</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>適合誰：</b>不常用 Project、希望在任何對話都能用的人。</div>
+        <div class="steps">
+          <div class="st">在對話輸入框附近找到風格選單（通常在輸入框下方或右上角設定）</div>
+          <div class="st">選擇建立自訂風格</div>
+          <div class="st">把 Part 3 的設定檔貼進風格說明欄位</div>
+          <div class="st">命名並儲存</div>
+          <div class="st">之後在任何對話切換到這個風格即可使用</div>
+        </div>
+        <div class="warn"><b>取捨：</b>跨對話生效很方便，但風格欄位也是你放語氣偏好、寫作習慣的地方。把 50 組指令塞進去會佔掉相當篇幅，可能排擠掉你其他的風格設定。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">C</span><span class="ch-t">單次對話貼上<span class="en"> · 零安裝成本</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>適合誰：</b>只是想先試試看效果的人。試完覺得有用，再回頭做方式 A。</div>
+        <div class="steps">
+          <div class="st">開一個新對話</div>
+          <div class="st">第一則訊息直接貼上 Part 3 的設定檔</div>
+          <div class="st">Claude 回覆確認後，接下來整段對話都能用</div>
+        </div>
+        <div class="warn"><b>取捨：</b>關掉對話就失效，下次要重貼。而且對話拉長之後，前面的設定可能被稀釋，指令的準確度會下降。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">D</span><span class="ch-t">Claude Code<span class="en"> · 給工程師</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos"><b>適合誰：</b>本來就在用 Claude Code 的工程師。Claude Code 的自訂指令是<b>檔案</b>，不是 Prompt。</div>
+        <div class="blk-h">建立 skill 資料夾</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">建資料夾</div><pre>mkdir -p ~/.claude/skills/brief</pre></div>
+        <div class="blk-h">建立 SKILL.md</div>
+        <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">~/.claude/skills/brief/SKILL.md</div><pre>---
+name: brief
+description: 用最多三到五行回答，不加前言與總結
+---
+
+回答接下來的問題時，控制在三到五行以內。
+直接給結論，不要前言，不要結尾總結，不要解釋你正在使用什麼模式。</pre></div>
+        <div class="tipline">存檔後在 session 裡執行 <b>/reload-skills</b>，就能打 /brief 使用。要建幾個就建幾個資料夾。官方也支援放在 .claude/commands/ 底下的舊格式，不過 Anthropic 現在建議改用 skills。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- Part 3 設定檔 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 3 · 完整設定檔</span>
+    <h2>整段複製<br><span class="g">貼進你選的位置</span></h2>
+    <div class="cp hero-cp"><button class="copy-btn" onclick="copyCp(this)">複製整份設定檔</button><div class="pl">50 組指令 · 完整設定檔</div><pre># 指令縮寫系統
+
+當我的訊息開頭出現以下 / 開頭的縮寫時，依照對照表調整回答方式，並直接執行縮寫後面的任務內容。
+
+## 運作規則
+
+1. 縮寫只在訊息開頭生效。縮寫後面的文字是實際任務。
+2. 執行時不要說明你正在套用哪個模式，直接輸出結果。
+3. 最多可疊加兩組縮寫，例如 /analyst /brief。疊加時，輸出格式縮寫優先於思考模式縮寫。
+4. 訊息沒有出現縮寫時，照你原本的方式回答。
+5. 遇到不在表內的 / 開頭字串，當成一般文字處理，不要猜測。
+
+## 01 執行與輸出模式
+
+/ghost — 只輸出最終答案。不解釋、不鋪陳、不加註解、不寫結尾。
+/minimal — 用能夠回答的最短篇幅。單句優先。
+/brief — 控制在三到五行以內。
+/expand — 展開細節，補上背景、例外情況與延伸說明。
+/stepbystep — 拆成編號步驟，每步只做一件事。
+/checklist — 輸出可勾選的檢查清單，每項都是具體可執行的動作。
+/framework — 整理成有層級的結構化框架，標示各層之間的關係。
+/blueprint — 輸出實作計畫，包含執行順序、所需資源、預期產出。
+/playbook — 輸出可重複套用的標準流程，含觸發時機與判斷準則。
+/roadmap — 依時間軸排列步驟，標示各階段的里程碑與依賴關係。
+
+## 02 思考模式
+
+/analyst — 深入分析。拆解結構、指出關鍵變數、說明因果關係。
+/critic — 只挑問題。列出弱點、風險、邏輯漏洞。不寫任何正面評價。
+/optimizer — 針對我提供的內容提出具體改進版本，並說明改了什麼。
+/simplify — 假設對方是完全的新手，用日常語言解釋，避免專有名詞。
+/eli5 — 用小學生能理解的方式解釋，可以使用比喻。
+/deepdive — 深入到實作層級的細節，包含邊界條件與例外。
+/compare — 比較我提供的選項，用表格呈現差異維度。
+/proscons — 分別列出優點與缺點，各自至少三項。
+/firstprinciples — 拆解到最基本的原理與假設，重新推導。
+/contrarian — 站在反方立場挑戰這個想法，提出最強的反對論證。
+
+## 03 內容創作
+
+/linkedin — 產出 LinkedIn 貼文格式，專業語氣，段落短，開頭一句抓住注意力。
+/twitter — 產出短討論串格式，每則獨立成立，逐則推進。
+/script — 產出影片或 Reels 腳本，含開場鉤子、分段內容、收尾。
+/hook — 產出多組開頭句，每組使用不同的切入角度。
+/story — 用故事結構敘述，包含情境、轉折、結果。
+/carousel — 產出輪播內容，一張一個重點，標明張次。
+/headlines — 產出多組標題選項，涵蓋不同的訴求角度。
+/captions — 產出社群貼文說明文案，符合平台慣用長度。
+/viral — 用高互動導向的寫法，強化開頭抓力與留言誘因。
+/authority — 用專業權威的語氣，論述明確，引用具體依據。
+
+## 04 職涯與求職
+
+/resume — 針對我提供的履歷內容提出修改建議，強化成果與量化描述。
+/interview — 產出可能的面試問題與建議回答方向。
+/mockinterview — 進行模擬面試，一次問一題，等我回答後給回饋再問下一題。
+/hr — 針對 HR 關卡的問題，給出得體且有策略的回答方向。
+/portfolio — 提出作品集專案構想，含專案範圍與能展示的能力。
+/roadmapcareer — 產出職涯發展路線圖，含各階段目標與所需能力。
+/jobsearch — 給出找工作的策略建議，含管道選擇與時間分配。
+/referral — 撰寫請人內推的訊息，簡短、具體、降低對方負擔。
+/salary — 提供薪資談判的策略與話術，含不同情境的應對。
+/skills — 列出針對目標所需補強的技能，依優先順序排列。
+
+## 05 程式與技術
+
+/debug — 找出程式碼中的錯誤，指出位置與原因，並提供修正。
+/refactor — 重構程式碼，改善可讀性與結構，保持行為不變。
+/optimizecode — 改善效能，指出瓶頸並提供優化後的版本。
+/systemdesign — 設計系統架構，含元件切分、資料流、技術選型理由。
+/api — 設計 API 結構，含端點、方法、請求與回應格式。
+/database — 設計資料庫結構，含表格、欄位、關聯、索引建議。
+/scalability — 提出擴充性規劃，指出目前架構的擴展瓶頸。
+/security — 檢查安全性問題，列出風險與修補方式。
+/testcases — 產生測試案例，涵蓋正常路徑、邊界條件、錯誤情境。
+/pseudocode — 只輸出邏輯虛擬碼，不寫特定語言的實作。</pre></div>
+  </div>
+
+  <!-- Part 4 對照表 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 4 · 完整對照表</span>
+    <h2>50 組指令<br><span class="g">中文說明與使用時機</span></h2>
+
+    <div class="acc">
+
+      <details class="ch" open><summary><span class="ch-n">01</span><span class="ch-t">執行與輸出模式<span class="en"> · 10 組 · 控制「怎麼講」</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">控制 Claude「怎麼講」，跟內容本身無關。<b>這一類的使用頻率最高。</b></div>
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>作用</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/ghost</td><td>只給最終答案</td><td>你已經知道背景，只要結果。翻譯、改寫、算數字</td></tr>
+          <tr><td>/minimal</td><td>最短篇幅</td><td>查一個定義、確認一件事實</td></tr>
+          <tr><td>/brief</td><td>三到五行</td><td>日常八成的問題。這是最常用的一個</td></tr>
+          <tr><td>/expand</td><td>展開細節</td><td>你要拿這份內容去做決策，需要看到例外情況</td></tr>
+          <tr><td>/stepbystep</td><td>編號步驟</td><td>操作類任務，安裝、設定、流程</td></tr>
+          <tr><td>/checklist</td><td>可勾選清單</td><td>你要照著做並追蹤進度，例如上線前檢查</td></tr>
+          <tr><td>/framework</td><td>結構化框架</td><td>把散亂的想法整理成有層級的架構</td></tr>
+          <tr><td>/blueprint</td><td>實作計畫</td><td>從想法進到執行，需要知道先做什麼</td></tr>
+          <tr><td>/playbook</td><td>可重複流程</td><td>這件事你會做很多次，需要標準化</td></tr>
+          <tr><td>/roadmap</td><td>時間軸步驟</td><td>跨週或跨月的專案排程</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>實用差異：</b>/checklist 和 /stepbystep 常被搞混。<b>步驟有先後順序，清單沒有。</b>要按順序做用 /stepbystep，要確保沒漏掉用 /checklist。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">02</span><span class="ch-t">思考模式<span class="en"> · 10 組 · 控制「怎麼想」</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">控制 Claude「怎麼想」。<b>這一類會實質改變答案的內容，價值最高。</b></div>
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>作用</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/analyst</td><td>深入分析</td><td>面對複雜情況，要拆解結構找出關鍵變數</td></tr>
+          <tr><td>/critic</td><td>只挑問題</td><td>你的方案自己看太久了，需要外部視角找漏洞</td></tr>
+          <tr><td>/optimizer</td><td>優化你給的內容</td><td>手上有初稿，要拿到改進版本</td></tr>
+          <tr><td>/simplify</td><td>新手能懂</td><td>你要把這件事解釋給不同背景的人聽</td></tr>
+          <tr><td>/eli5</td><td>小孩能懂</td><td>你自己完全不懂這個領域，要先建立直覺</td></tr>
+          <tr><td>/deepdive</td><td>鑽到最細</td><td>要進到實作，需要知道邊界條件</td></tr>
+          <tr><td>/compare</td><td>比較選項</td><td>手上有幾個方案要選</td></tr>
+          <tr><td>/proscons</td><td>優缺點</td><td>單一方案要不要做的決策</td></tr>
+          <tr><td>/firstprinciples</td><td>拆回原理</td><td>現有做法卡住了，要重新推導</td></tr>
+          <tr><td>/contrarian</td><td>挑戰想法</td><td>你對某個決定太有信心，需要有人踩煞車</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>使用建議：</b>/critic 是這一類裡最被低估的一個。Claude 預設偏向鼓勵，你給它看方案它通常會先肯定。<b>/critic 把這層拿掉，直接進到問題。</b>內容創作者拿它檢查自己的貼文草稿，效果明顯。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">03</span><span class="ch-t">內容創作<span class="en"> · 10 組 · 自媒體用最多</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="pos">自媒體經營者會用最多的一類。</div>
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>作用</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/linkedin</td><td>LinkedIn 貼文</td><td>產出專業向的長文貼文</td></tr>
+          <tr><td>/twitter</td><td>短討論串</td><td>一個主題拆成連續多則</td></tr>
+          <tr><td>/script</td><td>影片腳本</td><td>Reels、Shorts、YouTube 的口播稿</td></tr>
+          <tr><td>/hook</td><td>開頭句</td><td>內容有了，卡在第一句</td></tr>
+          <tr><td>/story</td><td>故事化</td><td>把觀點包進敘事裡，提升停留時間</td></tr>
+          <tr><td>/carousel</td><td>輪播內容</td><td>IG 輪播的分張規劃</td></tr>
+          <tr><td>/headlines</td><td>多組標題</td><td>一次拿到十個標題選項來挑</td></tr>
+          <tr><td>/captions</td><td>貼文說明</td><td>圖做完了，要配文案</td></tr>
+          <tr><td>/viral</td><td>高互動寫法</td><td>這篇你希望衝觸及</td></tr>
+          <tr><td>/authority</td><td>專業語氣</td><td>這篇你希望建立專業感</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>組合技：</b>/hook 跟 /headlines 分開用。<b>/headlines 給你標題，/hook 給你貼文的第一句話。</b>兩者的功能不同，一篇貼文通常兩個都需要。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">04</span><span class="ch-t">職涯與求職<span class="en"> · 10 組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>作用</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/resume</td><td>優化履歷</td><td>貼上你的履歷段落，拿到改寫建議</td></tr>
+          <tr><td>/interview</td><td>面試問答</td><td>準備某個職位的常見問題</td></tr>
+          <tr><td>/mockinterview</td><td>模擬面試</td><td>一問一答的實戰演練</td></tr>
+          <tr><td>/hr</td><td>HR 關卡</td><td>針對離職原因、期望薪資這類問題</td></tr>
+          <tr><td>/portfolio</td><td>作品集發想</td><td>需要專案來證明某項能力</td></tr>
+          <tr><td>/roadmapcareer</td><td>職涯路線圖</td><td>三年後想到某個位置，倒推現在要做什麼</td></tr>
+          <tr><td>/jobsearch</td><td>求職策略</td><td>投了很多沒回音，需要調整方法</td></tr>
+          <tr><td>/referral</td><td>內推訊息</td><td>要請人幫忙內推，訊息要好開口</td></tr>
+          <tr><td>/salary</td><td>薪資談判</td><td>拿到 offer 要談</td></tr>
+          <tr><td>/skills</td><td>技能清單</td><td>確認目標後，要知道補什麼</td></tr>
+        </tbody></table></div>
+        <div class="tipline"><b>注意：</b>/mockinterview 設計成多輪互動，它會問一題等你回答，給完回饋才問下一題。單次問答用 /interview 就好。</div>
+      </div></details>
+
+      <details class="ch"><summary><span class="ch-n">05</span><span class="ch-t">程式與技術<span class="en"> · 10 組</span></span><span class="ch-mk"></span></summary>
+      <div class="ch-body">
+        <div class="tblwrap"><table class="tbl cmd"><thead><tr><th>指令</th><th>作用</th><th>什麼時候用</th></tr></thead><tbody>
+          <tr><td>/debug</td><td>找出錯誤</td><td>程式跑不動，貼上錯誤訊息與程式碼</td></tr>
+          <tr><td>/refactor</td><td>重構</td><td>程式能跑但很亂</td></tr>
+          <tr><td>/optimizecode</td><td>改善效能</td><td>能跑但太慢</td></tr>
+          <tr><td>/systemdesign</td><td>架構設計</td><td>專案開始前的技術規劃</td></tr>
+          <tr><td>/api</td><td>API 結構</td><td>設計端點與資料格式</td></tr>
+          <tr><td>/database</td><td>資料庫設計</td><td>規劃表格與關聯</td></tr>
+          <tr><td>/scalability</td><td>擴充性規劃</td><td>使用量成長，現有架構撐不住</td></tr>
+          <tr><td>/security</td><td>安全檢查</td><td>上線前的漏洞掃描</td></tr>
+          <tr><td>/testcases</td><td>產生測試</td><td>補測試覆蓋率</td></tr>
+          <tr><td>/pseudocode</td><td>虛擬碼</td><td>只要邏輯，語言之後再說</td></tr>
+        </tbody></table></div>
+        <div class="warn">⚠️ <b>再次提醒：</b>在 Claude Code 終端機裡，/debug 是官方內建指令，用途是開啟 session debug log，跟這裡定義的不一樣。Claude Code 的安全掃描要用官方的 <b>/security-review</b>。</div>
+      </div></details>
+
+    </div>
+  </div>
+
+  <!-- 中段 CTA -->
+  <div class="mid-cta fade">
+    <div class="mid-card">
+      <div class="mk">50 組都在上面了</div>
+      <h3>指令是零件<br><span class="g">工作流才是機器</span></h3>
+      <p>縮寫幫你省下重打的時間。要把 AI 接成一條「內容 → 流量 → 收入」的產線，我在 Skool 帶你做、每週更新。</p>
+      <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-mid" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+    </div>
+  </div>
+
+  <!-- Part 5 進階 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 5 · 進階用法</span>
+    <h2>疊加使用<br><span class="g">實務上最有價值的用法</span></h2>
+    <p>設定檔允許最多兩組疊加。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">只挑問題，而且控制在五行內</div><pre>/critic /brief 幫我看這段貼文草稿</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">深入分析原因，輸出成可執行的檢查清單</div><pre>/analyst /checklist 我的 IG 觸及在下降</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">站在反方挑戰這個決定，而且展開講細節</div><pre>/contrarian /expand 我打算把所有內容改成短影音</pre></div>
+    <div class="warn"><b>疊加的原則：</b>一組來自「思考模式」，一組來自「執行與輸出模式」。<b>同類疊加會互相打架</b>，例如 /brief /expand 是矛盾的。</div>
+
+    <div class="sub-h">加上你自己的變體</div>
+    <p style="font-size:14px;">設定檔可以自己擴充。在對應分類底下加一行就好，格式照抄現有的寫法。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">五個值得加的變體</div><pre>/zh — 用繁體中文回答，台灣用語，不使用簡體字。
+/table — 把答案整理成表格。
+/why — 針對我提供的結論，反推它成立需要哪些前提。
+/redteam — 假設你要破壞這個方案，你會從哪裡下手。
+/tone — 分析我提供文字的語氣特徵，並列出可調整的方向。</pre></div>
+    <div class="tipline">自媒體經營者特別推薦加 <b>/zh</b>。Claude 偶爾會混入中國用語（視頻、質量、優化路徑之類的），一個縮寫就能修正。</div>
+
+    <div class="sub-h">常見失敗與排除</div>
+    <div class="faq"><div class="q">指令沒反應，Claude 照原樣回答</div><div class="a">設定檔沒生效。依序檢查：Project instructions 有沒有存檔、你是不是在那個 Project 底下開的對話、有沒有貼完整（設定檔會被輸入框長度截斷的話，改用方式 A）。</div></div>
+    <div class="faq"><div class="q">Claude 會先說「好的，我使用簡短模式」才開始回答</div><div class="a">設定檔的規則 2 沒被遵守。在對話裡直接說一次「不要說明你套用了什麼模式」，通常一次就會修正。如果反覆發生，<b>把規則 2 從清單裡拉出來，獨立放在設定檔最前面</b>。</div></div>
+    <div class="faq"><div class="q">對話很長之後，指令準確度下降</div><div class="a">長對話會稀釋前面的指令，這是所有 LLM 的共同現象。解法是開新對話，或者在對話中途重貼一次規則區塊。<b>用方式 A 的 Project instructions 比較不會有這個問題，因為它每輪都會重新載入。</b></div></div>
+    <div class="faq"><div class="q">兩組疊加時只吃到一組</div><div class="a">檢查是不是同類疊加。/brief /minimal 兩個都是輸出模式，Claude 會挑一個。改成一組思考、一組輸出。</div></div>
+  </div>
+
+  <!-- Part 6 移植 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 6 · 移植到其他 AI</span>
+    <h2>原理是<br><span class="g">先定義，再使用</span></h2>
+    <p>所以任何支援自訂指令的 AI 都能套用。</p>
+
+    <div class="sub-h">ChatGPT</div>
+    <p style="font-size:14px;">兩個位置可以放。<b>Custom Instructions</b>：設定選單裡找到「Personalization」或「自訂指令」，把 Part 3 的設定檔貼進「你希望 ChatGPT 如何回應」的欄位，全域生效。<b>Projects</b>：ChatGPT 也有 Projects 功能，做法跟 Claude 的方式 A 一樣。</p>
+    <div class="tipline"><b>需要調整的地方：</b>把設定檔開頭的「當我的訊息開頭出現」改成「當使用者的訊息開頭出現」。ChatGPT 對第三人稱的指令描述遵守度略高一些。</div>
+
+    <div class="sub-h">Gemini</div>
+    <p style="font-size:14px;">Gemini 的對應功能是 <span class="hl">Gems</span>（自訂 AI 助理）。建立一個新的 Gem，把 Part 3 的設定檔貼進 Instructions 欄位，命名後儲存。之後從 Gem 清單進入對話就能使用。</p>
+    <p style="font-size:14px;"><b>需要調整的地方：</b>Gemini 對「不要解釋你在做什麼」這類的抑制指令遵守度較低，容易加前言。建議把規則 2 改寫得更強硬：</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">Gemini 專用的規則 2</div><pre>2. 絕對不要說明你正在套用哪個模式。不要寫「好的」「當然」「我將使用」這類開場。第一個字就是答案本身。</pre></div>
+
+    <div class="sub-h">通用移植原則</div>
+    <div class="steps">
+      <div class="st"><b>設定要放在系統層級</b>，不要放在一般對話裡。系統層級的指令權重高很多</div>
+      <div class="st"><b>規則區塊放最前面</b>，指令清單放後面。模型對開頭的內容遵守度最高</div>
+      <div class="st"><b>每次移植後都要測試。</b>用「/brief 說明什麼是 RAG」當標準測試題，看回應長度就知道有沒有生效</div>
+    </div>
+  </div>
+
+  <!-- Part 7 實戰 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 7 · 三個實戰範例</span>
+    <h2>指令怎麼串<br><span class="g">才會變成產出</span></h2>
+
+    <div class="sub-h">範例一 · 貼文草稿健檢</div>
+    <p style="font-size:14px;"><b>情境：</b>你寫好一篇 IG 貼文，發之前想確認有沒有問題。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">健檢</div><pre>/critic /brief
+<span class="ph">（貼上你的貼文草稿）</span></pre></div>
+    <div class="tipline"><b>得到什麼：</b>五行以內、只有問題、沒有客套話。通常會直接指出鉤子太弱、中段資訊密度不足、CTA 動作不明確這類具體問題。</div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">接下來：拿改寫版本</div><pre>/optimizer 針對你剛剛指出的鉤子問題，給我三個改寫版本</pre></div>
+
+    <div class="sub-h">範例二 · 把一個主題變成一週的內容</div>
+    <p style="font-size:14px;"><b>情境：</b>你想做「AI 自動化」這個主題，但不知道怎麼拆。四個指令，從主題到完整貼文。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">① 拆主題</div><pre>/framework AI 自動化這個主題，對自媒體經營者來說可以拆成哪些子題</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">② 挑一個子題規劃輪播</div><pre>/carousel 用「用 AI 自動排程貼文」這個子題，規劃一則八張的 IG 輪播</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">③ 配標題</div><pre>/headlines 針對這則輪播，給我十組標題選項</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">④ 配文案</div><pre>/captions 針對這則輪播，寫一段 IG 貼文說明文案</pre></div>
+
+    <div class="sub-h">範例三 · 技術決策的雙面驗證</div>
+    <p style="font-size:14px;"><b>情境：</b>你打算把網站從 WordPress 搬到某個新平台，但不確定。</p>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">先問正面</div><pre>/analyst /proscons 從 WordPress 搬到 Framer 的優缺點</pre></div>
+    <div class="cp"><button class="copy-btn" onclick="copyCp(this)">複製</button><div class="pl">再讓它反過來打自己</div><pre>/contrarian 我已經決定要搬了，說服我不要搬</pre></div>
+    <div class="insight"><div class="il">這個組合的價值</div><div class="it">AI 預設會配合你的方向。你說想搬，它就幫你找搬的理由。/contrarian 強制它站到對立面，補上你自己看不到的那一半。</div></div>
+  </div>
+
+  <!-- Part 8 資源 -->
+  <div class="sec fade">
+    <span class="sec-tag">Part 8 · 官方資源</span>
+    <h2>查證用<br><span class="g">都是第一手來源</span></h2>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>資源</th><th>網址</th></tr></thead><tbody>
+      <tr><td>Claude 主站</td><td><a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a></td></tr>
+      <tr><td>Claude Code 官方指令清單</td><td><a href="https://code.claude.com/docs/en/commands" target="_blank" rel="noopener">code.claude.com/docs/en/commands</a></td></tr>
+      <tr><td>Claude Code 總覽</td><td><a href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">docs.claude.com/en/docs/claude-code/overview</a></td></tr>
+      <tr><td>Anthropic Prompt 工程指南</td><td><a href="https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener">prompt-engineering/overview</a></td></tr>
+      <tr><td>Anthropic 官方支援中心</td><td><a href="https://support.claude.com" target="_blank" rel="noopener">support.claude.com</a></td></tr>
+      <tr><td>ChatGPT</td><td><a href="https://chatgpt.com" target="_blank" rel="noopener">chatgpt.com</a></td></tr>
+      <tr><td>Gemini</td><td><a href="https://gemini.google.com" target="_blank" rel="noopener">gemini.google.com</a></td></tr>
+    </tbody></table></div>
+    <div class="tipline"><b>關於 Claude Code 那份清單：</b>Anthropic 持續在更新，官方文件會變動。要看你目前版本實際有哪些指令，在 Claude Code 裡打 <b>/help</b> 最準確。</div>
+  </div>
+
+  <!-- 最後 -->
+  <div class="sec fade">
+    <span class="sec-tag">最後</span>
+    <h2>價值不在數量<br><span class="g">在你選出的那五組</span></h2>
+    <p>這 50 組指令的價值不在數量，在於你選出自己每天真的會用到的那五到十組。</p>
+    <p>我自己固定在用的是 <span class="hl">/brief</span>、<span class="hl">/critic</span>、<span class="hl">/optimizer</span>、<span class="hl">/checklist</span>、<span class="hl">/contrarian</span> 這五個。其他的偶爾用得上，但這五個幾乎每天都會打。</p>
+    <div class="insight"><div class="il">怎麼開始</div><div class="it">先照 Part 2 的方式 A 裝好，用一週，看看哪幾組是你真的會回頭找的。剩下的留著，需要的時候再翻這份文件。</div></div>
+  </div>
+
+  <!-- 後段 CTA -->
+  <div class="cta fade">
+    <div class="cta-card">
+      <div class="cta-kicker">下一步</div>
+      <h2>指令設好了，<span class="g">接下來換我陪你把 AI 接成生意</span></h2>
+      <div class="cta-lead">50 組縮寫讓你每天少打幾千個字。但要把 AI 接成一整條「內容 → 流量 → 收入」的產線，那不該你一個人慢慢摸。</div>
+      <div class="fit">
+        <div class="f">想用 AI ＋ 自媒體建立個人品牌、創造收入的人</div>
+        <div class="f">Prompt 會寫、卻不知道怎麼串成系統的你</div>
+        <div class="f">收藏了一堆指令包，卻從來沒真的設定過一次的人</div>
+      </div>
+      <div class="gives">
+        <div class="gt">進來你會拿到</div>
+        <div class="gi">AI ＋ 自媒體的完整變現工作流</div>
+        <div class="gi">實測過、真的能用的工具教學與自動化流程，每週更新</div>
+        <div class="gi">一群跟你一樣、正在用 AI 翻身的人</div>
+      </div>
+      <div class="btn-wrap">
+        <a class="skbtn" href="https://www.skool.com/d11-lab/about" id="skool-link" target="_blank" rel="noopener">加入 奇點研究所 × D11 →</a>
+        <div class="btn-note">裝完之後，回貼文底下留言告訴我你固定在用哪五組</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="fa">傑森所長 @jasonxtsai</div>
+    <div class="fc">AI ＋ 自媒體變現——把 AI 工具拆成可以重複執行的工作流<br>Instagram：@jasonxtsai　／　Threads：@jasonxtsai<br>※ 本文件可自由分享。內容依撰寫當下的官方文件與實測結果整理，AI 工具的功能與介面會隨版本更新，實際操作請以各平台當前介面為準</div>
+  </div>
+
+</div>
+
+<script>
+function copyCp(btn){
+  var pre = btn.parentElement.querySelector('pre');
+  var text = pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var old = btn.textContent;
+    btn.textContent = '已複製 ✓'; btn.classList.add('done');
+    setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1800);
+  }).catch(function(){ btn.textContent = '請手動選取'; });
+}
+function revealOnScroll(){
+  var vh = window.innerHeight || document.documentElement.clientHeight;
+  var els = document.querySelectorAll('.fade:not(.vis)');
+  for(var i=0;i<els.length;i++){
+    if(els[i].getBoundingClientRect().top < vh*0.94){ els[i].classList.add('vis'); }
+  }
+}
+window.addEventListener('scroll', revealOnScroll, {passive:true});
+window.addEventListener('resize', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+revealOnScroll();
+setTimeout(function(){
+  var all = document.querySelectorAll('.fade');
+  for(var i=0;i<all.length;i++){ all[i].classList.add('vis'); }
+}, 2500);
+</script>
+
+<!--
+═══════════════════════════════════════════
+落地頁設定備註（不顯示，給操盤手）
+═══════════════════════════════════════════
+· 用途：50 組 Claude 隱藏指令——輪播 DM 承接頁／lead magnet（貼文講縮寫系統，落地頁給完整設定檔與對照表）
+· 內容：Part1 這不是內建功能＋Claude Code 撞名表／Part2 四種安裝方式摺疊卡（A Project 推薦／B Style／C 單次／D Claude Code skill）／Part3 完整設定檔 hero-cp／Part4 五類對照表摺疊卡（各 10 組，.tbl.cmd 指令欄金色等寬）／中段CTA／Part5 疊加＋自訂變體＋4 題排除／Part6 移植 ChatGPT 與 Gemini／Part7 三個實戰範例（共 8 個可複製指令）／Part8 官方資源表／最後
+· 版型決策：安裝方式與對照表都用摺疊卡，但兩組卡的編號用不同語意（A-D vs 01-05）；新增 .tbl.cmd 讓表格第一欄的指令變金色等寬字，掃描時好認；Claude Code 撞名警告在 Part1 與 Part4-05 各出現一次（原稿也重複提醒，這是重要防呆不刪）
+· 可複製區塊：19 個 .cp，hero-cp 1 個（Part3 完整設定檔，全頁最重要的轉換點）
+· 三段 Skool CTA：前段 .side-cta（skool-side）／.top-cta（skool-top）、中段 .mid-cta（skool-mid）、後段 .cta（skool-link）→ https://www.skool.com/d11-lab/about（無 ref）
+· 視覺：Jason 落地頁系統（米色 #F4F1EA + 金橘 #D4902A），無頂部細色條
+· 來源：傑森所長自有「claude-50-codes」文件
+· 命名：日期前綴（2026-08-06-claude-50-commands.html）
+· 狀態：本機已就位，尚未 commit/push
+═══════════════════════════════════════════
+-->
+</body>
+</html>
